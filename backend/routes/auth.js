@@ -46,20 +46,30 @@ function generateVerificationCode() {
 }
 
 function buildTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
-  if (!host || !user || !pass) {
+  if (!user || !pass) {
     return null;
   }
 
+  // Gmail SMTP works most reliably with service: 'gmail' on cloud platforms (Render, etc.)
+  if (host.includes('gmail') || String(user).includes('gmail.com')) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false }
+    });
+  }
+
+  const port = Number(process.env.SMTP_PORT || 587);
   return nodemailer.createTransport({
     host,
     port,
-    secure: Number(port) === 465,
+    secure: port === 465,
     auth: { user, pass },
+    tls: { rejectUnauthorized: false }
   });
 }
 
@@ -68,18 +78,66 @@ async function sendVerificationEmail(email, code) {
   const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'oldbreades@gmail.com';
 
   if (!transporter) {
+    console.warn('SMTP transporter not configured.');
     return false;
   }
 
-  await transporter.sendMail({
-    from: fromAddress,
-    to: email,
-    subject: 'Verify your Allié account email',
-    text: `Your Allié verification code is: ${code}. It expires in 15 minutes.`,
-    html: `<p>Your Allié verification code is: <strong>${code}</strong></p><p>It expires in 15 minutes.</p>`,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Allié" <${fromAddress}>`,
+      to: email,
+      subject: 'Verify your Allié account email',
+      text: `Your Allié verification code is: ${code}. It expires in 15 minutes.`,
+      html: `
+        <div style="font-family: sans-serif; padding: 24px; border: 2px solid #252b3a; border-radius: 14px; background: #fffdf5; max-width: 500px; color: #252b3a;">
+          <h2 style="color: #6434df; margin-top: 0;">Welcome to Allié</h2>
+          <p>Please use the following verification code to activate your account:</p>
+          <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 24px; background: #f1ebff; border: 2px solid #252b3a; border-radius: 10px; display: inline-block; color: #252b3a; margin: 12px 0;">
+            ${code}
+          </div>
+          <p style="color: #64748b; font-size: 13px;">This code will expire in 15 minutes.</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Failed to send verification email:', err.message);
+    return false;
+  }
+}
 
-  return true;
+async function sendPasswordResetEmail(email, code) {
+  const transporter = buildTransporter();
+  const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'oldbreades@gmail.com';
+
+  if (!transporter) {
+    console.warn('SMTP transporter not configured.');
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"Allié" <${fromAddress}>`,
+      to: email,
+      subject: 'Reset your Allié account password',
+      text: `Your Allié password reset code is: ${code}. It expires in 15 minutes.`,
+      html: `
+        <div style="font-family: sans-serif; padding: 24px; border: 2px solid #252b3a; border-radius: 14px; background: #fffdf5; max-width: 500px; color: #252b3a;">
+          <h2 style="color: #6434df; margin-top: 0;">Password Reset Request</h2>
+          <p>You requested to reset your password for your Allié account.</p>
+          <p>Your 6-digit verification code is:</p>
+          <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 24px; background: #f1ebff; border: 2px solid #252b3a; border-radius: 10px; display: inline-block; color: #252b3a; margin: 12px 0;">
+            ${code}
+          </div>
+          <p style="color: #64748b; font-size: 13px;">This code expires in 15 minutes. If you did not request this change, you can safely ignore this email.</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (err) {
+    console.error('Failed to send password reset email:', err.message);
+    return false;
+  }
 }
 
 async function issueVerificationCode(business) {
@@ -273,6 +331,80 @@ router.post('/verify-email', validate(verifyCodeSchema), async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Unable to verify email.' });
+  }
+});
+
+// POST /api/auth/forgot-password — Send 6-digit password reset code to user email
+router.post('/forgot-password', validate(z.object({ email: z.string().email('Invalid email address') })), async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+
+    const email = normalizeEmail(req.body.email);
+    const business = await Business.findOne({ email });
+
+    if (!business) {
+      return res.status(404).json({ error: 'No account found with this email address.' });
+    }
+
+    const code = generateVerificationCode();
+    business.resetPasswordCode = code;
+    business.resetPasswordExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    await business.save();
+
+    const delivered = await sendPasswordResetEmail(business.email, code);
+
+    return res.status(200).json({
+      success: true,
+      delivered,
+      email: business.email,
+      message: delivered
+        ? `A 6-digit password reset code has been sent to ${business.email}. Please check your inbox.`
+        : 'A 6-digit password reset code has been generated.',
+      devCode: process.env.NODE_ENV !== 'production' ? code : undefined
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({ error: err.message || 'Unable to process password reset request.' });
+  }
+});
+
+// POST /api/auth/reset-password — Verify code and set new password
+router.post('/reset-password', validate(z.object({
+  email: z.string().email('Invalid email address'),
+  code: z.string().min(4, 'Verification code is required'),
+  newPassword: z.string().min(6, 'Password must be at least 6 characters')
+})), async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+
+    const { email, code, newPassword } = req.body;
+    const normalizedEmail = normalizeEmail(email);
+    const business = await Business.findOne({ email: normalizedEmail });
+
+    if (!business || !business.resetPasswordCode || !business.resetPasswordExpiresAt) {
+      return res.status(400).json({ error: 'No active password reset request was found for this email.' });
+    }
+
+    if (new Date() > new Date(business.resetPasswordExpiresAt)) {
+      return res.status(410).json({ error: 'Reset code has expired. Please request a new code.' });
+    }
+
+    if (String(business.resetPasswordCode).trim() !== String(code).trim()) {
+      return res.status(400).json({ error: 'Invalid verification code. Please check your email.' });
+    }
+
+    business.passwordHash = await bcrypt.hash(newPassword, 10);
+    business.resetPasswordCode = '';
+    business.resetPasswordExpiresAt = null;
+    await business.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully! You can now sign in with your new password.'
+    });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    return res.status(500).json({ error: err.message || 'Unable to reset password.' });
   }
 });
 

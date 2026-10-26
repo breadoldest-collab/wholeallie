@@ -26,8 +26,11 @@ const sampleTestimonials = [
 
 export default function Login({ initialMode = 'login' }) {
   const [error, setError] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(initialMode);
+  const [resetStep, setResetStep] = useState(1);
+  const [resetEmail, setResetEmail] = useState('');
   const [verificationState, setVerificationState] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,6 +44,7 @@ export default function Login({ initialMode = 'login' }) {
   const handleAuth = async (e) => {
     e.preventDefault();
     setError('');
+    setStatusMessage('');
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -112,6 +116,7 @@ export default function Login({ initialMode = 'login' }) {
   const handleVerifyEmail = async (code) => {
     if (!verificationState?.email) return;
     setError('');
+    setStatusMessage('');
     setLoading(true);
 
     try {
@@ -136,6 +141,7 @@ export default function Login({ initialMode = 'login' }) {
   const handleResendCode = async () => {
     if (!verificationState?.email) return;
     setError('');
+    setStatusMessage('');
     setLoading(true);
 
     try {
@@ -155,41 +161,112 @@ export default function Login({ initialMode = 'login' }) {
     }
   };
 
-  const title = mode === 'register'
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setStatusMessage('');
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      if (resetStep === 1) {
+        const email = String(formData.get('email') || '').trim();
+        if (!email) throw new Error('Please enter your email address');
+
+        const res = await API.post('/api/auth/forgot-password', { email });
+        setResetEmail(email);
+        setResetStep(2);
+        setStatusMessage(res.data.message || `A 6-digit password reset code has been sent to ${email}. Please check your inbox.`);
+        return;
+      }
+
+      // Step 2: verify code and set new password
+      const code = String(formData.get('code') || '').trim();
+      const newPassword = String(formData.get('newPassword') || '');
+
+      if (!code) throw new Error('Please enter the 6-digit verification code sent to your email');
+      if (!newPassword || newPassword.length < 6) throw new Error('Password must be at least 6 characters');
+
+      const res = await API.post('/api/auth/reset-password', {
+        email: resetEmail,
+        code,
+        newPassword,
+      });
+
+      setStatusMessage(res.data.message || 'Password reset successfully! Please sign in with your new password.');
+      setMode('login');
+      setResetStep(1);
+      setResetEmail('');
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Unable to complete password reset.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const title = mode === 'reset'
+    ? (
+        <span className="block font-black uppercase leading-[0.78] tracking-[-0.04em] text-[#252b3a]">
+          <span className="block">Reset your</span>
+          <span className="block text-[#6434df]">Password</span>
+        </span>
+      )
+    : mode === 'register'
     ? (
         <span className="block font-black uppercase leading-[0.78] tracking-[-0.04em] text-[#252b3a]">
           <span className="block">Create your</span>
-            <span className="block text-[#6434df]">Allié</span>
+          <span className="block text-[#6434df]">Allié</span>
           <span className="block">Account</span>
         </span>
       )
     : (
         <span className="block font-black uppercase leading-[0.78] tracking-[-0.04em] text-[#252b3a]">
           <span className="block">Sign in to</span>
-            <span className="block text-[#6434df]">Allié</span>
+          <span className="block text-[#6434df]">Allié</span>
         </span>
       );
+
+  const description = mode === 'reset'
+    ? (resetStep === 1
+        ? 'Enter your account email to receive a secure 6-digit verification code in your inbox.'
+        : `We sent a 6-digit code to ${resetEmail}. Enter the code and your new password below.`)
+    : verificationState?.required
+    ? `We sent a 6-digit code to ${verificationState.email}. Enter it to confirm this address before you continue.`
+    : mode === 'register'
+    ? 'Set up your business profile and start managing AI support in minutes.'
+    : 'Access your AI support dashboard and manage real-time customer chats';
 
   return (
     <SignInPage
       mode={mode}
       title={verificationState?.required ? 'Verify your email' : title}
-      description={verificationState?.required
-        ? `We sent a 6-digit code to ${verificationState.email}. Enter it to confirm this address before you continue.`
-        : mode === 'register'
-          ? 'Set up your business profile and start managing AI support in minutes.'
-          : 'Access your AI support dashboard and manage real-time customer chats'}
+      description={description}
       heroImageSrc="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&q=80"
       testimonials={sampleTestimonials}
       onSubmit={handleAuth}
-      onGoogleSignIn={() => alert('Google Sign-In integration ready')}
+      onGoogleSignIn={() => {
+        setStatusMessage('');
+        setError('Google Sign-In is in private preview mode. Please sign in with your email and password.');
+      }}
       onModeChange={(nextMode) => {
         setVerificationState(null);
+        setError('');
+        setStatusMessage('');
+        setResetStep(1);
         setMode(nextMode);
       }}
-      onResetPassword={() => alert('Password reset link sent to your email')}
+      onResetPassword={() => {
+        setError('');
+        setStatusMessage('');
+        setResetStep(1);
+        setMode('reset');
+      }}
       errorMessage={error}
+      statusMessage={statusMessage}
       isLoading={loading}
+      resetStep={resetStep}
+      onResetPasswordSubmit={handleResetPasswordSubmit}
       verificationState={verificationState}
       onVerifyEmail={handleVerifyEmail}
       onResendCode={handleResendCode}

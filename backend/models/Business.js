@@ -12,6 +12,8 @@ const BusinessSchema = new mongoose.Schema({
   emailVerified: { type: Boolean, default: false },
   verificationCode: { type: String, default: '' },
   verificationCodeExpiresAt: { type: Date, default: null },
+  resetPasswordCode: { type: String, default: '' },
+  resetPasswordExpiresAt: { type: Date, default: null },
   description: { type: String, default: "" },
   logoUrl: { type: String, default: "" },
   botAvatarUrl: { type: String, default: "" },

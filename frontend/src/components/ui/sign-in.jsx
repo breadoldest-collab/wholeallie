@@ -41,8 +41,11 @@ export const SignInPage = ({
   onResetPassword,
   onModeChange,
   errorMessage,
+  statusMessage,
   isLoading = false,
   mode = 'login',
+  resetStep = 1,
+  onResetPasswordSubmit,
   verificationState = null,
   onVerifyEmail,
   onResendCode,
@@ -76,6 +79,12 @@ export const SignInPage = ({
             <p className="mt-5 max-w-[500px] text-[15px] leading-[1.7] text-[#253044]/75 md:text-[17px]">
               {description}
             </p>
+
+            {statusMessage && (
+              <div className="mt-6 rounded-[18px] border-[3px] border-[#252b3a] bg-[#e9fff5] px-4 py-3 text-sm font-semibold text-[#0f7a57] shadow-[4px_4px_0_0_#252b3a]">
+                {statusMessage}
+              </div>
+            )}
 
             {errorMessage && (
               <div className="mt-6 rounded-[18px] border-[3px] border-[#252b3a] bg-[#fff0f7] px-4 py-3 text-sm font-medium text-[#253044] shadow-[4px_4px_0_0_#252b3a]">
@@ -123,127 +132,205 @@ export const SignInPage = ({
               </div>
             )}
 
-            <form className="mt-8 space-y-7" onSubmit={onSubmit}>
-              {isRegister && (
+            {mode === 'reset' ? (
+              <form className="mt-8 space-y-7" onSubmit={onResetPasswordSubmit}>
                 <div>
-                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Business name</label>
-                  <InputShell>
-                    <input
-                      name="businessName"
-                      type="text"
-                      required
-                      placeholder="Enter your business name"
-                      className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
-                    />
-                  </InputShell>
-                </div>
-              )}
-
-              <div>
-                <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Email address</label>
-                <InputShell>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    value={emailValue}
-                    onChange={(event) => setEmailValue(event.target.value)}
-                    placeholder="Enter your email address"
-                    className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
-                  />
-                </InputShell>
-                {emailMeta.isPublicProvider && (
-                  <p className="mt-2 text-[12px] leading-5 text-[#253044]/70">
-                    <span className="font-semibold text-[#6434df]">Note:</span> {emailMeta.note}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Password</label>
-                <InputShell>
-                  <div className="relative">
-                    <input
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder={isRegister ? 'Create a password' : 'Enter your password'}
-                      className="w-full bg-transparent px-4 py-3.5 pr-12 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((value) => !value)}
-                      className="absolute inset-y-0 right-3 flex items-center text-[#253044]/60 transition-colors hover:text-[#253044]"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </InputShell>
-              </div>
-
-              {isRegister && (
-                <div>
-                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Confirm password</label>
-                  <InputShell>
-                    <input
-                      name="confirmPassword"
-                      type="password"
-                      required
-                      placeholder="Confirm your password"
-                      className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
-                    />
-                  </InputShell>
-                </div>
-              )}
-
-              {!isRegister && (
-                <div className="flex items-center justify-between gap-3 text-sm text-[#253044]">
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input type="checkbox" name="rememberMe" className="h-4 w-4 rounded border-[2px] border-[#252b3a] accent-[#6434df]" />
-                    <span className="font-medium">Keep me signed in</span>
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">
+                    Account Email Address
                   </label>
-                  <button type="button" onClick={onResetPassword} className="font-semibold text-[#6434df] underline-offset-2 hover:underline">
-                    Reset password
-                  </button>
+                  <InputShell>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      value={emailValue}
+                      onChange={(event) => setEmailValue(event.target.value)}
+                      placeholder="Enter your registered email address"
+                      className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                    />
+                  </InputShell>
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={isLoading || (emailMeta.isPublicProvider && !emailMeta.isValidFormat)}
-                className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
-              >
-                {isLoading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'}
-              </button>
-            </form>
+                {resetStep === 2 && (
+                  <>
+                    <div>
+                      <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">
+                        6-Digit Verification Code
+                      </label>
+                      <InputShell>
+                        <input
+                          name="code"
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          required
+                          placeholder="Enter 6-digit code from email"
+                          className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                        />
+                      </InputShell>
+                    </div>
 
-            <div className="relative my-7 flex items-center justify-center">
-              <span className="h-[3px] w-full bg-[#252b3a]" />
-              <span className="absolute bg-[#fffdf5] px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#253044]/65">
-                or continue with
-              </span>
-            </div>
+                    <div>
+                      <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">
+                        New Password
+                      </label>
+                      <InputShell>
+                        <input
+                          name="newPassword"
+                          type="password"
+                          required
+                          placeholder="Enter new password (at least 6 characters)"
+                          className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                        />
+                      </InputShell>
+                    </div>
+                  </>
+                )}
 
-            <button
-              type="button"
-              onClick={onGoogleSignIn}
-              className="flex w-full items-center justify-center gap-3 rounded-full border-[3px] border-[#252b3a] bg-[#fffdf5] px-5 py-4 text-[15px] font-semibold text-[#253044] shadow-[6px_6px_0_0_#252b3a] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
-            >
-              <GoogleIcon />
-              Continue with Google
-            </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60"
+                >
+                  {isLoading ? 'Processing...' : resetStep === 2 ? 'Save New Password' : 'Send Reset Code'}
+                </button>
 
-            <p className="mt-6 text-center text-[15px] text-[#253044]/75">
-              {isRegister ? 'Already have an account?' : 'New to our platform?'}{' '}
-              <button
-                type="button"
-                onClick={() => onModeChange?.(isRegister ? 'login' : 'register')}
-                className="font-bold text-[#6434df] underline-offset-2 hover:underline"
-              >
-                {isRegister ? 'Sign in' : 'Create account'}
-              </button>
-            </p>
+                <p className="mt-6 text-center text-[15px] text-[#253044]/75">
+                  Remember your password?{' '}
+                  <button
+                    type="button"
+                    onClick={() => onModeChange?.('login')}
+                    className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                  >
+                    Back to sign in
+                  </button>
+                </p>
+              </form>
+            ) : (
+              <>
+                <form className="mt-8 space-y-7" onSubmit={onSubmit}>
+                  {isRegister && (
+                    <div>
+                      <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Business name</label>
+                      <InputShell>
+                        <input
+                          name="businessName"
+                          type="text"
+                          required
+                          placeholder="Enter your business name"
+                          className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                        />
+                      </InputShell>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Email address</label>
+                    <InputShell>
+                      <input
+                        name="email"
+                        type="email"
+                        required
+                        value={emailValue}
+                        onChange={(event) => setEmailValue(event.target.value)}
+                        placeholder="Enter your email address"
+                        className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                      />
+                    </InputShell>
+                    {emailMeta.isPublicProvider && (
+                      <p className="mt-2 text-[12px] leading-5 text-[#253044]/70">
+                        <span className="font-semibold text-[#6434df]">Note:</span> {emailMeta.note}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Password</label>
+                    <InputShell>
+                      <div className="relative">
+                        <input
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder={isRegister ? 'Create a password' : 'Enter your password'}
+                          className="w-full bg-transparent px-4 py-3.5 pr-12 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((value) => !value)}
+                          className="absolute inset-y-0 right-3 flex items-center text-[#253044]/60 transition-colors hover:text-[#253044]"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </InputShell>
+                  </div>
+
+                  {isRegister && (
+                    <div>
+                      <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">Confirm password</label>
+                      <InputShell>
+                        <input
+                          name="confirmPassword"
+                          type="password"
+                          required
+                          placeholder="Confirm your password"
+                          className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                        />
+                      </InputShell>
+                    </div>
+                  )}
+
+                  {!isRegister && (
+                    <div className="flex items-center justify-between gap-3 text-sm text-[#253044]">
+                      <label className="flex cursor-pointer items-center gap-3">
+                        <input type="checkbox" name="rememberMe" className="h-4 w-4 rounded border-[2px] border-[#252b3a] accent-[#6434df]" />
+                        <span className="font-medium">Keep me signed in</span>
+                      </label>
+                      <button type="button" onClick={onResetPassword} className="font-semibold text-[#6434df] underline-offset-2 hover:underline">
+                        Reset password
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || (emailMeta.isPublicProvider && !emailMeta.isValidFormat)}
+                    className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
+                  >
+                    {isLoading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'}
+                  </button>
+                </form>
+
+                <div className="relative my-7 flex items-center justify-center">
+                  <span className="h-[3px] w-full bg-[#252b3a]" />
+                  <span className="absolute bg-[#fffdf5] px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#253044]/65">
+                    or continue with
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onGoogleSignIn}
+                  className="flex w-full items-center justify-center gap-3 rounded-full border-[3px] border-[#252b3a] bg-[#fffdf5] px-5 py-4 text-[15px] font-semibold text-[#253044] shadow-[6px_6px_0_0_#252b3a] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </button>
+
+                <p className="mt-6 text-center text-[15px] text-[#253044]/75">
+                  {isRegister ? 'Already have an account?' : 'New to our platform?'}{' '}
+                  <button
+                    type="button"
+                    onClick={() => onModeChange?.(isRegister ? 'login' : 'register')}
+                    className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                  >
+                    {isRegister ? 'Sign in' : 'Create account'}
+                  </button>
+                </p>
+              </>
+            )}
           </div>
         </section>
       </div>
