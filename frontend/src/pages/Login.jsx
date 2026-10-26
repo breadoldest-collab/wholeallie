@@ -161,6 +161,12 @@ export default function Login({ initialMode = 'login' }) {
     }
   };
 
+  const handleToggleResetStep = (step) => {
+    setError('');
+    setStatusMessage('');
+    setResetStep(step);
+  };
+
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -168,14 +174,16 @@ export default function Login({ initialMode = 'login' }) {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const email = String(formData.get('email') || resetEmail || '').trim();
 
     try {
-      if (resetStep === 1) {
-        const email = String(formData.get('email') || '').trim();
-        if (!email) throw new Error('Please enter your email address');
+      if (!email) {
+        throw new Error('Please enter your account email address');
+      }
 
-        const res = await API.post('/api/auth/forgot-password', { email });
+      if (resetStep === 1) {
         setResetEmail(email);
+        const res = await API.post('/api/auth/forgot-password', { email });
         setResetStep(2);
         setStatusMessage(res.data.message || `A 6-digit password reset code has been sent to ${email}. Please check your inbox.`);
         return;
@@ -186,10 +194,11 @@ export default function Login({ initialMode = 'login' }) {
       const newPassword = String(formData.get('newPassword') || '');
 
       if (!code) throw new Error('Please enter the 6-digit verification code sent to your email');
+      if (code.length < 4) throw new Error('Verification code must be at least 4 digits');
       if (!newPassword || newPassword.length < 6) throw new Error('Password must be at least 6 characters');
 
       const res = await API.post('/api/auth/reset-password', {
-        email: resetEmail,
+        email,
         code,
         newPassword,
       });
@@ -229,8 +238,8 @@ export default function Login({ initialMode = 'login' }) {
 
   const description = mode === 'reset'
     ? (resetStep === 1
-        ? 'Enter your account email to receive a secure 6-digit verification code in your inbox.'
-        : `We sent a 6-digit code to ${resetEmail}. Enter the code and your new password below.`)
+        ? 'Enter your account email to receive a secure 6-digit verification code, or enter your code directly if you already have one.'
+        : `Enter your email, the 6-digit verification code${resetEmail ? ` sent to ${resetEmail}` : ''}, and your new password.`)
     : verificationState?.required
     ? `We sent a 6-digit code to ${verificationState.email}. Enter it to confirm this address before you continue.`
     : mode === 'register'
@@ -245,10 +254,6 @@ export default function Login({ initialMode = 'login' }) {
       heroImageSrc="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&q=80"
       testimonials={sampleTestimonials}
       onSubmit={handleAuth}
-      onGoogleSignIn={() => {
-        setStatusMessage('');
-        setError('Google Sign-In is in private preview mode. Please sign in with your email and password.');
-      }}
       onModeChange={(nextMode) => {
         setVerificationState(null);
         setError('');
@@ -266,6 +271,7 @@ export default function Login({ initialMode = 'login' }) {
       statusMessage={statusMessage}
       isLoading={loading}
       resetStep={resetStep}
+      onToggleResetStep={handleToggleResetStep}
       onResetPasswordSubmit={handleResetPasswordSubmit}
       verificationState={verificationState}
       onVerifyEmail={handleVerifyEmail}

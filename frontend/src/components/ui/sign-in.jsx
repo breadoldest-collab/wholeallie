@@ -18,15 +18,6 @@ const getEmailMeta = (value = '') => {
   };
 };
 
-const GoogleIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 48 48">
-    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s12-5.373 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-2.641-.21-5.236-.611-7.743z" />
-    <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
-    <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
-    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.026 44 30.038 44 24c0-2.641-.21-5.236-.611-7.743z" />
-  </svg>
-);
-
 const InputShell = ({ children }) => (
   <div className="rounded-[18px] border-[3px] border-[#252b3a] bg-[#fffdf5] shadow-[4px_4px_0_0_#252b3a] transition-all duration-200 focus-within:-translate-y-0.5 focus-within:shadow-[5px_5px_0_0_#252b3a]">
     {children}
@@ -37,7 +28,6 @@ export const SignInPage = ({
   title = <span className="font-light text-[#253044] tracking-tighter">Welcome</span>,
   description = 'Access your account and continue your journey with us',
   onSubmit,
-  onGoogleSignIn,
   onResetPassword,
   onModeChange,
   errorMessage,
@@ -45,6 +35,7 @@ export const SignInPage = ({
   isLoading = false,
   mode = 'login',
   resetStep = 1,
+  onToggleResetStep,
   onResetPasswordSubmit,
   verificationState = null,
   onVerifyEmail,
@@ -133,7 +124,7 @@ export const SignInPage = ({
             )}
 
             {mode === 'reset' ? (
-              <form className="mt-8 space-y-7" onSubmit={onResetPasswordSubmit}>
+              <form className="mt-8 space-y-6" onSubmit={onResetPasswordSubmit}>
                 <div>
                   <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.18em] text-[#253044]/75">
                     Account Email Address
@@ -175,13 +166,23 @@ export const SignInPage = ({
                         New Password
                       </label>
                       <InputShell>
-                        <input
-                          name="newPassword"
-                          type="password"
-                          required
-                          placeholder="Enter new password (at least 6 characters)"
-                          className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
-                        />
+                        <div className="relative">
+                          <input
+                            name="newPassword"
+                            type={showPassword ? 'text' : 'password'}
+                            required
+                            placeholder="Enter new password (at least 6 characters)"
+                            className="w-full bg-transparent px-4 py-3.5 pr-12 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((value) => !value)}
+                            className="absolute inset-y-0 right-3 flex items-center text-[#253044]/60 transition-colors hover:text-[#253044]"
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
+                        </div>
                       </InputShell>
                     </div>
                   </>
@@ -190,10 +191,39 @@ export const SignInPage = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60"
+                  className="mt-2 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60"
                 >
                   {isLoading ? 'Processing...' : resetStep === 2 ? 'Save New Password' : 'Send Reset Code'}
                 </button>
+
+                {resetStep === 1 ? (
+                  <div className="rounded-[18px] border-[3px] border-[#252b3a] bg-[#f1ebff] p-4 shadow-[4px_4px_0_0_#252b3a]">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <p className="text-[13px] font-bold text-[#252b3a]">Already have a 6-digit code?</p>
+                        <p className="text-[12px] text-[#253044]/70">Enter your code directly to set a new password.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onToggleResetStep?.(2)}
+                        className="inline-flex items-center justify-center whitespace-nowrap rounded-full border-[3px] border-[#252b3a] bg-[#ffd05b] px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#252b3a]"
+                      >
+                        Enter Code Directly →
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between text-xs text-[#253044]/80 px-1">
+                    <span>Need to request a new code?</span>
+                    <button
+                      type="button"
+                      onClick={() => onToggleResetStep?.(1)}
+                      className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                    >
+                      Send code again
+                    </button>
+                  </div>
+                )}
 
                 <p className="mt-6 text-center text-[15px] text-[#253044]/75">
                   Remember your password?{' '}
@@ -302,22 +332,6 @@ export const SignInPage = ({
                     {isLoading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'}
                   </button>
                 </form>
-
-                <div className="relative my-7 flex items-center justify-center">
-                  <span className="h-[3px] w-full bg-[#252b3a]" />
-                  <span className="absolute bg-[#fffdf5] px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[#253044]/65">
-                    or continue with
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={onGoogleSignIn}
-                  className="flex w-full items-center justify-center gap-3 rounded-full border-[3px] border-[#252b3a] bg-[#fffdf5] px-5 py-4 text-[15px] font-semibold text-[#253044] shadow-[6px_6px_0_0_#252b3a] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
-                >
-                  <GoogleIcon />
-                  Continue with Google
-                </button>
 
                 <p className="mt-6 text-center text-[15px] text-[#253044]/75">
                   {isRegister ? 'Already have an account?' : 'New to our platform?'}{' '}

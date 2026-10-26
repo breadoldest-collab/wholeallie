@@ -59,7 +59,10 @@ function buildTransporter() {
     return nodemailer.createTransport({
       service: 'gmail',
       auth: { user, pass },
-      tls: { rejectUnauthorized: false }
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 10000,
+      greetingTimeout: 7000,
+      socketTimeout: 15000,
     });
   }
 
@@ -69,7 +72,10 @@ function buildTransporter() {
     port,
     secure: port === 465,
     auth: { user, pass },
-    tls: { rejectUnauthorized: false }
+    tls: { rejectUnauthorized: false },
+    connectionTimeout: 10000,
+    greetingTimeout: 7000,
+    socketTimeout: 15000,
   });
 }
 
@@ -120,7 +126,7 @@ async function sendPasswordResetEmail(email, code) {
       from: `"Allié" <${fromAddress}>`,
       to: email,
       subject: 'Reset your Allié account password',
-      text: `Your Allié password reset code is: ${code}. It expires in 15 minutes.`,
+      text: `Your Allié password reset code is: ${code}. It expires in 60 minutes.`,
       html: `
         <div style="font-family: sans-serif; padding: 24px; border: 2px solid #252b3a; border-radius: 14px; background: #fffdf5; max-width: 500px; color: #252b3a;">
           <h2 style="color: #6434df; margin-top: 0;">Password Reset Request</h2>
@@ -129,7 +135,7 @@ async function sendPasswordResetEmail(email, code) {
           <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 24px; background: #f1ebff; border: 2px solid #252b3a; border-radius: 10px; display: inline-block; color: #252b3a; margin: 12px 0;">
             ${code}
           </div>
-          <p style="color: #64748b; font-size: 13px;">This code expires in 15 minutes. If you did not request this change, you can safely ignore this email.</p>
+          <p style="color: #64748b; font-size: 13px;">This code expires in 60 minutes. If you did not request this change, you can safely ignore this email.</p>
         </div>
       `,
     });
@@ -142,7 +148,7 @@ async function sendPasswordResetEmail(email, code) {
 
 async function issueVerificationCode(business) {
   const code = generateVerificationCode();
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
   business.verificationCode = code;
   business.verificationCodeExpiresAt = expiresAt;
   business.emailVerified = false;
@@ -348,7 +354,7 @@ router.post('/forgot-password', validate(z.object({ email: z.string().email('Inv
 
     const code = generateVerificationCode();
     business.resetPasswordCode = code;
-    business.resetPasswordExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    business.resetPasswordExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
     await business.save();
 
     const delivered = await sendPasswordResetEmail(business.email, code);
