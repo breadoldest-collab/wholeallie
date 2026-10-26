@@ -3,7 +3,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#0d1117] text-white">
       {/* Navbar */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-8 py-8">
-        <span className="text-2xl font-bold tracking-tight">CXBot</span>
+        <span className="text-2xl font-bold tracking-tight">Allié</span>
         <nav className="flex items-center gap-6">
           <button
             type="button"
@@ -78,7 +78,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-8 px-8 py-12 md:flex-row">
-          <span className="text-lg font-bold">CXBot</span>
+          <span className="text-lg font-bold">Allié</span>
           <div className="flex flex-wrap items-center justify-center gap-8 text-base text-white/60">
             <a href="#" className="hover:text-white">
               Product
@@ -97,7 +97,7 @@ export default function Home() {
             </a>
           </div>
           <p className="text-sm text-white/40">
-            &copy; {new Date().getFullYear()} CXBot. All rights reserved.
+            &copy; {new Date().getFullYear()} Allié. All rights reserved.
           </p>
         </div>
       </footer>

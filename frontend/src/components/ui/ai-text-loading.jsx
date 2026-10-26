@@ -21,7 +21,7 @@ export default function AITextLoading({
     "Responding...",
   ],
   className,
-  interval = 500,
+  interval = 1400,
 }) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
 

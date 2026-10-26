@@ -12,7 +12,24 @@ API.interceptors.request.use(
     }
     return config;
   },
+  (error) => Promise.reject(error)
+);
+
+API.interceptors.response.use(
+  (response) => response,
   (error) => {
+    const status = error.response?.status;
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+    const isPublicRoute = ['/', '/landing', '/login', '/register'].includes(pathname) || pathname.startsWith('/support/');
+
+    if ((status === 401 || status === 403) && !isPublicRoute) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('businessId');
+      localStorage.removeItem('businessName');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/login';
+    }
+
     return Promise.reject(error);
   }
 );

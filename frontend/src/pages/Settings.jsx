@@ -9,8 +9,8 @@ const MAX_DESC = 500;
 export default function Settings() {
   const location = useLocation();
   const [description, setDescription] = useState('');
-  const [faqs, setFaqs]               = useState([]);
-  const [loading, setLoading]         = useState(true);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving]           = useState(false);
   const [toast, setToast]             = useState(false);
   const [errorMsg, setErrorMsg]       = useState('');
@@ -66,28 +66,29 @@ export default function Settings() {
 
   const inputStyle = {
     width: '100%',
-    background: '#f8fafc',
-    border: '1px solid #eaecf0',
-    borderRadius: 12,
+    background: '#fffdf5',
+    border: '3px solid #252b3a',
+    borderRadius: 14,
     padding: '12px 14px',
-    color: '#0f172a',
-    fontSize: 14,
+    color: '#252b3a',
+    fontSize: 15,
     outline: 'none',
     boxSizing: 'border-box',
     transition: 'border-color 0.15s, box-shadow 0.15s',
+    boxShadow: '4px 4px 0 0 #252b3a',
   };
 
   const focusStyle = (e) => {
-    e.target.style.borderColor = '#3b82f6';
-    e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.1)';
+    e.target.style.borderColor = '#6434df';
+    e.target.style.boxShadow = '4px 4px 0 0 #6434df';
   };
   const blurStyle  = (e) => {
-    e.target.style.borderColor = '#eaecf0';
-    e.target.style.boxShadow = 'none';
+    e.target.style.borderColor = '#252b3a';
+    e.target.style.boxShadow = '4px 4px 0 0 #252b3a';
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#fffdf5', fontFamily: 'var(--dp-typography-reading), sans-serif' }}>
       <Sidebar />
 
       {/* Success Toast */}
@@ -107,15 +108,23 @@ export default function Settings() {
         </div>
       )}
 
-      <main style={{ flex: 1, padding: '40px 48px', maxWidth: 1000, margin: '0 auto', boxSizing: 'border-box' }}>
+      <main style={{ flex: 1, padding: '32px 36px 40px', maxWidth: 1000, margin: '0 auto', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-          {/* Page Header */}
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', margin: 0, letterSpacing: '-0.5px' }}>
+            <h1 style={{
+              fontSize: 52,
+              fontWeight: 900,
+              color: '#252b3a',
+              margin: 0,
+              letterSpacing: '-0.03em',
+              lineHeight: 0.9,
+              textTransform: 'uppercase',
+              fontFamily: 'var(--dp-typography-display), sans-serif',
+            }}>
               AI Support Settings
             </h1>
-            <p style={{ fontSize: 14, color: '#64748b', margin: '4px 0 0' }}>
+            <p style={{ fontSize: 17, color: '#4d586d', margin: '10px 0 0', lineHeight: 1.6 }}>
               Configure your knowledge base and FAQ pairs for the Gemini AI bot
             </p>
           </div>
@@ -137,17 +146,17 @@ export default function Settings() {
 
               {/* Business Description Card */}
               <div style={{
-                background: '#ffffff', border: '1px solid #eaecf0',
-                borderRadius: 16, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 24, boxShadow: '5px 5px 0 0 #252b3a',
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
                       width: 34, height: 34, borderRadius: 10,
-                      background: '#eff6ff', border: '1px solid #dbeafe',
+                      background: '#f1ebff', border: '3px solid #252b3a',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <FileText size={16} style={{ color: '#3b82f6' }} />
+                      <FileText size={16} style={{ color: '#6434df' }} />
                     </div>
                     <div>
                       <h2 style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', margin: 0 }}>Business Description</h2>
@@ -179,17 +188,17 @@ export default function Settings() {
 
               {/* FAQs Card */}
               <div style={{
-                background: '#ffffff', border: '1px solid #eaecf0',
-                borderRadius: 16, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 24, boxShadow: '5px 5px 0 0 #252b3a',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
                       width: 34, height: 34, borderRadius: 10,
-                      background: '#f3f4f6', border: '1px solid #e2e8f0',
+                      background: '#e9fff5', border: '3px solid #252b3a',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <HelpCircle size={16} style={{ color: '#0f172a' }} />
+                      <HelpCircle size={16} style={{ color: '#252b3a' }} />
                     </div>
                     <div>
                       <h2 style={{ fontSize: 16, fontWeight: 600, color: '#0f172a', margin: 0 }}>
@@ -205,15 +214,12 @@ export default function Settings() {
                     onClick={addFaq}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 7,
-                      padding: '9px 16px', borderRadius: 10, border: 'none',
-                      background: '#3b82f6', color: '#fff',
-                      fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                      boxShadow: '0 2px 8px rgba(59,130,246,0.2)',
-                      transition: 'background 0.15s',
+                      padding: '10px 16px', borderRadius: 999, border: '3px solid #252b3a',
+                      background: '#6434df', color: '#fff',
+                      fontSize: 12, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
+                      boxShadow: '4px 4px 0 0 #252b3a',
                       whiteSpace: 'nowrap',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#2563eb'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#3b82f6'}
                   >
                     <Plus size={15} /> Add FAQ
                   </button>
@@ -228,7 +234,7 @@ export default function Settings() {
                   }}>
                     <HelpCircle size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.4 }} />
                     No FAQs added yet.<br />
-                    <span style={{ color: '#3b82f6', fontWeight: 600, cursor: 'pointer' }} onClick={addFaq}>
+                    <span style={{ color: '#6434df', fontWeight: 700, cursor: 'pointer' }} onClick={addFaq}>
                       + Add your first FAQ
                     </span>
                   </div>
@@ -236,12 +242,12 @@ export default function Settings() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {faqs.map((faq, i) => (
                       <div key={i} style={{
-                        background: '#f8fafc', border: '1px solid #eaecf0',
-                        borderRadius: 14, padding: 16, position: 'relative',
+                        background: '#fffdf5', border: '3px solid #252b3a',
+                        borderRadius: 18, padding: 16, position: 'relative', boxShadow: '4px 4px 0 0 rgba(37, 43, 58, 0.12)',
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                           <span style={{
-                            fontSize: 11, fontWeight: 700, color: '#3b82f6',
+                            fontSize: 11, fontWeight: 800, color: '#6434df',
                             textTransform: 'uppercase', letterSpacing: '0.08em',
                           }}>
                             FAQ #{i + 1}
@@ -264,7 +270,7 @@ export default function Settings() {
 
                         {/* Question */}
                         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 10 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#3b82f6', marginTop: 10, flexShrink: 0 }}>Q:</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: '#6434df', marginTop: 10, flexShrink: 0 }}>Q:</span>
                           <input
                             type="text" required value={faq.question}
                             onChange={e => changeFaq(i, 'question', e.target.value)}
@@ -298,17 +304,17 @@ export default function Settings() {
                   disabled={saving}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 9,
-                    padding: '12px 28px', borderRadius: 10, border: 'none',
-                    background: saving ? '#1d4ed8' : '#3b82f6',
-                    color: '#fff', fontSize: 15, fontWeight: 600,
+                    padding: '12px 28px', borderRadius: 14, border: '3px solid #252b3a',
+                    background: saving ? '#f1ebff' : '#6434df',
+                    color: '#fff', fontSize: 15, fontWeight: 800,
                     cursor: saving ? 'not-allowed' : 'pointer',
                     minWidth: 160, justifyContent: 'center',
-                    boxShadow: '0 4px 14px rgba(59,130,246,0.25)',
-                    transition: 'background 0.15s',
-                    opacity: saving ? 0.8 : 1,
+                    boxShadow: '6px 6px 0 0 #252b3a',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
+                    opacity: saving ? 0.85 : 1,
                   }}
-                  onMouseEnter={e => { if (!saving) e.currentTarget.style.background = '#2563eb'; }}
-                  onMouseLeave={e => { if (!saving) e.currentTarget.style.background = '#3b82f6'; }}
+                  onMouseEnter={e => { if (!saving) { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '8px 8px 0 0 #252b3a'; } }}
+                  onMouseLeave={e => { if (!saving) { e.currentTarget.style.transform = 'translate(0, 0)'; e.currentTarget.style.boxShadow = '6px 6px 0 0 #252b3a'; } }}
                 >
                   <Save size={16} />
                   {saving ? 'Saving…' : 'Save Settings'}

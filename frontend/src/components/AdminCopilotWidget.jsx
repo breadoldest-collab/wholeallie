@@ -49,9 +49,9 @@ export default function AdminCopilotWidget() {
   };
 
   const quickChips = [
-    { label: '📊 Summarize pending chats', prompt: 'Summarize all pending and open customer conversations.' },
-    { label: '⏳ How many open chats?', prompt: 'How many open conversations are currently pending review?' },
-    { label: '💡 What are common issues?', prompt: 'What are the main issues customers are asking about today?' },
+    { label: 'Summarize pending chats', prompt: 'Summarize all pending and open customer conversations.' },
+    { label: 'How many open chats?', prompt: 'How many open conversations are currently pending review?' },
+    { label: 'What are common issues?', prompt: 'What are the main issues customers are asking about today?' },
   ];
 
   return (
@@ -70,17 +70,19 @@ export default function AdminCopilotWidget() {
             gap: 10,
             padding: '12px 20px',
             borderRadius: 9999,
-            background: '#0f172a',
+            background: '#6434df',
             color: '#ffffff',
-            border: 'none',
+            border: '3px solid #252b3a',
             fontSize: 14,
-            fontWeight: 600,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
             cursor: 'pointer',
-            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.25)',
+            boxShadow: '6px 6px 0 0 #252b3a',
             transition: 'transform 0.2s ease, boxShadow 0.2s ease',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translate(-2px, -2px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translate(0, 0)')}
         >
           <Sparkles size={18} />
           <span>AI Copilot</span>
@@ -89,8 +91,9 @@ export default function AdminCopilotWidget() {
               width: 8,
               height: 8,
               borderRadius: '50%',
-              background: '#22c55e',
+              background: '#9bf1cd',
               display: 'inline-block',
+              border: '2px solid #252b3a',
             }}
           />
         </button>
@@ -106,15 +109,15 @@ export default function AdminCopilotWidget() {
             width: 380,
             height: 520,
             maxHeight: 'calc(100vh - 60px)',
-            background: '#ffffff',
-            border: '1px solid #eaecf0',
-            borderRadius: 20,
-            boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
+            background: '#fffdf5',
+            border: '3px solid #252b3a',
+            borderRadius: 22,
+            boxShadow: '12px 12px 0 0 #252b3a',
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontFamily: 'var(--dp-typography-reading), sans-serif',
             animation: 'slideUp 0.2s ease',
           }}
         >
@@ -129,11 +132,12 @@ export default function AdminCopilotWidget() {
           <div
             style={{
               padding: '16px 20px',
-              background: '#0f172a',
-              color: '#ffffff',
+              background: '#f1ebff',
+              color: '#252b3a',
               display: 'flex',
               alignItems: 'center',
-              justify: 'space-between',
+              justifyContent: 'space-between',
+              borderBottom: '3px solid #252b3a',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -142,10 +146,11 @@ export default function AdminCopilotWidget() {
                   width: 34,
                   height: 34,
                   borderRadius: 10,
-                  background: 'rgba(255,255,255,0.2)',
+                  background: '#9bf1cd',
+                  border: '3px solid #252b3a',
                   display: 'flex',
                   alignItems: 'center',
-                  justify: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <Bot size={20} />
@@ -163,14 +168,14 @@ export default function AdminCopilotWidget() {
             <button
               onClick={() => setIsOpen(false)}
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#ffffff',
+                background: '#ffffff',
+                border: '2px solid #252b3a',
+                color: '#252b3a',
                 cursor: 'pointer',
                 padding: 4,
                 borderRadius: 6,
                 display: 'flex',
-                opacity: 0.8,
+                boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
               }}
             >
               <X size={18} />
@@ -207,8 +212,8 @@ export default function AdminCopilotWidget() {
                   flexShrink: 0,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#0f172a';
-                  e.currentTarget.style.color = '#0f172a';
+                  e.currentTarget.style.borderColor = '#252b3a';
+                  e.currentTarget.style.color = '#252b3a';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.borderColor = '#e2e8f0';
@@ -247,11 +252,12 @@ export default function AdminCopilotWidget() {
                     width: 28,
                     height: 28,
                     borderRadius: '50%',
-                    background: msg.role === 'user' ? '#3b82f6' : '#0f172a',
-                    color: '#ffffff',
+                    background: msg.role === 'user' ? '#6434df' : '#9bf1cd',
+                    border: '2px solid #252b3a',
+                    color: msg.role === 'user' ? '#ffffff' : '#252b3a',
                     display: 'flex',
                     alignItems: 'center',
-                    justify: 'center',
+                    justifyContent: 'center',
                     fontSize: 12,
                     flexShrink: 0,
                   }}
@@ -261,16 +267,17 @@ export default function AdminCopilotWidget() {
 
                 <div
                   style={{
-                    background: msg.role === 'user' ? '#3b82f6' : '#f8fafc',
-                    color: msg.role === 'user' ? '#ffffff' : '#0f172a',
-                    border: msg.role === 'user' ? 'none' : '1px solid #eaecf0',
-                    borderLeft: msg.role === 'user' ? 'none' : '3px solid #0f172a',
+                    background: msg.role === 'user' ? '#6434df' : '#ffffff',
+                    color: msg.role === 'user' ? '#ffffff' : '#252b3a',
+                    border: '3px solid #252b3a',
+                    borderLeft: msg.role === 'user' ? '3px solid #252b3a' : '6px solid #6434df',
                     padding: '10px 14px',
-                    borderRadius: msg.role === 'user' ? '14px 14px 2px 14px' : '2px 14px 14px 14px',
+                    borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '4px 14px 14px 14px',
                     fontSize: 13,
                     lineHeight: 1.5,
                     whiteSpace: 'pre-line',
                     maxWidth: '82%',
+                    boxShadow: '4px 4px 0 0 rgba(37,43,58,0.12)',
                   }}
                 >
                   {cleanText(msg.content)}
@@ -316,10 +323,11 @@ export default function AdminCopilotWidget() {
                 flex: 1,
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: '1px solid #eaecf0',
+                border: '2px solid #252b3a',
                 fontSize: 13,
                 outline: 'none',
-                color: '#0f172a',
+                color: '#252b3a',
+                boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',
               }}
             />
             <button
@@ -328,14 +336,15 @@ export default function AdminCopilotWidget() {
               style={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: 'none',
-                background: '#0f172a',
-                color: '#ffffff',
+                border: '3px solid #252b3a',
+                background: loading || !input.trim() ? '#f1ebff' : '#6434df',
+                color: loading || !input.trim() ? '#252b3a' : '#ffffff',
                 cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                opacity: loading || !input.trim() ? 0.5 : 1,
+                opacity: loading || !input.trim() ? 0.75 : 1,
                 display: 'flex',
                 alignItems: 'center',
-                justify: 'center',
+                justifyContent: 'center',
+                boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',
               }}
             >
               <Send size={15} />

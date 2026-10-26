@@ -1,0 +1,142 @@
+[
+  {
+    "text": "My service is completely down and I cannot access the app.",
+    "intent": "technical",
+    "urgency": "critical",
+    "reason": "full outage / no access",
+    "action": "escalate_immediately"
+  },
+  {
+    "text": "I think my account has been hacked.",
+    "intent": "security",
+    "urgency": "critical",
+    "reason": "security breach / account compromise",
+    "action": "escalate_immediately"
+  },
+  {
+    "text": "I was charged twice for the same invoice.",
+    "intent": "billing",
+    "urgency": "high",
+    "reason": "payment issue / duplicate charge",
+    "action": "human_needed"
+  },
+  {
+    "text": "My order never arrived and I need a refund.",
+    "intent": "order",
+    "urgency": "high",
+    "reason": "delivery failure / refund request",
+    "action": "human_needed"
+  },
+  {
+    "text": "The website is crashing for all customers.",
+    "intent": "technical",
+    "urgency": "critical",
+    "reason": "platform-wide outage",
+    "action": "escalate_immediately"
+  },
+  {
+    "text": "I can't log in to my account.",
+    "intent": "account",
+    "urgency": "medium",
+    "reason": "login problem",
+    "action": "auto_reply"
+  },
+  {
+    "text": "Where is my order?",
+    "intent": "order",
+    "urgency": "low",
+    "reason": "status check",
+    "action": "auto_reply"
+  },
+  {
+    "text": "Can I get a copy of my invoice?",
+    "intent": "billing",
+    "urgency": "low",
+    "reason": "document request",
+    "action": "auto_reply"
+  },
+  {
+    "text": "My payment failed but the money was debited from my card.",
+    "intent": "billing",
+    "urgency": "high",
+    "reason": "failed payment / financial issue",
+    "action": "human_needed"
+  },
+  {
+    "text": "I need to cancel my subscription immediately.",
+    "intent": "account",
+    "urgency": "medium",
+    "reason": "subscription cancellation request",
+    "action": "human_needed"
+  },
+  {
+    "text": "What is the refund window for annual plans?",
+    "intent": "billing",
+    "urgency": "low",
+    "reason": "faq / policy question",
+    "action": "auto_reply"
+  },
+  {
+    "text": "This is urgent: my card was charged but no order was created.",
+    "intent": "billing",
+    "urgency": "high",
+    "reason": "financial discrepancy",
+    "action": "human_needed"
+  },
+  {
+    "text": "My package is delayed by 2 weeks.",
+    "intent": "order",
+    "urgency": "medium",
+    "reason": "shipping delay",
+    "action": "human_needed"
+  },
+  {
+    "text": "I need help updating my billing email.",
+    "intent": "billing",
+    "urgency": "low",
+    "reason": "account update",
+    "action": "auto_reply"
+  },
+  {
+    "text": "I am receiving abusive messages from the system.",
+    "intent": "security",
+    "urgency": "critical",
+    "reason": "security / harassment concern",
+    "action": "escalate_immediately"
+  },
+  {
+    "text": "Can you tell me the return policy?",
+    "intent": "return",
+    "urgency": "low",
+    "reason": "faq / informational",
+    "action": "auto_reply"
+  },
+  {
+    "text": "My product arrived damaged.",
+    "intent": "return",
+    "urgency": "medium",
+    "reason": "damaged product complaint",
+    "action": "human_needed"
+  },
+  {
+    "text": "I am locked out of my account and this is affecting my work.",
+    "intent": "account",
+    "urgency": "high",
+    "reason": "access blocked / business impact",
+    "action": "human_needed"
+  },
+  {
+    "text": "The app keeps freezing every 5 minutes.",
+    "intent": "technical",
+    "urgency": "medium",
+    "reason": "recurrent technical issue",
+    "action": "auto_reply"
+  },
+  {
+    "text": "I want to know when my invoice will be generated.",
+    "intent": "billing",
+    "urgency": "low",
+    "reason": "billing info request",
+    "action": "auto_reply"
+  }
+]

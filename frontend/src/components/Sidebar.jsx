@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Settings, LogOut, X, Copy, Check, Hash, Store, FileText, HelpCircle } from 'lucide-react';
+import QRCodeStyling from 'qr-code-styling';
+import { LayoutDashboard, MessageSquare, Settings, LogOut, X, Copy, Check, Hash, Store, FileText, HelpCircle, QrCode, ExternalLink, Sparkles, User } from 'lucide-react';
 import API from '../api/axios';
 
 export default function Sidebar() {
@@ -9,21 +10,42 @@ export default function Sidebar() {
 
   const businessName = localStorage.getItem('businessName') || 'My Business';
   const businessId   = localStorage.getItem('businessId')   || '';
-  const userEmail    = localStorage.getItem('userEmail')    || 'admin@cxbot.io';
+  const userEmail    = localStorage.getItem('userEmail')    || 'admin@allie.io';
   const initial      = businessName.charAt(0).toUpperCase();
-  const supportUrl   = `${window.location.origin}/support/${businessId}`;
+  const supportUrl   = businessId ? `${window.location.origin}/support/${businessId}` : '';
+  const qrUrl        = supportUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(supportUrl)}` : '';
 
+  const [customLogo, setCustomLogo]   = useState(() => localStorage.getItem('businessLogo') || '');
   const [profileOpen, setProfileOpen] = useState(false);
   const [profile, setProfile]         = useState(null);
+
   const [analytics, setAnalytics]     = useState(null);
   const [copied, setCopied]           = useState(false);
   const [alertCount, setAlertCount]   = useState(0);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [qrStyle, setQrStyle]         = useState('rounded');
   const bottomRef = useRef(null);
+  const qrRef = useRef(null);
 
   useEffect(() => {
     API.get('/api/analytics/alerts')
       .then(res => setAlertCount(res.data.totalUnresolved || 0))
       .catch(() => {});
+
+    API.get('/api/settings')
+      .then(res => {
+        if (res.data?.logoUrl) {
+          setCustomLogo(res.data.logoUrl);
+          localStorage.setItem('businessLogo', res.data.logoUrl);
+        }
+      })
+      .catch(() => {});
+
+    const onBrandingUpdate = () => {
+      setCustomLogo(localStorage.getItem('businessLogo') || '');
+    };
+    window.addEventListener('brandingUpdated', onBrandingUpdate);
+    return () => window.removeEventListener('brandingUpdated', onBrandingUpdate);
   }, []);
 
   useEffect(() => {
@@ -51,10 +73,54 @@ export default function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [profileOpen]);
 
+  useEffect(() => {
+    if (!qrModalOpen || !supportUrl || !qrRef.current) return;
+
+    const styleMap = {
+      classic: { dots: 'square', corners: 'square' },
+      rounded: { dots: 'rounded', corners: 'rounded' },
+      dots: { dots: 'dots', corners: 'dot' },
+      premium: { dots: 'extra-rounded', corners: 'extra-rounded' },
+    };
+
+    const currentStyle = styleMap[qrStyle] || styleMap.rounded;
+    qrRef.current.innerHTML = '';
+
+    const qrCode = new QRCodeStyling({
+      width: 260,
+      height: 260,
+      margin: 12,
+      data: supportUrl,
+      qrOptions: {
+        typeNumber: 0,
+        mode: 'Byte',
+        errorCorrectionLevel: 'M',
+      },
+      dotsOptions: {
+        color: '#1f2937',
+        type: currentStyle.dots
+      },
+      cornersSquareOptions: {
+        color: '#1f2937',
+        type: currentStyle.corners
+      },
+      backgroundOptions: {
+        color: '#ffffff'
+      }
+    });
+
+    qrCode.append(qrRef.current);
+
+    return () => {
+      if (qrRef.current) qrRef.current.innerHTML = '';
+    };
+  }, [qrModalOpen, qrStyle, supportUrl]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('businessId');
     localStorage.removeItem('businessName');
+    localStorage.removeItem('userEmail');
     navigate('/login');
   };
 
@@ -64,45 +130,232 @@ export default function Sidebar() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handlePrintQr = () => {
+    window.print();
+  };
+
   const navItems = [
     { name: 'Dashboard',     path: '/dashboard',     icon: LayoutDashboard, alert: alertCount > 0 },
     { name: 'Conversations', path: '/conversations', icon: MessageSquare },
     { name: 'Settings',      path: '/settings',      icon: Settings },
+    { name: 'Profile',       path: '/profile',       icon: User },
   ];
 
   return (
-    <aside style={{
-      width: 240,
-      minWidth: 240,
-      background: '#ffffff',
-      borderRight: '1px solid #eaecf0',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '24px 16px',
-      minHeight: '100vh',
-      height: '100vh',
-      position: 'sticky',
-      top: 0,
-      zIndex: 20,
-      boxSizing: 'border-box',
-    }}>
+    <>
+      {qrModalOpen && (
+        <div
+          onClick={() => setQrModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: 'min(520px, 100%)',
+              background: '#fffdf5',
+              border: '3px solid #252b3a',
+              borderRadius: 28,
+              boxShadow: '12px 12px 0 0 #252b3a',
+              padding: 20,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4d586d' }}>
+                  Support Widget
+                </p>
+                <h3 style={{ margin: '6px 0 0', fontSize: 28, color: '#252b3a' }}>{businessName}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQrModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: '#252b3a', cursor: 'pointer', padding: 4 }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <style>{`@media print { .qr-widget-actions, .qr-widget-style-row { display: none !important; } .qr-widget-card { box-shadow: none !important; border: 0 !important; } }`}</style>
+
+            <div className="qr-widget-card" style={{ display: 'flex', gap: 22, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', width: 270, height: 270, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div ref={qrRef} style={{ width: 260, height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
+                <div style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  background: '#f1ebff',
+                  border: '3px solid #252b3a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#252b3a',
+                  fontWeight: 900,
+                  fontSize: 20,
+                  boxShadow: '4px 4px 0 0 #252b3a',
+                }}>
+                  {businessName?.charAt(0)?.toUpperCase() || 'F'}
+                </div>
+              </div>
+
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', color: '#4d586d', textTransform: 'uppercase' }}>
+                  Public support URL
+                </p>
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+                  background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 12,
+                  padding: '10px 12px',
+                }}>
+                  <span style={{ fontSize: 12, fontFamily: 'monospace', color: '#0f172a', wordBreak: 'break-all' }}>{supportUrl}</span>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    style={{ background: 'none', border: 'none', color: copied ? '#10b981' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+
+                <div className="qr-widget-style-row" style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {[
+                    { id: 'classic', label: 'Classic' },
+                    { id: 'rounded', label: 'Rounded' },
+                    { id: 'dots', label: 'Dots' },
+                    { id: 'premium', label: 'Premium' },
+                  ].map(option => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setQrStyle(option.id)}
+                      style={{
+                        border: qrStyle === option.id ? '2px solid #252b3a' : '2px solid #cbd5e1',
+                        background: qrStyle === option.id ? '#6434df' : '#ffffff',
+                        color: qrStyle === option.id ? '#ffffff' : '#252b3a',
+                        borderRadius: 999,
+                        padding: '8px 12px',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="qr-widget-actions" style={{ marginTop: 18, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handlePrintQr}
+                    style={{
+                      background: '#252b3a', color: '#fff', border: '2px solid #252b3a', borderRadius: 12,
+                      padding: '10px 14px', fontWeight: 800, cursor: 'pointer', boxShadow: '3px 3px 0 0 #cbd5e1',
+                    }}
+                  >
+                    Print QR
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQrModalOpen(false)}
+                    style={{
+                      background: '#fff', color: '#252b3a', border: '2px solid #252b3a', borderRadius: 12,
+                      padding: '10px 14px', fontWeight: 800, cursor: 'pointer', boxShadow: '3px 3px 0 0 #252b3a',
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <aside style={{
+        width: 240,
+        minWidth: 240,
+        background: '#fffdf5',
+        borderRight: '3px solid #252b3a',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '22px 16px 18px',
+        minHeight: '100vh',
+        height: '100vh',
+        overflowY: 'auto',
+        position: 'sticky',
+        top: 0,
+        zIndex: 20,
+        boxSizing: 'border-box',
+        fontFamily: 'var(--dp-typography-reading), sans-serif',
+      }}>
       <div>
-        {/* Brand */}
-        <div style={{ padding: '0 8px', marginBottom: 32 }}>
-          <span style={{
-            fontSize: 22,
-            fontWeight: 800,
-            color: '#0f172a',
-            letterSpacing: '-0.5px',
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
+        <div style={{ padding: '0 8px', marginBottom: 28 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '8px 10px',
+            borderRadius: 16,
+            border: '3px solid #252b3a',
+            background: '#fffdf5',
+            boxShadow: '4px 4px 0 0 #252b3a',
           }}>
-            CXBot
-          </span>
+            <div style={{
+              width: 28,
+              height: 28,
+              borderRadius: 9,
+              background: '#9bf1cd',
+              border: '3px solid #252b3a',
+              color: '#252b3a',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: 15,
+              overflow: 'hidden',
+              fontFamily: 'var(--dp-typography-display), sans-serif',
+            }}>
+              {customLogo ? (
+                <img
+                  src={customLogo}
+                  alt="Logo"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                'A'
+              )}
+            </div>
+            <span style={{
+              fontSize: 20,
+              fontWeight: 900,
+              color: '#252b3a',
+              letterSpacing: '-0.02em',
+              fontFamily: 'var(--dp-typography-display), sans-serif',
+            }}>
+              Allié
+            </span>
+          </div>
         </div>
 
-        {/* Navigation */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {navItems.map(({ name, path, icon: Icon, alert }) => {
             const isActive = location.pathname === path;
             return (
@@ -113,24 +366,26 @@ export default function Sidebar() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '10px 14px',
-                  borderRadius: 12,
-                  fontSize: 14,
-                  fontWeight: isActive ? 600 : 500,
+                  padding: '12px 14px',
+                  borderRadius: 14,
+                  fontSize: 15,
+                  fontWeight: isActive ? 700 : 600,
                   textDecoration: 'none',
-                  color: isActive ? '#0f172a' : '#64748b',
-                  background: isActive ? '#f1f5f9' : 'transparent',
+                  color: isActive ? '#252b3a' : '#4d586d',
+                  background: isActive ? '#f1ebff' : 'transparent',
+                  border: isActive ? '3px solid #252b3a' : '3px solid transparent',
+                  boxShadow: isActive ? '4px 4px 0 0 #252b3a' : 'none',
                   transition: 'all 0.15s ease',
                 }}
               >
                 <div style={{ position: 'relative', display: 'flex' }}>
-                  <Icon size={18} style={{ color: isActive ? '#0f172a' : '#64748b' }} />
+                  <Icon size={18} style={{ color: isActive ? '#252b3a' : '#4d586d' }} />
                   {alert && (
                     <span style={{
                       position: 'absolute', top: -3, right: -4,
                       width: 8, height: 8, borderRadius: '50%',
                       background: '#ef4444',
-                      border: '1.5px solid #ffffff',
+                      border: '2px solid #fffdf5',
                     }} />
                   )}
                 </div>
@@ -141,7 +396,6 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Bottom User Section */}
       <div ref={bottomRef} style={{ position: 'relative' }}>
         {/* Profile Popover */}
         {profileOpen && (
@@ -164,16 +418,16 @@ export default function Sidebar() {
             {/* Header */}
             <div style={{
               padding: '14px 16px',
-              background: '#f8fafc',
-              borderBottom: '1px solid #eaecf0',
+              background: '#f1ebff',
+              borderBottom: '3px solid #252b3a',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: '#0f172a', color: '#fff',
+                  background: '#9bf1cd', color: '#252b3a', border: '3px solid #252b3a',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 15, fontWeight: 700,
+                  fontSize: 15, fontWeight: 800,
                 }}>
                   {initial}
                 </div>
@@ -220,6 +474,28 @@ export default function Sidebar() {
                     {copied ? <Check size={12} /> : <Copy size={12} />}
                   </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setQrModalOpen(true)}
+                  style={{
+                    marginTop: 10,
+                    width: '100%',
+                    border: '2px solid #252b3a',
+                    borderRadius: 10,
+                    background: '#f1ebff',
+                    color: '#252b3a',
+                    fontWeight: 800,
+                    fontSize: 11,
+                    padding: '8px 10px',
+                    cursor: 'pointer',
+                    boxShadow: '2px 2px 0 0 #252b3a',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Open QR Code
+                </button>
               </div>
             </div>
           </div>
@@ -227,14 +503,15 @@ export default function Sidebar() {
 
         {/* User Card Row */}
         <div style={{
-          borderTop: '1px solid #eaecf0',
+          borderTop: '3px solid #252b3a',
           paddingTop: 16,
           display: 'flex',
           alignItems: 'center',
-          justify: 'space-between',
+          justifyContent: 'space-between',
         }}>
           <button
-            onClick={() => setProfileOpen(prev => !prev)}
+            onClick={() => navigate('/profile')}
+            title="Go to Profile & Branding"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -249,53 +526,84 @@ export default function Sidebar() {
             }}
           >
             <div style={{
-              width: 34,
-              height: 34,
+              width: 36,
+              height: 36,
               borderRadius: '50%',
-              background: '#0f172a',
+              background: '#252b3a',
+              border: '2px solid #252b3a',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
-              justify: 'center',
+              justifyContent: 'center',
               fontWeight: 700,
               fontSize: 14,
+              overflow: 'hidden',
               flexShrink: 0,
             }}>
-              {initial}
+              {customLogo ? (
+                <img
+                  src={customLogo}
+                  alt={businessName}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                initial
+              )}
             </div>
             <div style={{ overflow: 'hidden', minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {businessName}
-              </p>
-              <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#252b3a', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {businessName}
+                </p>
+                <span style={{
+                  background: '#f1ebff',
+                  color: '#6434df',
+                  border: '1.5px solid #252b3a',
+                  borderRadius: 999,
+                  padding: '1px 6px',
+                  fontSize: 9,
+                  fontWeight: 900,
+                  letterSpacing: '0.04em',
+                  boxShadow: '1px 1px 0 0 #252b3a',
+                  flexShrink: 0,
+                }}>
+                  PREMIUM
+                </span>
+              </div>
+              <p style={{ fontSize: 11, color: '#4d586d', margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {userEmail}
               </p>
             </div>
           </button>
 
-          <button
-            onClick={handleLogout}
-            title="Log Out"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#94a3b8',
-              cursor: 'pointer',
-              padding: 6,
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justify: 'center',
-              transition: 'color 0.15s',
-              flexShrink: 0,
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
-            onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
-          >
-            <LogOut size={16} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+            <button
+              onClick={handleLogout}
+              title="Log Out"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: 6,
+                borderRadius: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'color 0.15s',
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+              onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
         </div>
       </div>
     </aside>
+    </>
   );
 }

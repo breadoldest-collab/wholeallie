@@ -36,7 +36,7 @@ export default function Register() {
     <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-xl p-8 space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-[#3b82f6]">CXBot</h1>
+          <h1 className="text-3xl font-bold text-[#3b82f6]">Allié</h1>
           <p className="text-gray-400 text-lg">Create your business account</p>
         </div>
 
