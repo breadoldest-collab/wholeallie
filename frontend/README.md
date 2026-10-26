@@ -1,16 +1,52 @@
-# React + Vite
+# Allié — Frontend Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The frontend client for the **Allié** AI Customer Support platform. Built with React 19, Vite, and Tailwind CSS.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Getting Started
 
-## React Compiler
+### 1. Prerequisites
+- Node.js (v18+ recommended)
+- Running [Backend Service](../backend)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Installation
+```bash
+npm install
+```
 
-## Expanding the Oxlint configuration
+### 3. Environment Variables
+Create a `.env` file in the `frontend/` directory (or configure in deployment settings):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```env
+# URL of your deployed backend API (defaults to http://localhost:5000 in dev)
+VITE_API_URL=http://localhost:5000
+```
+
+### 4. Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### 5. Production Build
+```bash
+npm run build
+npm run preview
+```
+
+---
+
+## 🌐 Deployment
+
+### Deploying to Vercel
+1. Import the repository into **Vercel**.
+2. Set **Root Directory** to `frontend`.
+3. Add Environment Variable:
+   - `VITE_API_URL`: Your live backend URL (e.g. `https://your-backend.onrender.com`).
+4. Click **Deploy**. SPA routing rules are already configured via `vercel.json`.
+
+### Deploying to Netlify
+1. Import repository and set base directory to `frontend`.
+2. Build command: `npm run build`, publish directory: `dist`.
+3. SPA routing redirect rules are configured in `public/_redirects`.
