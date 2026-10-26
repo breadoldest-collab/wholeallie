@@ -409,7 +409,7 @@ YOUR INSTRUCTIONS:
           const response = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: AbortSignal.timeout(10000), // 10-second timeout
+            signal: AbortSignal.timeout(25000), // 10-second timeout
             body: JSON.stringify({
               contents: [...history, { role: 'user', parts: [{ text: userMessage }] }],
               systemInstruction: { parts: [{ text: systemPrompt }] }

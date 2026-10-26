@@ -81,7 +81,18 @@ router.post('/assistant', async (req, res) => {
 
     const dbStatus = `TOTAL CONVERSATIONS: ${total}\nOPEN / PENDING CONVERSATIONS (${openConvs.length}):\n${openSummaries || 'None'}\n\nRESOLVED CONVERSATIONS (${resolvedConvs.length}):\n${resolvedSummaries || 'None'}`;
 
-    const systemPrompt = `You are Faro Admin Copilot, an AI assistant for the store owner.\nHere is the real-time conversation data for their business:\n\n${dbStatus}\n\nRULES:\n- DO NOT use any markdown asterisks (no **, no ***, no *).\n- Use clean bullet points (•) or clean headers.\n- Keep formatting minimal, elegant, and readable.`;
+    const systemPrompt = `You are Allié Admin Copilot, an intelligent AI assistant for the store owner.
+You have real-time access to their business conversation data:
+
+${dbStatus}
+
+INSTRUCTIONS:
+1. If the user asks about customer conversations, pending chats, summaries, customer sentiment, or store issues, use the real-time data above to provide concise, actionable insights.
+2. If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X"), answer helpfully, accurately, and politely as Allié Admin Copilot.
+3. DO NOT use any markdown asterisks (no **, no ***, no *).
+4. Use clean bullet points (•) or clean headers.
+5. Keep formatting minimal, elegant, and readable.`;
+
     const geminiApiKey = getGeminiApiKey('summary');
     const candidateModels = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
 
@@ -95,7 +106,7 @@ router.post('/assistant', async (req, res) => {
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(25000), // 25s timeout for cloud environments
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
             systemInstruction: { parts: [{ text: systemPrompt }] }
