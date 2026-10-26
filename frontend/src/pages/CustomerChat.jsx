@@ -29,7 +29,8 @@ import {
   ChevronRight,
   Layers,
   User,
-  Star
+  Star,
+  Square
 } from 'lucide-react';
 import AITextLoading from '../components/ui/ai-text-loading';
 
@@ -90,6 +91,8 @@ export default function CustomerChat() {
 
   const messagesEndRef = useRef(null);
   const broadcastChannelRef = useRef(null);
+  const loadingRef = useRef(false);
+  const abortControllerRef = useRef(null);
 
   // 1. Single Instance / Single Tab Concurrency Protection
   useEffect(() => {
@@ -197,6 +200,9 @@ export default function CustomerChat() {
   useEffect(() => {
     if (!sessionId) return;
     const fetchLatest = () => {
+      // Never overwrite or flicker messages while user has a prompt generating locally
+      if (loadingRef.current) return;
+
       axios.get(`${API_BASE}/api/chat/messages/${sessionId}`)
         .then(res => {
           if (res.data?.messages && Array.isArray(res.data.messages) && res.data.messages.length > 0) {
@@ -207,17 +213,22 @@ export default function CustomerChat() {
               flagged: m.flagged,
             }));
             setMessages(prev => {
-              // Restore full conversation history if only greeting is currently shown
+              if (loadingRef.current) return prev;
+              // Restore full conversation history if only initial greeting is currently shown
               if (!prev || prev.length <= 1) {
                 return formatted;
               }
+              // Only update if server has strictly more messages (e.g. staff reply from admin dashboard)
               if (formatted.length > prev.length) {
                 return formatted;
               }
-              const lastLocal = prev[prev.length - 1];
-              const lastServer = formatted[formatted.length - 1];
-              if (lastServer && lastLocal && lastServer.content !== lastLocal.content) {
-                return formatted;
+              // If equal length, sync if last message content changed
+              if (formatted.length === prev.length) {
+                const lastLocal = prev[prev.length - 1];
+                const lastServer = formatted[formatted.length - 1];
+                if (lastServer && lastLocal && lastServer.content !== lastLocal.content) {
+                  return formatted;
+                }
               }
               return prev;
             });
@@ -238,14 +249,40 @@ export default function CustomerChat() {
     { label: 'Payment & Helpline', query: 'What payment options do you support, and how do I speak to support?', icon: CreditCard },
   ];
 
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    loadingRef.current = false;
+    setMessages(prev => [
+      ...prev,
+      {
+        role: 'ai',
+        content: '[Response stopped by user]',
+      },
+    ]);
+  };
+
   const handleSend = async (manualText = null) => {
     const textToSend = (manualText || input).trim();
-    if (!textToSend || loading) return;
+    if (!textToSend) return;
+
+    // Abort previous in-flight request if user is firing a new prompt
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     const userMessage = { role: 'user', content: textToSend };
     setMessages(prev => [...prev, userMessage]);
     if (!manualText) setInput('');
     setLoading(true);
+    loadingRef.current = true;
 
     try {
       const response = await axios.post(`${API_BASE}/api/chat`, {
@@ -253,6 +290,8 @@ export default function CustomerChat() {
         sessionId,
         message: textToSend,
         userMessage: textToSend,
+      }, {
+        signal: controller.signal
       });
 
       const aiResponse = {
@@ -263,6 +302,10 @@ export default function CustomerChat() {
 
       setMessages(prev => [...prev, aiResponse]);
     } catch (err) {
+      if (axios.isCancel(err) || err.name === 'CanceledError' || err.name === 'AbortError') {
+        // Stopped by user click
+        return;
+      }
       console.error('Chat error:', err);
       setMessages(prev => [
         ...prev,
@@ -273,6 +316,8 @@ export default function CustomerChat() {
       ]);
     } finally {
       setLoading(false);
+      loadingRef.current = false;
+      abortControllerRef.current = null;
     }
   };
 
@@ -917,7 +962,6 @@ export default function CustomerChat() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  disabled={loading}
                   placeholder={`Ask ${aiName} about products, location, policies, or store hours...`}
                   style={{
                     width: '100%',
@@ -951,18 +995,45 @@ export default function CustomerChat() {
                 )}
               </div>
 
+              {loading && (
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  title="Stop generating AI response"
+                  style={{
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    border: '3px solid #252b3a',
+                    borderRadius: 16,
+                    padding: '14px 20px',
+                    fontSize: 14,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    boxShadow: '4px 4px 0 0 #252b3a',
+                    transition: 'all 0.15s ease',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Square size={16} style={{ fill: '#ffffff' }} />
+                  <span>Stop</span>
+                </button>
+              )}
+
               <button
                 type="submit"
-                disabled={loading || !input.trim()}
+                disabled={!input.trim()}
                 style={{
-                  background: loading || !input.trim() ? '#f1ebff' : '#6434df',
-                  color: loading || !input.trim() ? '#252b3a' : '#ffffff',
+                  background: !input.trim() ? '#f1ebff' : '#6434df',
+                  color: !input.trim() ? '#252b3a' : '#ffffff',
                   border: '3px solid #252b3a',
                   borderRadius: 16,
                   padding: '14px 22px',
                   fontSize: 14,
                   fontWeight: 800,
-                  cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+                  cursor: !input.trim() ? 'not-allowed' : 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,

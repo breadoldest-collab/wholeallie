@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Bot, Send, X, Sparkles, MessageSquare, Clock, RefreshCw } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Bot, Send, X, Sparkles, MessageSquare, Clock, RefreshCw, Maximize2, Minimize2, Square } from 'lucide-react';
 import API from '../api/axios';
 import AITextLoading from './ui/ai-text-loading';
 
@@ -14,6 +14,7 @@ const cleanText = (txt) => {
 
 export default function AdminCopilotWidget() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -22,10 +23,31 @@ export default function AdminCopilotWidget() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef(null);
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setMessages((prev) => [
+      ...prev,
+      { role: 'assistant', content: '[Analysis stopped by admin]' },
+    ]);
+  };
 
   const handleSend = async (userPrompt) => {
-    const query = userPrompt || input.trim();
-    if (!query || loading) return;
+    const query = (userPrompt || input).trim();
+    if (!query) return;
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     if (!userPrompt) setInput('');
 
@@ -33,18 +55,24 @@ export default function AdminCopilotWidget() {
     setLoading(true);
 
     try {
-      const res = await API.post('/api/conversations/assistant', { prompt: query });
+      const res = await API.post('/api/conversations/assistant', { prompt: query }, {
+        signal: controller.signal,
+      });
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: res.data.reply || 'Here is your conversation summary.' },
       ]);
     } catch (err) {
+      if (err.name === 'CanceledError' || err.name === 'AbortError') {
+        return;
+      }
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: 'Sorry, I had trouble fetching the conversation insights. Please try again.' },
       ]);
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -104,11 +132,16 @@ export default function AdminCopilotWidget() {
         <div
           style={{
             position: 'fixed',
-            bottom: 28,
-            right: 28,
-            width: 380,
-            height: 520,
-            maxHeight: 'calc(100vh - 60px)',
+            bottom: 24,
+            right: 24,
+            width: isExpanded ? 'min(840px, calc(100vw - 36px))' : 400,
+            height: isExpanded ? 'min(760px, calc(100vh - 48px))' : 540,
+            minWidth: 340,
+            minHeight: 440,
+            maxWidth: 'calc(100vw - 24px)',
+            maxHeight: 'calc(100vh - 36px)',
+            resize: 'both',
+            overflow: 'hidden',
             background: '#fffdf5',
             border: '3px solid #252b3a',
             borderRadius: 22,
@@ -116,8 +149,8 @@ export default function AdminCopilotWidget() {
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
             fontFamily: 'var(--dp-typography-reading), sans-serif',
+            transition: 'width 0.2s ease, height 0.2s ease',
             animation: 'slideUp 0.2s ease',
           }}
         >
@@ -165,21 +198,47 @@ export default function AdminCopilotWidget() {
               </div>
             </div>
 
-            <button
-              onClick={() => setIsOpen(false)}
-              style={{
-                background: '#ffffff',
-                border: '2px solid #252b3a',
-                color: '#252b3a',
-                cursor: 'pointer',
-                padding: 4,
-                borderRadius: 6,
-                display: 'flex',
-                boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
-              }}
-            >
-              <X size={18} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                title={isExpanded ? 'Restore standard size' : 'Expand / Maximize Copilot'}
+                style={{
+                  background: '#ffffff',
+                  border: '2px solid #252b3a',
+                  color: '#252b3a',
+                  cursor: 'pointer',
+                  padding: 5,
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
+                }}
+              >
+                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                title="Close Copilot"
+                style={{
+                  background: '#ffffff',
+                  border: '2px solid #252b3a',
+                  color: '#252b3a',
+                  cursor: 'pointer',
+                  padding: 5,
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Quick Chips */}
@@ -308,17 +367,18 @@ export default function AdminCopilotWidget() {
             }}
             style={{
               padding: 12,
-              borderTop: '1px solid #eaecf0',
+              borderTop: '2px solid #252b3a',
               background: '#ffffff',
               display: 'flex',
               gap: 8,
+              alignItems: 'center',
             }}
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Copilot about pending chats..."
+              placeholder="Ask Copilot about chats, issues, or general questions..."
               style={{
                 flex: 1,
                 padding: '10px 14px',
@@ -330,21 +390,50 @@ export default function AdminCopilotWidget() {
                 boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',
               }}
             />
+
+            {loading && (
+              <button
+                type="button"
+                onClick={handleStop}
+                title="Stop AI analysis"
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  border: '3px solid #252b3a',
+                  background: '#ef4444',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  boxShadow: '3px 3px 0 0 #252b3a',
+                  flexShrink: 0,
+                }}
+              >
+                <Square size={13} style={{ fill: '#ffffff' }} />
+                <span>Stop</span>
+              </button>
+            )}
+
             <button
               type="submit"
-              disabled={loading || !input.trim()}
+              disabled={!input.trim()}
+              title="Send prompt to Copilot"
               style={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 border: '3px solid #252b3a',
-                background: loading || !input.trim() ? '#f1ebff' : '#6434df',
-                color: loading || !input.trim() ? '#252b3a' : '#ffffff',
-                cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                opacity: loading || !input.trim() ? 0.75 : 1,
+                background: !input.trim() ? '#f1ebff' : '#6434df',
+                color: !input.trim() ? '#252b3a' : '#ffffff',
+                cursor: !input.trim() ? 'not-allowed' : 'pointer',
+                opacity: !input.trim() ? 0.75 : 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',
+                boxShadow: '3px 3px 0 0 #252b3a',
+                flexShrink: 0,
               }}
             >
               <Send size={15} />
