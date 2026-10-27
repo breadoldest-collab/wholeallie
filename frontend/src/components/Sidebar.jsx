@@ -307,52 +307,59 @@ export default function Sidebar() {
       }}>
       <div>
         <div style={{ padding: '0 8px', marginBottom: 28 }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '8px 10px',
-            borderRadius: 16,
-            border: '3px solid #252b3a',
-            background: '#fffdf5',
-            boxShadow: '4px 4px 0 0 #252b3a',
-          }}>
+          <Link to="/dashboard" style={{ textDecoration: 'none', display: 'inline-flex' }}>
             <div style={{
-              width: 28,
-              height: 28,
-              borderRadius: 9,
-              background: '#9bf1cd',
-              border: '3px solid #252b3a',
-              color: '#252b3a',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: 15,
-              overflow: 'hidden',
-              fontFamily: 'var(--dp-typography-display), sans-serif',
-            }}>
-              {customLogo ? (
-                <img
-                  src={customLogo}
-                  alt="Logo"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              ) : (
-                'A'
-              )}
+              gap: 10,
+              padding: '8px 10px',
+              borderRadius: 16,
+              border: '3px solid #252b3a',
+              background: '#fffdf5',
+              boxShadow: '4px 4px 0 0 #252b3a',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 0 #252b3a'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #252b3a'; }}
+            >
+              <div style={{
+                width: 28,
+                height: 28,
+                borderRadius: 9,
+                background: '#9bf1cd',
+                border: '3px solid #252b3a',
+                color: '#252b3a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: 15,
+                overflow: 'hidden',
+                fontFamily: 'var(--dp-typography-display), sans-serif',
+              }}>
+                {customLogo ? (
+                  <img
+                    src={customLogo}
+                    alt="Logo"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  'A'
+                )}
+              </div>
+              <span style={{
+                fontSize: 20,
+                fontWeight: 900,
+                color: '#252b3a',
+                letterSpacing: '-0.02em',
+                fontFamily: 'var(--dp-typography-display), sans-serif',
+              }}>
+                Allié
+              </span>
             </div>
-            <span style={{
-              fontSize: 20,
-              fontWeight: 900,
-              color: '#252b3a',
-              letterSpacing: '-0.02em',
-              fontFamily: 'var(--dp-typography-display), sans-serif',
-            }}>
-              Allié
-            </span>
-          </div>
+          </Link>
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

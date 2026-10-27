@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import BrandLogo from '../BrandLogo';
 import {
   ArrowRight,
@@ -98,7 +98,9 @@ export default function SaaSLandingTemplate() {
       <div className="mx-auto max-w-[1600px] px-5 pb-8 pt-5 md:px-8 lg:px-10">
         <header className="mb-7 rounded-[28px] border-[3px] border-[#252b3a] bg-[#fffdf5] px-4 py-4 shadow-[8px_8px_0_0_#252b3a] md:px-6">
           <nav className="flex items-center justify-between gap-4">
-            <BrandLogo compact showSubtitle={false} />
+            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }}>
+              <BrandLogo compact showSubtitle={false} />
+            </Link>
 
             <div className="hidden items-center gap-6 md:flex">
               {navItems.map((item) => (

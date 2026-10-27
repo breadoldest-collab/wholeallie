@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
 
@@ -56,7 +57,9 @@ export const SignInPage = ({
 
         <section className="relative overflow-hidden rounded-[32px] border-[3px] border-[#252b3a] bg-[#ffffff] p-5 shadow-[12px_12px_0_0_#252b3a] md:p-8 lg:p-10">
           <div className="mb-8 flex items-center justify-between gap-4 border-b-[3px] border-[#252b3a] pb-4">
-            <BrandLogo compact showSubtitle={false} className="gap-2.5" />
+            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }}>
+              <BrandLogo compact showSubtitle={false} className="gap-2.5" />
+            </Link>
             <span className="inline-flex items-center gap-2 rounded-full border-[3px] border-[#252b3a] bg-[#e9fff5] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#253044]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#6434df]" />
               secure
