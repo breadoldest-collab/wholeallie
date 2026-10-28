@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
@@ -36,6 +36,7 @@ export const SignInPage = ({
   isLoading = false,
   mode = 'login',
   resetStep = 1,
+  resetCode = '',
   onToggleResetStep,
   onResetPasswordSubmit,
   verificationState = null,
@@ -45,6 +46,14 @@ export const SignInPage = ({
   const [showPassword, setShowPassword] = useState(false);
   const [emailValue, setEmailValue] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const [inputCode, setInputCode] = useState(resetCode || '');
+
+  useEffect(() => {
+    if (resetCode) {
+      setInputCode(resetCode);
+    }
+  }, [resetCode]);
+
   const isRegister = mode === 'register';
   const emailMeta = getEmailMeta(emailValue);
 
@@ -158,7 +167,9 @@ export const SignInPage = ({
                           inputMode="numeric"
                           maxLength={6}
                           required
-                          placeholder="Enter 6-digit code from email"
+                          value={inputCode}
+                          onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          placeholder="Enter 6-digit code"
                           className="w-full bg-transparent px-4 py-3.5 text-[15px] text-[#253044] placeholder:text-[#253044]/45 focus:outline-none"
                         />
                       </InputShell>

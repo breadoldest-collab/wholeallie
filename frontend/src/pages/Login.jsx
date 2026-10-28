@@ -31,6 +31,7 @@ export default function Login({ initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode);
   const [resetStep, setResetStep] = useState(1);
   const [resetEmail, setResetEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
   const [verificationState, setVerificationState] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -185,6 +186,9 @@ export default function Login({ initialMode = 'login' }) {
         setResetEmail(email);
         const res = await API.post('/api/auth/forgot-password', { email });
         setResetStep(2);
+        if (res.data.code) {
+          setResetCode(res.data.code);
+        }
         setStatusMessage(res.data.message || `A 6-digit password reset code has been sent to ${email}. Please check your inbox.`);
         return;
       }
@@ -271,6 +275,7 @@ export default function Login({ initialMode = 'login' }) {
       statusMessage={statusMessage}
       isLoading={loading}
       resetStep={resetStep}
+      resetCode={resetCode}
       onToggleResetStep={handleToggleResetStep}
       onResetPasswordSubmit={handleResetPasswordSubmit}
       verificationState={verificationState}
