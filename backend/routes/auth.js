@@ -105,11 +105,11 @@ async function sendViaResend({ to, subject, html, text }) {
   return data;
 }
 
-// Brevo HTTPS API (Port 443 - works on Render free tier)
+// Brevo HTTPS API (Port 443 - works on Render free tier without custom domain)
 async function sendViaBrevo({ to, subject, html, text }) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) return null;
-  const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'allie@example.com';
+  const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'oldbreades@gmail.com';
   const response = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -133,18 +133,7 @@ async function sendViaBrevo({ to, subject, html, text }) {
 }
 
 async function sendEmailUniversal({ to, subject, html, text }) {
-  // 1. Try Resend HTTPS API if key configured (bypasses cloud host SMTP port blocks)
-  if (process.env.RESEND_API_KEY) {
-    try {
-      await sendViaResend({ to, subject, html, text });
-      console.log(`[Email] Successfully delivered to ${to} via Resend HTTP API.`);
-      return true;
-    } catch (err) {
-      console.warn('[Email] Resend delivery failed, falling back:', err.message);
-    }
-  }
-
-  // 2. Try Brevo HTTPS API if key configured
+  // 1. Try Brevo HTTPS API first (sends to ANY email without requiring a custom domain)
   if (process.env.BREVO_API_KEY) {
     try {
       await sendViaBrevo({ to, subject, html, text });
@@ -152,6 +141,17 @@ async function sendEmailUniversal({ to, subject, html, text }) {
       return true;
     } catch (err) {
       console.warn('[Email] Brevo delivery failed, falling back:', err.message);
+    }
+  }
+
+  // 2. Try Resend HTTPS API if key configured
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await sendViaResend({ to, subject, html, text });
+      console.log(`[Email] Successfully delivered to ${to} via Resend HTTP API.`);
+      return true;
+    } catch (err) {
+      console.warn('[Email] Resend delivery failed, falling back:', err.message);
     }
   }
 
@@ -175,44 +175,147 @@ async function sendEmailUniversal({ to, subject, html, text }) {
     }
   }
 
-  console.warn('[Email] No email delivery provider (Resend/Brevo/SMTP) was able to send the email.');
+  console.warn('[Email] No email delivery provider (Brevo/Resend/SMTP) was able to send the email.');
   return false;
 }
 
 async function sendVerificationEmail(email, code) {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify your Allié Account</title>
+</head>
+<body style="margin: 0; padding: 32px 16px; background-color: #f7f6f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden;">
+    <tr>
+      <td style="padding: 28px 32px 20px; background: #fffdf5; border-bottom: 3px solid #252b3a;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td>
+              <div style="display: inline-flex; align-items: center;">
+                <span style="display: inline-block; width: 34px; height: 34px; background: #9bf1cd; border: 2.5px solid #252b3a; border-radius: 10px; text-align: center; line-height: 34px; font-weight: 900; font-size: 18px; color: #252b3a;">A</span>
+                <span style="font-size: 22px; font-weight: 900; letter-spacing: -0.03em; color: #252b3a; vertical-align: middle; margin-left: 8px;">Allié</span>
+              </div>
+            </td>
+            <td align="right">
+              <span style="display: inline-block; background: #f1ebff; border: 2px solid #252b3a; border-radius: 999px; padding: 4px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #6434df;">Security</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 32px 32px 28px;">
+        <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: #252b3a;">Verify your email address</h1>
+        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4d586d;">
+          Thank you for signing up for <strong>Allié</strong>. Enter the 6-digit verification code below to activate your account and start managing your AI customer support:
+        </p>
+
+        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; width: 100%;">
+          <tr>
+            <td align="center">
+              <div style="display: inline-block; background: #f1ebff; border: 3px solid #252b3a; border-radius: 16px; padding: 16px 36px; box-shadow: 4px 4px 0px #252b3a;">
+                <span style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #252b3a;">${code}</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <div style="background: #fffdf5; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 14px 18px; margin: 24px 0 0;">
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #64748b;">
+            ⏱️ <strong>Valid for 15 minutes.</strong> Never share this verification code with anyone. If you didn't create an account, you can safely ignore this email.
+          </p>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px 32px; background: #fafaf9; border-top: 2px solid #e2e8f0; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+          Allié AI Support Platform • Automated Security Notification
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
   return await sendEmailUniversal({
     to: email,
-    subject: 'Verify your Allié account email',
+    subject: `${code} is your Allié verification code`,
     text: `Your Allié verification code is: ${code}. It expires in 15 minutes.`,
-    html: `
-      <div style="font-family: sans-serif; padding: 24px; border: 2px solid #252b3a; border-radius: 14px; background: #fffdf5; max-width: 500px; color: #252b3a;">
-        <h2 style="color: #6434df; margin-top: 0;">Welcome to Allié</h2>
-        <p>Please use the following verification code to activate your account:</p>
-        <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 24px; background: #f1ebff; border: 2px solid #252b3a; border-radius: 10px; display: inline-block; color: #252b3a; margin: 12px 0;">
-          ${code}
-        </div>
-        <p style="color: #64748b; font-size: 13px;">This code will expire in 15 minutes.</p>
-      </div>
-    `,
+    html,
   });
 }
 
 async function sendPasswordResetEmail(email, code) {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset your Allié Password</title>
+</head>
+<body style="margin: 0; padding: 32px 16px; background-color: #f7f6f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden;">
+    <tr>
+      <td style="padding: 28px 32px 20px; background: #fffdf5; border-bottom: 3px solid #252b3a;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td>
+              <div style="display: inline-flex; align-items: center;">
+                <span style="display: inline-block; width: 34px; height: 34px; background: #9bf1cd; border: 2.5px solid #252b3a; border-radius: 10px; text-align: center; line-height: 34px; font-weight: 900; font-size: 18px; color: #252b3a;">A</span>
+                <span style="font-size: 22px; font-weight: 900; letter-spacing: -0.03em; color: #252b3a; vertical-align: middle; margin-left: 8px;">Allié</span>
+              </div>
+            </td>
+            <td align="right">
+              <span style="display: inline-block; background: #fee2e2; border: 2px solid #252b3a; border-radius: 999px; padding: 4px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #dc2626;">Password Reset</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 32px 32px 28px;">
+        <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: #252b3a;">Reset your password</h1>
+        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4d586d;">
+          We received a request to reset the password for your <strong>Allié</strong> account. Enter the 6-digit code below to set a new password:
+        </p>
+
+        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; width: 100%;">
+          <tr>
+            <td align="center">
+              <div style="display: inline-block; background: #f1ebff; border: 3px solid #252b3a; border-radius: 16px; padding: 16px 36px; box-shadow: 4px 4px 0px #252b3a;">
+                <span style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #252b3a;">${code}</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <div style="background: #fffdf5; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 14px 18px; margin: 24px 0 0;">
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #64748b;">
+            ⏱️ <strong>Valid for 60 minutes.</strong> If you didn't request a password reset, you can safely ignore this email — your account remains completely secure.
+          </p>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px 32px; background: #fafaf9; border-top: 2px solid #e2e8f0; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+          Allié AI Support Platform • Automated Security Notification
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
   return await sendEmailUniversal({
     to: email,
-    subject: 'Reset your Allié account password',
+    subject: `${code} is your Allié password reset code`,
     text: `Your Allié password reset code is: ${code}. It expires in 60 minutes.`,
-    html: `
-      <div style="font-family: sans-serif; padding: 24px; border: 2px solid #252b3a; border-radius: 14px; background: #fffdf5; max-width: 500px; color: #252b3a;">
-        <h2 style="color: #6434df; margin-top: 0;">Password Reset Request</h2>
-        <p>You requested to reset your password for your Allié account.</p>
-        <p>Your 6-digit verification code is:</p>
-        <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 24px; background: #f1ebff; border: 2px solid #252b3a; border-radius: 10px; display: inline-block; color: #252b3a; margin: 12px 0;">
-          ${code}
-        </div>
-        <p style="color: #64748b; font-size: 13px;">This code expires in 60 minutes. If you did not request this change, you can safely ignore this email.</p>
-      </div>
-    `,
+    html,
   });
 }
 
