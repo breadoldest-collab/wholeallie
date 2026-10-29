@@ -1,7 +1,39 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Sparkles, MessageSquare, Clock, RefreshCw, Maximize2, Minimize2, Square } from 'lucide-react';
 import API from '../api/axios';
 import AITextLoading from './ui/ai-text-loading';
+
+const CREATIVE_THINKING_MESSAGES = [
+  "Consulting the support stars...",
+  "Sifting through customer insights...",
+  "Connecting the neural dots...",
+  "Analyzing store telemetry...",
+  "Crunching customer sentiment...",
+  "Checking the conversation pulse...",
+  "Brewing fresh intelligence...",
+  "Synthesizing conversational memory...",
+  "Pondering the smartest answer...",
+  "Scanning recent store chatter...",
+  "Cross-referencing customer history...",
+  "Translating data into insights...",
+  "Polishing actionable recommendations...",
+  "Deciphering customer signals...",
+  "Synthesizing business context...",
+  "Tuning into your store frequency...",
+  "Unlocking conversational intelligence...",
+  "Formulating the perfect response...",
+  "Distilling chat analytics...",
+  "Thinking through the details...",
+];
+
+function shuffleThinking(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 const cleanText = (txt) => {
   if (!txt) return '';
@@ -23,7 +55,13 @@ export default function AdminCopilotWidget() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [thinkingTexts, setThinkingTexts] = useState(() => shuffleThinking(CREATIVE_THINKING_MESSAGES));
   const abortControllerRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
 
   const handleStop = () => {
     if (abortControllerRef.current) {
@@ -51,11 +89,26 @@ export default function AdminCopilotWidget() {
 
     if (!userPrompt) setInput('');
 
+    // Prepare full conversation history for multi-turn conversational memory
+    const historyPayload = messages
+      .filter((m) => m && m.content && m.content !== '[Analysis stopped by admin]')
+      .slice(-12)
+      .map((m) => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content,
+      }));
+
+    // Randomize creative thinking thoughts for this turn
+    setThinkingTexts(shuffleThinking(CREATIVE_THINKING_MESSAGES));
+
     setMessages((prev) => [...prev, { role: 'user', content: query }]);
     setLoading(true);
 
     try {
-      const res = await API.post('/api/conversations/assistant', { prompt: query }, {
+      const res = await API.post('/api/conversations/assistant', {
+        prompt: query,
+        history: historyPayload,
+      }, {
         signal: controller.signal,
       });
       setMessages((prev) => [
@@ -345,18 +398,63 @@ export default function AdminCopilotWidget() {
             ))}
 
             {loading && (
-              <div style={{ paddingLeft: 38 }}>
-                <AITextLoading
-                  texts={[
-                    "Thinking...",
-                    "Analyzing...",
-                    "Responding...",
-                  ]}
-                  className="text-xs font-semibold text-slate-600"
-                  interval={400}
-                />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '2px 0',
+                }}
+              >
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: '#f1ebff',
+                    border: '2px solid #252b3a',
+                    color: '#6434df',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
+                  }}
+                >
+                  <Sparkles size={14} className="text-[#6434df]" />
+                </div>
+                <div
+                  style={{
+                    background: '#fffdf5',
+                    border: '2px solid #252b3a',
+                    borderLeft: '4px solid #6434df',
+                    borderRadius: '4px 14px 14px 14px',
+                    padding: '8px 14px',
+                    boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    minHeight: 36,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#6434df',
+                      display: 'inline-block',
+                    }}
+                  />
+                  <AITextLoading
+                    texts={thinkingTexts}
+                    interval={1800}
+                    className="text-xs font-bold text-[#6434df]"
+                  />
+                </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Box */}

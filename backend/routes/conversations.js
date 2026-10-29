@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const Conversation = require('../models/Conversation');
+const Business = require('../models/Business');
 const { getGeminiApiKey } = require('../config/aiKeys');
 
 router.use(authMiddleware);
@@ -50,17 +51,22 @@ router.get('/', async (req, res) => {
 // POST /api/conversations/assistant — AI Admin Copilot
 router.post('/assistant', async (req, res) => {
   try {
-    const { prompt } = req.body;
-    if (!prompt) {
+    const { prompt, history } = req.body;
+    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Gracefully handle no DB connection
+    // Gracefully handle no DB connection & fetch store data
     let conversations = [];
+    let businessName = '';
     if (require('mongoose').connection.readyState === 1) {
       try {
-        conversations = await Conversation.find({ businessId: req.business })
-          .sort({ createdAt: -1 });
+        const [convs, bus] = await Promise.all([
+          Conversation.find({ businessId: req.business }).sort({ createdAt: -1 }),
+          req.business ? Business.findById(req.business) : null,
+        ]);
+        conversations = convs || [];
+        if (bus) businessName = bus.businessName || '';
       } catch (dbErr) { /* skip */ }
     }
 
@@ -79,19 +85,59 @@ router.post('/assistant', async (req, res) => {
       return `Session [${c.sessionId}] Rating: ${c.rating || 'unrated'}, Last: "${lastMsg}"`;
     }).join('\n');
 
-    const dbStatus = `TOTAL CONVERSATIONS: ${total}\nOPEN / PENDING CONVERSATIONS (${openConvs.length}):\n${openSummaries || 'None'}\n\nRESOLVED CONVERSATIONS (${resolvedConvs.length}):\n${resolvedSummaries || 'None'}`;
+    const dbStatus = `STORE NAME: ${businessName || 'Allié Store'}\nTOTAL CONVERSATIONS: ${total}\nOPEN / PENDING CONVERSATIONS (${openConvs.length}):\n${openSummaries || 'None'}\n\nRESOLVED CONVERSATIONS (${resolvedConvs.length}):\n${resolvedSummaries || 'None'}`;
 
-    const systemPrompt = `You are Allié Admin Copilot, an intelligent AI assistant for the store owner.
+    const systemPrompt = `You are Allié Admin Copilot, an intelligent, conversational AI assistant for the store owner of "${businessName || 'this store'}".
 You have real-time access to their business conversation data:
 
 ${dbStatus}
 
-INSTRUCTIONS:
-1. If the user asks about customer conversations, pending chats, summaries, customer sentiment, or store issues, use the real-time data above to provide concise, actionable insights.
-2. If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X"), answer helpfully, accurately, and politely as Allié Admin Copilot.
-3. DO NOT use any markdown asterisks (no **, no ***, no *).
-4. Use clean bullet points (•) or clean headers.
-5. Keep formatting minimal, elegant, and readable.`;
+CRITICAL INSTRUCTIONS:
+1. CONVERSATIONAL MEMORY: You are having an ongoing conversation with the store owner/admin. Always remember and maintain context of previous turns in this chat session (e.g. if the user told you their name, previous questions they asked, or instructions they gave). If the user asks "who am I" or refers back to what they said, accurately use what they told you earlier in this conversation!
+2. STORE & CUSTOMER INTELLIGENCE: If the user asks about customer conversations, pending chats, customer sentiment, or store issues, use the real-time data above to provide concise, actionable insights.
+3. GENERAL CAPABILITIES: If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X", personal introductions), answer helpfully, accurately, and politely as Allié Admin Copilot.
+4. FORMATTING RULES:
+   - DO NOT use markdown asterisks (no **, no ***, no *).
+   - Use clean bullet points (•) or clean section headers.
+   - Keep formatting minimal, elegant, and readable.`;
+
+    // Construct multi-turn contents for Gemini preserving conversational history
+    const contents = [];
+
+    if (Array.isArray(history)) {
+      for (const msg of history) {
+        if (!msg || !msg.content || typeof msg.content !== 'string') continue;
+        const text = msg.content.trim();
+        if (!text) continue;
+
+        // Skip default greeting or stopped placeholder
+        if (text.startsWith('Hi! I am your AI Conversation Assistant') || text === '[Analysis stopped by admin]') {
+          continue;
+        }
+
+        const role = (msg.role === 'assistant' || msg.role === 'model') ? 'model' : 'user';
+
+        if (role === 'user') {
+          if (contents.length === 0 || contents[contents.length - 1].role === 'model') {
+            contents.push({ role: 'user', parts: [{ text }] });
+          } else {
+            contents[contents.length - 1].parts[0].text += `\n${text}`;
+          }
+        } else {
+          // Model turn: must follow a user turn in Gemini
+          if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+            contents.push({ role: 'model', parts: [{ text }] });
+          }
+        }
+      }
+    }
+
+    // Append current user prompt as the final turn
+    if (contents.length === 0 || contents[contents.length - 1].role === 'model') {
+      contents.push({ role: 'user', parts: [{ text: prompt.trim() }] });
+    } else {
+      contents[contents.length - 1].parts[0].text += `\n${prompt.trim()}`;
+    }
 
     const geminiApiKey = getGeminiApiKey('summary');
     const candidateModels = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
@@ -108,7 +154,7 @@ INSTRUCTIONS:
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(25000), // 25s timeout for cloud environments
           body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            contents,
             systemInstruction: { parts: [{ text: systemPrompt }] }
           })
         });

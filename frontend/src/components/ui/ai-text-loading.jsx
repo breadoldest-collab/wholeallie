@@ -33,22 +33,24 @@ export default function AITextLoading({
     return () => clearInterval(timer);
   }, [interval, texts.length]);
 
+  if (!texts || texts.length === 0) return null;
+
   return (
-    <div className="flex items-center justify-center py-0.5 px-1">
-      <AnimatePresence mode="instant">
-        <motion.div
-          key={currentTextIndex}
-          initial={{ opacity: 0, y: 4 }}
+    <div className="relative inline-flex items-center overflow-hidden py-0.5 min-h-[22px]">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={`${currentTextIndex}-${texts[currentTextIndex]}`}
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.12 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{ duration: 0.16, ease: "easeInOut" }}
           className={cn(
-            "text-xs font-medium text-slate-600 select-none",
+            "text-xs font-semibold text-slate-700 select-none whitespace-nowrap",
             className
           )}
         >
           {texts[currentTextIndex]}
-        </motion.div>
+        </motion.span>
       </AnimatePresence>
     </div>
   );
