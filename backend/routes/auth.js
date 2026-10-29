@@ -179,142 +179,226 @@ async function sendEmailUniversal({ to, subject, html, text }) {
   return false;
 }
 
-async function sendVerificationEmail(email, code) {
-  const html = `<!DOCTYPE html>
-<html>
+function renderCodeTiles(code) {
+  const digits = String(code || '').trim().split('').slice(0, 6);
+  while (digits.length < 6) digits.push('•');
+
+  return digits.map(digit => `
+    <td align="center" valign="middle" style="padding: 0 3px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+        <tr>
+          <td align="center" valign="middle" style="width: 44px; height: 56px; min-width: 44px; max-width: 44px; background: #ffffff; border: 2.5px solid #252b3a; border-right: 4.5px solid #252b3a; border-bottom: 4.5px solid #252b3a; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 900; color: #252b3a; line-height: 56px; text-align: center;">
+            ${digit}
+          </td>
+        </tr>
+      </table>
+    </td>
+  `).join('');
+}
+
+function buildAllieEmailHtml({
+  preheader,
+  badgeText,
+  badgeBg,
+  badgeColor,
+  titlePre,
+  titleHighlight,
+  description,
+  code,
+  expiryMinutes = 60,
+  ctaText,
+  ctaUrl = 'https://wholeallie.vercel.app/login'
+}) {
+  return `<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify your Allié Account</title>
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>${titlePre} ${titleHighlight}</title>
 </head>
-<body style="margin: 0; padding: 32px 16px; background-color: #f7f6f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a;">
-  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden;">
+<body style="margin: 0; padding: 36px 14px; background-color: #fffdf5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a; -webkit-font-smoothing: antialiased;">
+  <!-- Hidden preheader for email preview snippets -->
+  <div style="display: none; font-size: 1px; color: #fffdf5; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">
+    ${preheader || `Your 6-digit Allié security code is ${code}. Valid for ${expiryMinutes} minutes.`}
+  </div>
+
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-right: 7px solid #252b3a; border-bottom: 7px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden; border-collapse: separate;">
+    <!-- Brand Header -->
     <tr>
-      <td style="padding: 28px 32px 20px; background: #fffdf5; border-bottom: 3px solid #252b3a;">
+      <td style="padding: 24px 28px 20px; background: #fffdf5; border-bottom: 3px solid #252b3a;">
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
           <tr>
-            <td>
-              <div style="display: inline-flex; align-items: center;">
-                <span style="display: inline-block; width: 34px; height: 34px; background: #9bf1cd; border: 2.5px solid #252b3a; border-radius: 10px; text-align: center; line-height: 34px; font-weight: 900; font-size: 18px; color: #252b3a;">A</span>
-                <span style="font-size: 22px; font-weight: 900; letter-spacing: -0.03em; color: #252b3a; vertical-align: middle; margin-left: 8px;">Allié</span>
-              </div>
+            <td valign="middle">
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td valign="middle" style="width: 42px;">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center" valign="middle" style="width: 40px; height: 40px; background: #9bf1cd; border: 2.5px solid #252b3a; border-right: 4px solid #252b3a; border-bottom: 4px solid #252b3a; border-radius: 12px; font-size: 22px; font-weight: 900; color: #252b3a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 40px; text-align: center;">
+                          A
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td valign="middle" style="padding-left: 12px; line-height: 1.1;">
+                    <span style="font-size: 24px; font-weight: 900; letter-spacing: -0.05em; color: #252b3a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      Allié
+                    </span>
+                    <div style="margin-top: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #5b6475; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399; margin-right: 4px; vertical-align: middle;"></span>ALLIÉ AI
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </td>
-            <td align="right">
-              <span style="display: inline-block; background: #f1ebff; border: 2px solid #252b3a; border-radius: 999px; padding: 4px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #6434df;">Security</span>
+            <td align="right" valign="middle">
+              <table border="0" cellpadding="0" cellspacing="0" align="right">
+                <tr>
+                  <td align="center" style="background: ${badgeBg}; border: 2.5px solid #252b3a; border-right: 4px solid #252b3a; border-bottom: 4px solid #252b3a; border-radius: 9999px; padding: 6px 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: ${badgeColor}; white-space: nowrap;">
+                    ${badgeText}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
       </td>
     </tr>
+
+    <!-- Main Content Area -->
     <tr>
-      <td style="padding: 32px 32px 28px;">
-        <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: #252b3a;">Verify your email address</h1>
-        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4d586d;">
-          Thank you for signing up for <strong>Allié</strong>. Enter the 6-digit verification code below to activate your account and start managing your AI customer support:
+      <td style="padding: 34px 30px 28px; background: #ffffff;">
+        <!-- Two-tone Heading -->
+        <h1 style="margin: 0 0 14px; font-size: 30px; font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; text-transform: uppercase; color: #252b3a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          ${titlePre} <span style="color: #6434df;">${titleHighlight}</span>
+        </h1>
+
+        <!-- Subtext -->
+        <p style="margin: 0 0 26px; font-size: 15px; line-height: 1.65; color: #4d586d; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          ${description}
         </p>
 
-        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; width: 100%;">
+        <!-- Neo-brutalist Code Tiles Container -->
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0 26px; background: #f1ebff; border: 2.5px solid #252b3a; border-right: 5.5px solid #252b3a; border-bottom: 5.5px solid #252b3a; border-radius: 20px; box-shadow: 4px 4px 0px #252b3a;">
           <tr>
-            <td align="center">
-              <div style="display: inline-block; background: #f1ebff; border: 3px solid #252b3a; border-radius: 16px; padding: 16px 36px; box-shadow: 4px 4px 0px #252b3a;">
-                <span style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #252b3a;">${code}</span>
+            <td align="center" style="padding: 22px 14px 20px;">
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; color: #6434df; margin-bottom: 14px;">
+                One-Time Authorization Code
+              </div>
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+                <tr>
+                  ${renderCodeTiles(code)}
+                </tr>
+              </table>
+              <div style="margin-top: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11.5px; font-weight: 700; color: #6c5fa7; letter-spacing: 0.04em;">
+                Expires in ${expiryMinutes} minutes &bull; Single-use only
               </div>
             </td>
           </tr>
         </table>
 
-        <div style="background: #fffdf5; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 14px 18px; margin: 24px 0 0;">
-          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #64748b;">
-            ⏱️ <strong>Valid for 15 minutes.</strong> Never share this verification code with anyone. If you didn't create an account, you can safely ignore this email.
-          </p>
-        </div>
+        <!-- Neo-brutalist Primary CTA Button -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0 20px;">
+          <tr>
+            <td align="center">
+              <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="background: #6434df; border: 3px solid #252b3a; border-right: 6px solid #252b3a; border-bottom: 6px solid #252b3a; border-radius: 9999px; box-shadow: 4px 4px 0px #252b3a;">
+                    <a href="${ctaUrl}" target="_blank" style="display: block; padding: 15px 36px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; color: #ffffff; text-decoration: none; white-space: nowrap;">
+                      ${ctaText} &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Security Note Box -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: #e9fff5; border: 2.5px solid #252b3a; border-right: 5px solid #252b3a; border-bottom: 5px solid #252b3a; border-radius: 16px; box-shadow: 3px 3px 0px #252b3a; margin: 10px 0 0;">
+          <tr>
+            <td style="padding: 15px 18px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td valign="top" style="width: 28px; font-size: 20px; line-height: 1;">
+                    🛡️
+                  </td>
+                  <td valign="top" style="padding-left: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12.5px; line-height: 1.55; color: #253044;">
+                    <strong style="color: #0f7a57;">Security Guarantee:</strong> This verification code is valid for ${expiryMinutes} minutes. If you did not request this, you can safely disregard this email — your account remains completely protected.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
+
+    <!-- Brand Footer -->
     <tr>
-      <td style="padding: 20px 32px; background: #fafaf9; border-top: 2px solid #e2e8f0; text-align: center;">
-        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-          Allié AI Support Platform • Automated Security Notification
+      <td style="padding: 24px 30px 26px; background: #fffdf5; border-top: 3px solid #252b3a; text-align: center;">
+        <p style="margin: 0 0 5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 0.04em; color: #252b3a;">
+          Allié AI Support Platform
+        </p>
+        <p style="margin: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; line-height: 1.5; color: #64748b;">
+          Automated security notification &bull; Please do not reply directly to this email
+        </p>
+        <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 800; color: #6434df;">
+          <a href="https://wholeallie.vercel.app" target="_blank" style="color: #6434df; text-decoration: none;">Website</a> &nbsp;&bull;&nbsp; 
+          <a href="https://wholeallie.vercel.app/login" target="_blank" style="color: #6434df; text-decoration: none;">Sign In</a> &nbsp;&bull;&nbsp; 
+          <a href="https://wholeallie.vercel.app/dashboard" target="_blank" style="color: #6434df; text-decoration: none;">Dashboard</a>
         </p>
       </td>
     </tr>
   </table>
 </body>
 </html>`;
+}
+
+async function sendVerificationEmail(email, code) {
+  const html = buildAllieEmailHtml({
+    preheader: `Your Allié account verification code is ${code}. Activate your workspace now.`,
+    badgeText: '● VERIFY ACCOUNT',
+    badgeBg: '#e9fff5',
+    badgeColor: '#0f7a57',
+    titlePre: 'Verify your',
+    titleHighlight: 'Account',
+    description: 'Welcome to <strong>Allié</strong>! Enter the 6-digit verification passcode below to activate your account and start managing your AI customer operations workspace:',
+    code,
+    expiryMinutes: 60,
+    ctaText: 'Open Allié & Verify',
+    ctaUrl: 'https://wholeallie.vercel.app/login'
+  });
 
   return await sendEmailUniversal({
     to: email,
     subject: `${code} is your Allié verification code`,
-    text: `Your Allié verification code is: ${code}. It expires in 15 minutes.`,
+    text: `Your Allié verification code is: ${code}. It expires in 60 minutes. Use it at https://wholeallie.vercel.app/login`,
     html,
   });
 }
 
 async function sendPasswordResetEmail(email, code) {
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset your Allié Password</title>
-</head>
-<body style="margin: 0; padding: 32px 16px; background-color: #f7f6f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a;">
-  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden;">
-    <tr>
-      <td style="padding: 28px 32px 20px; background: #fffdf5; border-bottom: 3px solid #252b3a;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-          <tr>
-            <td>
-              <div style="display: inline-flex; align-items: center;">
-                <span style="display: inline-block; width: 34px; height: 34px; background: #9bf1cd; border: 2.5px solid #252b3a; border-radius: 10px; text-align: center; line-height: 34px; font-weight: 900; font-size: 18px; color: #252b3a;">A</span>
-                <span style="font-size: 22px; font-weight: 900; letter-spacing: -0.03em; color: #252b3a; vertical-align: middle; margin-left: 8px;">Allié</span>
-              </div>
-            </td>
-            <td align="right">
-              <span style="display: inline-block; background: #fee2e2; border: 2px solid #252b3a; border-radius: 999px; padding: 4px 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #dc2626;">Password Reset</span>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 32px 32px 28px;">
-        <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: #252b3a;">Reset your password</h1>
-        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #4d586d;">
-          We received a request to reset the password for your <strong>Allié</strong> account. Enter the 6-digit code below to set a new password:
-        </p>
-
-        <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; width: 100%;">
-          <tr>
-            <td align="center">
-              <div style="display: inline-block; background: #f1ebff; border: 3px solid #252b3a; border-radius: 16px; padding: 16px 36px; box-shadow: 4px 4px 0px #252b3a;">
-                <span style="font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #252b3a;">${code}</span>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <div style="background: #fffdf5; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 14px 18px; margin: 24px 0 0;">
-          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #64748b;">
-            ⏱️ <strong>Valid for 60 minutes.</strong> If you didn't request a password reset, you can safely ignore this email — your account remains completely secure.
-          </p>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 20px 32px; background: #fafaf9; border-top: 2px solid #e2e8f0; text-align: center;">
-        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-          Allié AI Support Platform • Automated Security Notification
-        </p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+  const html = buildAllieEmailHtml({
+    preheader: `Your Allié password reset code is ${code}. Valid for 60 minutes.`,
+    badgeText: '● SECURE RESET',
+    badgeBg: '#ffd05b',
+    badgeColor: '#252b3a',
+    titlePre: 'Reset your',
+    titleHighlight: 'Password',
+    description: 'We received a request to reset the password for your <strong>Allié</strong> account. Enter the 6-digit one-time code below to create a new password:',
+    code,
+    expiryMinutes: 60,
+    ctaText: 'Open Allié & Enter Code',
+    ctaUrl: 'https://wholeallie.vercel.app/login'
+  });
 
   return await sendEmailUniversal({
     to: email,
     subject: `${code} is your Allié password reset code`,
-    text: `Your Allié password reset code is: ${code}. It expires in 60 minutes.`,
+    text: `Your Allié password reset code is: ${code}. It expires in 60 minutes. Enter your code at https://wholeallie.vercel.app/login`,
     html,
   });
 }
