@@ -653,7 +653,27 @@ export default function Profile() {
           </div>
 
           {loading ? (
-            <div style={{ padding: 48, textAlign: 'center', color: '#64748b', fontWeight: 600 }}>Loading profile data…</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, animation: 'pulseProfileSkeleton 1.8s ease-in-out infinite' }}>
+              <style>{`
+                @keyframes pulseProfileSkeleton {
+                  0%, 100% { opacity: 0.95; }
+                  50% { opacity: 0.55; }
+                }
+              `}</style>
+              <div style={{
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 26, boxShadow: '6px 6px 0 0 #252b3a',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 12, background: '#e9fff5', border: '3px solid #252b3a' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ width: 170, height: 18, background: '#e2e8f0', borderRadius: 6 }} />
+                    <div style={{ width: 250, height: 12, background: '#f1f5f9', borderRadius: 4 }} />
+                  </div>
+                </div>
+                <div style={{ height: 48, borderRadius: 14, border: '3px solid #252b3a', background: '#ffffff', boxShadow: '3px 3px 0 0 rgba(37,43,58,0.1)' }} />
+              </div>
+            </div>
           ) : (
             <div>
 

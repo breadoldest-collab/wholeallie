@@ -140,7 +140,84 @@ export default function Settings() {
           )}
 
           {loading ? (
-            <div style={{ padding: 48, textAlign: 'center', color: '#64748b' }}>Loading settings…</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, animation: 'pulseSettingsSkeleton 1.8s ease-in-out infinite' }}>
+              <style>{`
+                @keyframes pulseSettingsSkeleton {
+                  0%, 100% { opacity: 0.95; }
+                  50% { opacity: 0.55; }
+                }
+              `}</style>
+
+              {/* Business Description Card Skeleton */}
+              <div style={{
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 24, boxShadow: '5px 5px 0 0 #252b3a',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10,
+                      background: '#f1ebff', border: '3px solid #252b3a',
+                    }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ width: 180, height: 18, background: '#e2e8f0', borderRadius: 6 }} />
+                      <div style={{ width: 260, height: 12, background: '#f1f5f9', borderRadius: 4 }} />
+                    </div>
+                  </div>
+                  <div style={{ width: 64, height: 24, background: '#f1f5f9', borderRadius: 8, border: '1px solid #eaecf0' }} />
+                </div>
+                <div style={{
+                  height: 140, borderRadius: 16, border: '3px solid #252b3a',
+                  background: '#ffffff', boxShadow: '3px 3px 0 0 rgba(37,43,58,0.08)'
+                }} />
+              </div>
+
+              {/* Frequently Asked Questions Card Skeleton */}
+              <div style={{
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 24, boxShadow: '5px 5px 0 0 #252b3a',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 10,
+                      background: '#e9fff5', border: '3px solid #252b3a',
+                    }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ width: 210, height: 18, background: '#e2e8f0', borderRadius: 6 }} />
+                      <div style={{ width: 130, height: 12, background: '#f1f5f9', borderRadius: 4 }} />
+                    </div>
+                  </div>
+                  <div style={{ width: 110, height: 36, borderRadius: 999, background: '#f1ebff', border: '3px solid #252b3a', boxShadow: '4px 4px 0 0 #252b3a' }} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {[1, 2].map((i) => (
+                    <div key={i} style={{
+                      background: '#ffffff', border: '3px solid #252b3a',
+                      borderRadius: 18, padding: 18, boxShadow: '4px 4px 0 0 rgba(37, 43, 58, 0.12)',
+                      display: 'flex', flexDirection: 'column', gap: 12
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ width: 75, height: 14, background: '#e2e8f0', borderRadius: 4 }} />
+                        <div style={{ width: 22, height: 22, borderRadius: 6, background: '#fee2e2' }} />
+                      </div>
+                      <div style={{ height: 42, borderRadius: 12, border: '2px solid #252b3a', background: '#fffdf5' }} />
+                      <div style={{ height: 60, borderRadius: 12, border: '2px solid #252b3a', background: '#fffdf5' }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Button Skeleton */}
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{
+                  width: 140, height: 44, borderRadius: 999,
+                  background: '#6434df', opacity: 0.6,
+                  border: '3px solid #252b3a', boxShadow: '4px 4px 0 0 #252b3a',
+                }} />
+              </div>
+            </div>
           ) : (
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 

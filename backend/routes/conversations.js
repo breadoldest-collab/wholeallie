@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/conversations/assistant — AI Admin Copilot
+// POST /api/conversations/assistant — Owner's Allié
 router.post('/assistant', async (req, res) => {
   try {
     const { prompt, history } = req.body;
@@ -56,50 +56,65 @@ router.post('/assistant', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Gracefully handle no DB connection & fetch store data
-    let conversations = [];
+    // Lean and fast telemetry query
+    let openConvs = [];
+    let resolvedConvs = [];
+    let total = 0;
     let businessName = '';
+
     if (require('mongoose').connection.readyState === 1) {
       try {
-        const [convs, bus] = await Promise.all([
-          Conversation.find({ businessId: req.business }).sort({ createdAt: -1 }),
-          req.business ? Business.findById(req.business) : null,
+        const [openData, resolvedData, totalCount, bus] = await Promise.all([
+          Conversation.find({ businessId: req.business, status: 'open' })
+            .select('sessionId customerName messages')
+            .sort({ updatedAt: -1 })
+            .limit(8)
+            .lean(),
+          Conversation.find({ businessId: req.business, status: 'resolved' })
+            .select('sessionId rating messages')
+            .sort({ updatedAt: -1 })
+            .limit(4)
+            .lean(),
+          Conversation.countDocuments({ businessId: req.business }),
+          req.business ? Business.findById(req.business).select('businessName').lean() : null,
         ]);
-        conversations = convs || [];
+
+        openConvs = openData || [];
+        resolvedConvs = resolvedData || [];
+        total = totalCount || 0;
         if (bus) businessName = bus.businessName || '';
       } catch (dbErr) { /* skip */ }
     }
 
-    const total = conversations.length;
-    const openConvs = conversations.filter(c => c.status === 'open');
-    const resolvedConvs = conversations.filter(c => c.status === 'resolved');
-
-    // Build context summary for Gemini
+    // Build concise context summary (last 2 messages per session, max 100 chars)
     const openSummaries = openConvs.map(c => {
-      const msgs = (c.messages || []).map(m => `${m.role.toUpperCase()}: ${m.content}`).join(' | ');
-      return `Session [${c.sessionId}] (${c.customerName}): ${msgs || 'No messages'}`;
+      const recent = (c.messages || []).slice(-2).map(m => {
+        const snippet = String(m.content || '').slice(0, 100);
+        return `${m.role.toUpperCase()}: ${snippet}`;
+      }).join(' | ');
+      return `Session [${c.sessionId}] (${c.customerName || 'Guest'}): ${recent || 'No recent messages'}`;
     }).join('\n');
 
     const resolvedSummaries = resolvedConvs.map(c => {
-      const lastMsg = c.messages?.length > 0 ? c.messages[c.messages.length - 1].content : '';
-      return `Session [${c.sessionId}] Rating: ${c.rating || 'unrated'}, Last: "${lastMsg}"`;
+      const lastMsg = c.messages?.length > 0 ? String(c.messages[c.messages.length - 1].content || '').slice(0, 80) : '';
+      return `Session [${c.sessionId}] Rating: ${c.rating || 'unrated'}${lastMsg ? `, Last: "${lastMsg}"` : ''}`;
     }).join('\n');
 
     const dbStatus = `STORE NAME: ${businessName || 'Allié Store'}\nTOTAL CONVERSATIONS: ${total}\nOPEN / PENDING CONVERSATIONS (${openConvs.length}):\n${openSummaries || 'None'}\n\nRESOLVED CONVERSATIONS (${resolvedConvs.length}):\n${resolvedSummaries || 'None'}`;
 
-    const systemPrompt = `You are Allié Admin Copilot, an intelligent, conversational AI assistant for the store owner of "${businessName || 'this store'}".
-You have real-time access to their business conversation data:
+    const systemPrompt = `You are Owner's Allié, an intelligent, conversational executive AI assistant and operational copilot for the store owner of "${businessName || 'this store'}".
+You have real-time access to their business conversation telemetry:
 
 ${dbStatus}
 
 CRITICAL INSTRUCTIONS:
 1. CONVERSATIONAL MEMORY: You are having an ongoing conversation with the store owner/admin. Always remember and maintain context of previous turns in this chat session (e.g. if the user told you their name, previous questions they asked, or instructions they gave). If the user asks "who am I" or refers back to what they said, accurately use what they told you earlier in this conversation!
 2. STORE & CUSTOMER INTELLIGENCE: If the user asks about customer conversations, pending chats, customer sentiment, or store issues, use the real-time data above to provide concise, actionable insights.
-3. GENERAL CAPABILITIES: If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X", personal introductions), answer helpfully, accurately, and politely as Allié Admin Copilot.
+3. GENERAL CAPABILITIES: If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X", personal introductions), answer helpfully, accurately, and politely as Owner's Allié.
 4. FORMATTING RULES:
    - DO NOT use markdown asterisks (no **, no ***, no *).
    - Use clean bullet points (•) or clean section headers.
-   - Keep formatting minimal, elegant, and readable.`;
+   - Keep answers sharp, fast, elegant, and readable.`;
 
     // Construct multi-turn contents for Gemini preserving conversational history
     const contents = [];
@@ -111,7 +126,7 @@ CRITICAL INSTRUCTIONS:
         if (!text) continue;
 
         // Skip default greeting or stopped placeholder
-        if (text.startsWith('Hi! I am your AI Conversation Assistant') || text === '[Analysis stopped by admin]') {
+        if (text.startsWith('Hi! I am') || text === '[Analysis stopped by admin]') {
           continue;
         }
 
@@ -140,9 +155,9 @@ CRITICAL INSTRUCTIONS:
     }
 
     const geminiApiKey = getGeminiApiKey('summary');
-    const candidateModels = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
+    const candidateModels = ['gemini-flash-lite-latest', 'gemini-flash-latest'];
 
-    let reply = `You currently have ${openConvs.length} open conversations and ${total} total chats logged.`;
+    let reply = `You currently have ${openConvs.length} open conversations and ${total} total customer chats logged.`;
 
     let gotReply = false;
     for (const modelName of candidateModels) {
@@ -152,10 +167,14 @@ CRITICAL INSTRUCTIONS:
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(25000), // 25s timeout for cloud environments
+          signal: AbortSignal.timeout(7000), // 7s fast timeout to prevent long delays
           body: JSON.stringify({
             contents,
-            systemInstruction: { parts: [{ text: systemPrompt }] }
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            generationConfig: {
+              maxOutputTokens: 500,
+              temperature: 0.6
+            }
           })
         });
         if (response.ok) {
@@ -163,12 +182,16 @@ CRITICAL INSTRUCTIONS:
           const extracted = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (extracted) { reply = extracted.trim(); gotReply = true; }
         }
-      } catch (apiErr) { /* try next model */ }
+      } catch (apiErr) { /* try next model quickly */ }
     }
 
     return res.status(200).json({ reply, openCount: openConvs.length, total });
   } catch (err) {
-    return res.status(200).json({ reply: 'The database is temporarily unavailable, but I am here to help! Ask me anything about managing customer support.', openCount: 0, total: 0 });
+    return res.status(200).json({
+      reply: 'I am Owner\'s Allié, your store intelligence copilot. Ask me anything about managing customer support or store performance.',
+      openCount: 0,
+      total: 0
+    });
   }
 });
 

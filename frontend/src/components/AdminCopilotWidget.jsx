@@ -50,7 +50,7 @@ export default function AdminCopilotWidget() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hi! I am your AI Conversation Assistant. Ask me about pending chats, customer issues, or request a summary of today\'s conversations!',
+      content: "Hi! I am Owner's Allié, your intelligent store copilot. Ask me about pending chats, customer issues, or request a summary of today's conversations!",
     },
   ]);
   const [input, setInput] = useState('');
@@ -166,7 +166,7 @@ export default function AdminCopilotWidget() {
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'translate(0, 0)')}
         >
           <Sparkles size={18} />
-          <span>AI Copilot</span>
+          <span>Owner's Allié</span>
           <span
             style={{
               width: 8,
@@ -243,10 +243,10 @@ export default function AdminCopilotWidget() {
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>
-                  AI Admin Copilot
+                  Owner's Allié
                 </h3>
                 <p style={{ margin: '2px 0 0', fontSize: 11, opacity: 0.85, fontWeight: 500 }}>
-                  Real-time Conversation Intelligence
+                  Store Intelligence &amp; Operations Copilot
                 </p>
               </div>
             </div>
@@ -255,7 +255,7 @@ export default function AdminCopilotWidget() {
               <button
                 type="button"
                 onClick={() => setIsExpanded((prev) => !prev)}
-                title={isExpanded ? 'Restore standard size' : 'Expand / Maximize Copilot'}
+                title={isExpanded ? 'Restore standard size' : "Expand / Maximize Owner's Allié"}
                 style={{
                   background: '#ffffff',
                   border: '2px solid #252b3a',
@@ -275,7 +275,7 @@ export default function AdminCopilotWidget() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                title="Close Copilot"
+                title="Close Owner's Allié"
                 style={{
                   background: '#ffffff',
                   border: '2px solid #252b3a',
@@ -476,7 +476,7 @@ export default function AdminCopilotWidget() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Copilot about chats, issues, or general questions..."
+              placeholder="Ask Owner's Allié about chats, store issues, or general questions..."
               style={{
                 flex: 1,
                 padding: '10px 14px',
@@ -518,7 +518,7 @@ export default function AdminCopilotWidget() {
             <button
               type="submit"
               disabled={!input.trim()}
-              title="Send prompt to Copilot"
+              title="Send prompt to Owner's Allié"
               style={{
                 padding: '10px 14px',
                 borderRadius: 10,

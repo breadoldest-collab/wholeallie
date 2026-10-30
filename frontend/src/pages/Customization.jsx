@@ -242,7 +242,31 @@ export default function Customization() {
           )}
 
           {loading ? (
-            <div style={{ padding: 48, textAlign: 'center', color: '#64748b', fontWeight: 600 }}>Loading customization settings…</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, animation: 'pulseCustomSkeleton 1.8s ease-in-out infinite' }}>
+              <style>{`
+                @keyframes pulseCustomSkeleton {
+                  0%, 100% { opacity: 0.95; }
+                  50% { opacity: 0.55; }
+                }
+              `}</style>
+              <div style={{
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 26, boxShadow: '6px 6px 0 0 #252b3a',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 12, background: '#f1ebff', border: '3px solid #252b3a' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ width: 190, height: 20, background: '#e2e8f0', borderRadius: 6 }} />
+                    <div style={{ width: 270, height: 12, background: '#f1f5f9', borderRadius: 4 }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} style={{ height: 120, borderRadius: 16, border: '3px solid #252b3a', background: '#ffffff', boxShadow: '4px 4px 0 0 rgba(37,43,58,0.1)' }} />
+                  ))}
+                </div>
+              </div>
+            </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
