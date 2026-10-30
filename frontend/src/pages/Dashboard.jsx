@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
+import WeatherTimeWidget from '../components/WeatherTimeWidget';
 import API from '../api/axios';
 import { MessageSquare, CheckCircle2, Clock, CheckCircle, Plus, AlertCircle, Star } from 'lucide-react';
 import {
@@ -148,7 +149,7 @@ export default function Dashboard() {
       <Sidebar />
 
       <main style={{ flex: 1, padding: '32px 36px 40px', maxWidth: 1200, margin: '0 auto', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{
               fontSize: 52,
@@ -166,8 +167,8 @@ export default function Dashboard() {
               How your AI assistant is performing
             </p>
           </div>
-          <div style={{ fontSize: 13, color: '#4d586d', fontWeight: 700, paddingTop: 8, letterSpacing: '0.02em' }}>
-            {formattedDate}
+          <div>
+            <WeatherTimeWidget />
           </div>
         </div>
 
