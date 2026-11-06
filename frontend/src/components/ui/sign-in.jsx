@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import BrandLogo from '../BrandLogo';
 
 const EMAIL_PROVIDER_NOTE = 'A public email like @gmail.com or @outlook.com is a valid contact address, but it is not proof of identity unless it is verified through a secure account check.';
 
@@ -164,8 +163,13 @@ export const SignInPage = ({
 
         <section className="relative overflow-hidden rounded-[32px] border-[3px] border-[#252b3a] bg-[#ffffff] p-5 shadow-[12px_12px_0_0_#252b3a] md:p-8 lg:p-10">
           <div className="mb-8 flex items-center justify-between gap-4 border-b-[3px] border-[#252b3a] pb-4">
-            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }}>
-              <BrandLogo compact showSubtitle={false} className="gap-2.5" />
+            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }} className="flex items-center">
+              <span
+                className="whitespace-nowrap text-[26px] sm:text-[32px] font-black tracking-[-0.05em] text-[#252b3a] leading-none inline-block hover:opacity-90 transition-opacity select-none"
+                style={{ fontFamily: 'Inter, "Segoe UI", Arial, sans-serif' }}
+              >
+                Allié
+              </span>
             </Link>
             <span className="inline-flex items-center gap-2 rounded-full border-[3px] border-[#252b3a] bg-[#e9fff5] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#253044]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#6434df]" />
@@ -174,7 +178,7 @@ export const SignInPage = ({
           </div>
 
           <div className="mx-auto max-w-[620px]">
-            <h1 className="text-[34px] font-black uppercase leading-[0.9] tracking-[-0.03em] text-[#252b3a] md:text-[48px] lg:text-[58px]">
+            <h1 className="text-[34px] font-black uppercase leading-[1.05] tracking-[-0.03em] text-[#252b3a] md:text-[46px] lg:text-[54px]">
               {title}
             </h1>
             <p className="mt-5 max-w-[500px] text-[15px] leading-[1.7] text-[#253044]/75 md:text-[17px]">
