@@ -283,7 +283,7 @@ export const SignInPage = ({
                 <div className="mt-4 rounded-[16px] border-[2.5px] border-[#252b3a] bg-white p-3.5 shadow-[3px_3px_0_0_#252b3a]">
                   <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em] text-[#6434df] mb-1.5">
                     <span className="flex items-center gap-1.5">
-                      <span>💡</span> Did you know?
+                      Did you know?
                     </span>
                     <span className="text-[10px] text-[#252b3a] font-black bg-[#ffd05b] px-2 py-0.5 rounded-full border border-[#252b3a]">
                       {FUN_FACTS[factIndex].tag}

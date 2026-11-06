@@ -547,7 +547,7 @@ export default function WebsiteWalkthroughModal({ isOpen, onClose }) {
                 </div>
 
                 <div style={{ background: '#e9fff5', border: '2px solid #252b3a', borderRadius: 10, padding: 8, marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#252b3a' }}>⚡ Human Rep & AI Co-pilot Working Together</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#252b3a' }}>Human Rep & AI Co-pilot Working Together</span>
                   <span style={{ fontSize: 10, fontWeight: 800, color: '#059669' }}>Live Synced</span>
                 </div>
               </div>

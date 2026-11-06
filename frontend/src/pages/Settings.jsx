@@ -339,7 +339,7 @@ export default function Settings() {
                     boxShadow: '4px 4px 0 0 #252b3a',
                   }}>
                     <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: '#252b3a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      📋 Paste FAQ Block
+                      Paste FAQ Block
                     </p>
                     <p style={{ margin: '0 0 12px', fontSize: 12, color: '#64748b', lineHeight: 1.6 }}>
                       Paste any format —{' '}
@@ -360,7 +360,7 @@ export default function Settings() {
                     />
                     {bulkError && (
                       <p style={{ margin: '0 0 10px', fontSize: 12, color: '#dc2626', fontWeight: 700, whiteSpace: 'pre-line' }}>
-                        ⚠ {bulkError}
+                        {bulkError}
                       </p>
                     )}
                     <div style={{ display: 'flex', gap: 10 }}>

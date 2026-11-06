@@ -24,6 +24,7 @@ export default function Sidebar() {
   const [alertCount, setAlertCount]   = useState(0);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [qrStyle, setQrStyle]         = useState('rounded');
+  const [qrColor, setQrColor]         = useState('#1f2937');
   const bottomRef = useRef(null);
   const qrRef = useRef(null);
 
@@ -77,10 +78,14 @@ export default function Sidebar() {
     if (!qrModalOpen || !supportUrl || !qrRef.current) return;
 
     const styleMap = {
-      classic: { dots: 'square', corners: 'square' },
-      rounded: { dots: 'rounded', corners: 'rounded' },
-      dots: { dots: 'dots', corners: 'dot' },
-      premium: { dots: 'extra-rounded', corners: 'extra-rounded' },
+      classic:       { dots: 'square',         corners: 'square' },
+      rounded:       { dots: 'rounded',         corners: 'rounded' },
+      dots:          { dots: 'dots',            corners: 'dot' },
+      premium:       { dots: 'extra-rounded',   corners: 'extra-rounded' },
+      classy:        { dots: 'classy',          corners: 'extra-rounded' },
+      classyRounded: { dots: 'classy-rounded',  corners: 'rounded' },
+      star:          { dots: 'star',            corners: 'dot' },
+      diamond:       { dots: 'diamond',         corners: 'square' },
     };
 
     const currentStyle = styleMap[qrStyle] || styleMap.rounded;
@@ -97,11 +102,11 @@ export default function Sidebar() {
         errorCorrectionLevel: 'M',
       },
       dotsOptions: {
-        color: '#1f2937',
+        color: qrColor,
         type: currentStyle.dots
       },
       cornersSquareOptions: {
-        color: '#1f2937',
+        color: qrColor,
         type: currentStyle.corners
       },
       backgroundOptions: {
@@ -114,7 +119,7 @@ export default function Sidebar() {
     return () => {
       if (qrRef.current) qrRef.current.innerHTML = '';
     };
-  }, [qrModalOpen, qrStyle, supportUrl]);
+  }, [qrModalOpen, qrStyle, qrColor, supportUrl]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -230,33 +235,84 @@ export default function Sidebar() {
                   </button>
                 </div>
 
-                <div className="qr-widget-style-row" style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {[
-                    { id: 'classic', label: 'Classic' },
-                    { id: 'rounded', label: 'Rounded' },
-                    { id: 'dots', label: 'Dots' },
-                    { id: 'premium', label: 'Premium' },
-                  ].map(option => (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => setQrStyle(option.id)}
-                      style={{
-                        border: qrStyle === option.id ? '2px solid #252b3a' : '2px solid #cbd5e1',
-                        background: qrStyle === option.id ? '#6434df' : '#ffffff',
-                        color: qrStyle === option.id ? '#ffffff' : '#252b3a',
-                        borderRadius: 999,
-                        padding: '8px 12px',
-                        fontSize: 11,
-                        fontWeight: 800,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+                <div className="qr-widget-style-row" style={{ marginTop: 18 }}>
+                  <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 900, color: '#4d586d', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Style
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                    {[
+                      { id: 'classic',       label: 'Classic' },
+                      { id: 'rounded',       label: 'Rounded' },
+                      { id: 'dots',          label: 'Dots' },
+                      { id: 'premium',       label: 'Premium' },
+                      { id: 'classy',        label: 'Classy' },
+                      { id: 'classyRounded', label: 'Classy Round' },
+                      { id: 'star',          label: 'Star' },
+                      { id: 'diamond',       label: 'Diamond' },
+                    ].map(option => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setQrStyle(option.id)}
+                        style={{
+                          border: qrStyle === option.id ? '2px solid #252b3a' : '2px solid #cbd5e1',
+                          background: qrStyle === option.id ? '#6434df' : '#ffffff',
+                          color: qrStyle === option.id ? '#ffffff' : '#252b3a',
+                          borderRadius: 999,
+                          padding: '7px 12px',
+                          fontSize: 11,
+                          fontWeight: 800,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          cursor: 'pointer',
+                          boxShadow: qrStyle === option.id ? '2px 2px 0 0 #252b3a' : 'none',
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 900, color: '#4d586d', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Color
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {[
+                      { color: '#1f2937', label: 'Ink' },
+                      { color: '#6434df', label: 'Purple' },
+                      { color: '#0f172a', label: 'Midnight' },
+                      { color: '#dc2626', label: 'Red' },
+                      { color: '#059669', label: 'Green' },
+                      { color: '#2563eb', label: 'Blue' },
+                      { color: '#d97706', label: 'Amber' },
+                      { color: '#7c3aed', label: 'Violet' },
+                    ].map(opt => (
+                      <button
+                        key={opt.color}
+                        type="button"
+                        title={opt.label}
+                        onClick={() => setQrColor(opt.color)}
+                        style={{
+                          width: 30, height: 30,
+                          borderRadius: '50%',
+                          background: opt.color,
+                          border: qrColor === opt.color ? '3px solid #252b3a' : '2px solid #cbd5e1',
+                          cursor: 'pointer',
+                          boxShadow: qrColor === opt.color ? '2px 2px 0 0 #252b3a' : 'none',
+                          flexShrink: 0,
+                          position: 'relative',
+                        }}
+                      >
+                        {qrColor === opt.color && (
+                          <span style={{
+                            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <Check size={14} style={{ color: '#fff', strokeWidth: 3 }} />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="qr-widget-actions" style={{ marginTop: 18, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
