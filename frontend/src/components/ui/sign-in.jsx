@@ -47,12 +47,27 @@ export const SignInPage = ({
   const [emailValue, setEmailValue] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [inputCode, setInputCode] = useState(resetCode || '');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (resetCode) {
       setInputCode(resetCode);
     }
   }, [resetCode]);
+
+  // Start a 60-second cooldown when verificationState first appears (OTP just sent)
+  useEffect(() => {
+    if (verificationState?.required) {
+      setResendCooldown(60);
+    }
+  }, [verificationState?.email]);
+
+  // Tick the countdown down every second
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const isRegister = mode === 'register';
   const emailMeta = getEmailMeta(emailValue);
@@ -124,14 +139,21 @@ export const SignInPage = ({
                     Verify
                   </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={onResendCode}
-                  disabled={isLoading}
-                  className="mt-3 text-[12px] font-semibold text-[#6434df] underline-offset-2 hover:underline disabled:opacity-60"
-                >
-                  Resend code
-                </button>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { onResendCode?.(); setResendCooldown(60); }}
+                    disabled={isLoading || resendCooldown > 0}
+                    className="text-[12px] font-semibold text-[#6434df] underline-offset-2 hover:underline disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {resendCooldown > 0 ? 'Resend code' : 'Resend code'}
+                  </button>
+                  {resendCooldown > 0 && (
+                    <span className="inline-flex items-center rounded-full border-[2px] border-[#252b3a] bg-[#ffd05b] px-2 py-0.5 text-[11px] font-black text-[#252b3a]">
+                      {resendCooldown}s
+                    </span>
+                  )}
+                </div>
               </div>
             )}
 
