@@ -722,7 +722,7 @@ export default function Conversations() {
                                 letterSpacing: '0.04em',
                               }}>
                                 <Bot size={12} />
-                                AI Resolved
+                                {conv.status === 'resolved' ? 'AI Resolved' : 'AI Handled'}
                               </span>
                             )}
                           </td>

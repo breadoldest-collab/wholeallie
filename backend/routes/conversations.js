@@ -16,27 +16,33 @@ router.get('/', async (req, res) => {
     const conversations = await Conversation.find({ businessId: req.business })
       .sort({ isPinned: -1, createdAt: -1 });
 
-    const result = conversations.map(conv => {
-      const lastMsg = conv.messages && conv.messages.length > 0
-        ? conv.messages[conv.messages.length - 1].content
-        : "";
+    const HUMAN_REQUEST_REGEX = /(?:talk to|speak (?:with|to)|connect (?:me )?(?:to|with)|transfer (?:me )?to|get me)\s+(?:a\s+)?(?:human|agent|person|representative|support rep|real person|manager)|\b(?:live agent|human agent|human support|customer service representative|speak to human|talk to human)\b/i;
+    const CRITICAL_ISSUE_REGEX = /(?:\bhacked\b|security breach|credit card fraud|\boutage\b|chargeback|\blawyer\b|\bsue you\b)/i;
 
-      const hasFlagged = (conv.messages || []).some(m => m.flagged);
+    const result = conversations.map(conv => {
+      const msgs = conv.messages || [];
+      const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1].content : "";
+
+      const userAskedHuman = msgs.some(m => m.role === 'user' && (HUMAN_REQUEST_REGEX.test(m.content || '') || CRITICAL_ISSUE_REGEX.test(m.content || '')));
       const hasUnresolved = (conv.unresolvedTopics || []).length > 0;
-      const isUrgent = conv.priority === 'urgent' || ['critical', 'high'].includes(conv.priority) || (conv.status !== 'resolved' && conv.rating === 'down');
-      const isEscalated = Boolean(conv.isEscalated) || conv.priority === 'escalated' || isUrgent || hasFlagged || hasUnresolved;
+      const hasNegativeRating = conv.status !== 'resolved' && conv.rating === 'down';
+      const repliedByAdmin = Boolean(conv.repliedByAdmin);
+
+      // A chat only needs human staff if human was explicitly asked, topics are unresolved, or negative rating was given
+      const isEscalated = userAskedHuman || hasUnresolved || hasNegativeRating || (Boolean(conv.isEscalated) && (userAskedHuman || hasUnresolved));
+      const isUrgent = isEscalated && (userAskedHuman || ['urgent', 'critical'].includes(conv.priority) || hasNegativeRating);
 
       return {
         sessionId: conv.sessionId,
         customerName: conv.customerName,
         status: conv.status,
-        priority: isUrgent ? 'urgent' : (isEscalated ? 'escalated' : (conv.priority || 'normal')),
+        priority: isUrgent ? 'urgent' : (isEscalated ? 'escalated' : 'normal'),
         isEscalated,
-        repliedByAdmin: Boolean(conv.repliedByAdmin),
+        repliedByAdmin,
         isPinned: Boolean(conv.isPinned),
         unresolvedTopics: conv.unresolvedTopics || [],
         rating: conv.rating,
-        messageCount: conv.messages ? conv.messages.length : 0,
+        messageCount: msgs.length,
         createdAt: conv.createdAt,
         lastMessage: lastMsg
       };
@@ -208,7 +214,22 @@ router.get('/:sessionId', async (req, res) => {
       return res.status(404).json({ error: 'Conversation not found' });
     }
 
-    return res.status(200).json(conversation);
+    const HUMAN_REQUEST_REGEX = /(?:talk to|speak (?:with|to)|connect (?:me )?(?:to|with)|transfer (?:me )?to|get me)\s+(?:a\s+)?(?:human|agent|person|representative|support rep|real person|manager)|\b(?:live agent|human agent|human support|customer service representative|speak to human|talk to human)\b/i;
+    const CRITICAL_ISSUE_REGEX = /(?:\bhacked\b|security breach|credit card fraud|\boutage\b|chargeback|\blawyer\b|\bsue you\b)/i;
+
+    const convObj = conversation.toObject ? conversation.toObject() : conversation;
+    const msgs = convObj.messages || [];
+    const userAskedHuman = msgs.some(m => m.role === 'user' && (HUMAN_REQUEST_REGEX.test(m.content || '') || CRITICAL_ISSUE_REGEX.test(m.content || '')));
+    const hasUnresolved = (convObj.unresolvedTopics || []).length > 0;
+    const hasNegativeRating = convObj.status !== 'resolved' && convObj.rating === 'down';
+
+    if (!userAskedHuman && !hasUnresolved && !hasNegativeRating && !convObj.repliedByAdmin) {
+      convObj.isEscalated = false;
+      convObj.priority = 'normal';
+      convObj.messages = msgs.map(m => ({ ...m, flagged: false }));
+    }
+
+    return res.status(200).json(convObj);
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }

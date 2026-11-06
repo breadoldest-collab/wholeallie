@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
       ? `${Math.max(60, Math.min(100, Math.round(((totalMessages - totalUnresolved) / totalMessages) * 100)))}%`
       : '95%';
 
-    const escalatedCount = conversations.filter(c => c.status === 'open' || c.isEscalated || ['critical', 'high', 'urgent'].includes(c.priority) || (c.unresolvedTopics && c.unresolvedTopics.length > 0)).length;
+    const escalatedCount = conversations.filter(c => Boolean(c.isEscalated) || ['critical', 'high', 'urgent', 'escalated'].includes(c.priority) || (c.unresolvedTopics && c.unresolvedTopics.length > 0)).length;
     const escalationRate = totalChats > 0
       ? `${Math.round((escalatedCount / totalChats) * 100)}%`
       : '0%';

@@ -11,12 +11,15 @@ const userNameMemoryStore = new Map();
 const sessionStateStore = new Map();
 
 const CANT_ANSWER_PHRASES = [
-  "connect you with our team",
-  "don't have information",
-  "reach out to",
-  "unable to help",
-  "contact our team",
-  "not able to answer",
+  "i don't have information about",
+  "i do not have information about",
+  "i am unable to help with that",
+  "i am unable to answer",
+  "i cannot answer that",
+  "not able to answer that",
+  "connecting you with our team",
+  "connect you with a human",
+  "transfer you to our team",
 ];
 
 const GREETING_WORDS = ["hi", "hello", "hey", "good morning", "good afternoon", "greetings", "howdy", "hi there", "hello there"];
@@ -159,21 +162,22 @@ function classifyMessageUrgency(userMessage) {
   ];
 
   let bestUrgency = 'low';
-  let bestScore = -1;
+  let bestScore = 0;
 
-  thresholdMap.forEach(rule => {
+  for (const rule of thresholdMap) {
     const score = rule.keywords.reduce((count, keyword) => count + (message.includes(keyword) ? 1 : 0), 0);
-    if (score > bestScore) {
+    if (score > 0) {
       bestScore = score;
       bestUrgency = rule.urgency;
+      break; // Critical matches first, then high, then medium, then low
     }
-  });
+  }
 
   const matchedIntent = intentMap.find(rule => rule.keywords.some(keyword => message.includes(keyword))) || { intent: 'general' };
   const actionMap = {
     critical: 'escalate_immediately',
     high: 'human_needed',
-    medium: 'human_needed',
+    medium: 'auto_reply',
     low: 'auto_reply',
   };
 
@@ -445,17 +449,23 @@ YOUR INSTRUCTIONS:
       });
     }
 
+    const isHumanRequest = /(?:talk to|speak (?:with|to)|connect (?:me )?(?:to|with)|transfer (?:me )?to|get me)\s+(?:a\s+)?(?:human|agent|person|representative|support rep|real person|manager)/i.test(userMessage) ||
+      /\b(?:live agent|human agent|human support|customer service representative|speak to human|talk to human)\b/i.test(userMessage);
+
+    const isCriticalIssue = /(?:\bhacked\b|security breach|credit card fraud|\boutage\b|chargeback|\blawyer\b|\bsue you\b)/i.test(userMessage);
+
+    const isStaffEscalationResponse = /(?:flagged with high priority|human representative will be in touch|connecting you with a human agent|touch with you shortly)/i.test(aiReplyText);
+
     const isEscalated = cantAnswer ||
       urgencyInfo.action === 'escalate_immediately' ||
-      urgencyInfo.action === 'human_needed' ||
-      ['critical', 'high'].includes(urgencyInfo.urgency) ||
-      /(?:speak|talk|reach|connect|representative|human|agent|support team|outage|refund|chargeback|dispute|damaged|broken|lawyer|sue)/i.test(userMessage) ||
-      /(?:flagged with high priority|human representative will be in touch|connect you with|touch with you shortly)/i.test(aiReplyText);
+      isHumanRequest ||
+      isCriticalIssue ||
+      isStaffEscalationResponse;
 
-    const isUrgent = ['critical', 'high'].includes(urgencyInfo.urgency) || /(?:urgent|emergency|asap|outage|fraud|stolen|compromised)/i.test(userMessage);
+    const isUrgent = urgencyInfo.urgency === 'critical' || /(?:urgent|emergency|asap|\boutage\b|\bfraud\b|stolen account|compromised)/i.test(userMessage);
 
     conversation.isEscalated = isEscalated;
-    conversation.priority = isUrgent ? 'urgent' : (isEscalated ? 'escalated' : urgencyInfo.urgency);
+    conversation.priority = isUrgent ? 'urgent' : (isEscalated ? 'escalated' : 'normal');
 
     conversation.messages.push({
       role: 'user',
@@ -466,7 +476,7 @@ YOUR INSTRUCTIONS:
     conversation.messages.push({
       role: 'ai',
       content: aiReplyText,
-      flagged: cantAnswer || isEscalated,
+      flagged: Boolean(cantAnswer || isEscalated),
       urgency: urgencyInfo.urgency,
       intent: urgencyInfo.intent,
     });
@@ -481,7 +491,7 @@ YOUR INSTRUCTIONS:
             sessionId,
             customerName: conversation.customerName || 'Customer',
             priority: conversation.priority || (isUrgent ? 'urgent' : (isEscalated ? 'escalated' : 'normal')),
-            status: isEscalated ? 'open' : 'resolved',
+            status: 'open',
             isEscalated: isEscalated,
             repliedByAdmin: false,
             messages: conversation.messages,
@@ -490,14 +500,13 @@ YOUR INSTRUCTIONS:
         } else {
           dbConv.messages = conversation.messages;
           dbConv.unresolvedTopics = conversation.unresolvedTopics || [];
-          if (isEscalated) {
-            dbConv.isEscalated = true;
-            dbConv.status = 'open';
-          }
+          dbConv.isEscalated = isEscalated;
           if (isUrgent) {
             dbConv.priority = 'urgent';
-          } else if (isEscalated && dbConv.priority !== 'urgent') {
+          } else if (isEscalated) {
             dbConv.priority = 'escalated';
+          } else {
+            dbConv.priority = 'normal';
           }
           if (conversation.customerName) dbConv.customerName = conversation.customerName;
         }
