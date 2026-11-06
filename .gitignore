@@ -16,3 +16,12 @@ build/
 
 # Logs
 *.log
+
+# Scratch and temporary scripts
+scraped__*.html
+scrape-puddis.js
+puddis_scraped.html
+all_scraped_data.json
+parse-menu.js
+test_find.js
+test-*.js
