@@ -129,7 +129,7 @@ export default function SaaSLandingTemplate() {
               >
                 Sign in
               </Link>
-              <LandingButton to="/register" variant="primary">Create ac</LandingButton>
+              <LandingButton to="/register" variant="primary">Create account</LandingButton>
             </div>
           </nav>
         </header>
