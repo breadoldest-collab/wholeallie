@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import API from '../api/axios';
 import { FileText, HelpCircle, Plus, Trash2, Save, CheckCircle2, ClipboardPaste, ChevronDown, ChevronUp } from 'lucide-react';
 
-const MAX_DESC = 500;
+const MAX_DESC = 2000;
 
 export default function Settings() {
   const location = useLocation();
@@ -271,7 +271,7 @@ export default function Settings() {
                   onFocus={focusStyle}
                   onBlur={blurStyle}
                   placeholder="We are a premium SaaS company offering 24/7 customer support. Our products include…"
-                  style={{ ...inputStyle, resize: 'none', marginTop: 16, minHeight: 140, lineHeight: 1.7 }}
+                  style={{ ...inputStyle, resize: 'vertical', marginTop: 16, minHeight: 220, lineHeight: 1.7 }}
                 />
               </div>
 
