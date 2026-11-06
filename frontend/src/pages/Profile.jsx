@@ -10,6 +10,7 @@ import {
   Upload,
   CheckCircle2,
   Copy,
+  Clipboard,
   Check,
   ExternalLink,
   Printer,
@@ -123,6 +124,8 @@ export default function Profile() {
 
   const fileInputRef = useRef(null);
   const botFileInputRef = useRef(null);
+  const logoInputRef = useRef(null);
+  const botInputRef = useRef(null);
   const qrRef = useRef(null);
   const qrCodeInstanceRef = useRef(null);
 
@@ -250,6 +253,26 @@ export default function Profile() {
     };
   }, [supportUrl, qrStyle, qrColor, showCenterLogo, logoUrl, activeTab]);
 
+  useEffect(() => {
+    const handleGlobalPaste = (e) => {
+      const activeTag = document.activeElement?.tagName?.toLowerCase();
+      if (activeTag === 'textarea') return;
+      if (activeTag === 'input' && document.activeElement.type === 'text') {
+        if (document.activeElement === logoInputRef.current || document.activeElement === botInputRef.current) {
+          return;
+        }
+        return;
+      }
+
+      if (activeTab === 'photo') {
+        const target = avatarSubTab === 'bot' ? 'bot' : 'logo';
+        handlePasteEvent(e, target);
+      }
+    };
+    window.addEventListener('paste', handleGlobalPaste);
+    return () => window.removeEventListener('paste', handleGlobalPaste);
+  }, [activeTab, avatarSubTab, useSameAvatar, logoUrl, botAvatarUrl]);
+
   const handleToggleSameAvatar = (checked) => {
     setUseSameAvatar(checked);
     if (checked) {
@@ -275,17 +298,7 @@ export default function Profile() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target.result;
-      if (target === 'logo') {
-        setLogoUrl(dataUrl);
-        setUrlInput('');
-        if (useSameAvatar) {
-          setBotAvatarUrl(dataUrl);
-          setBotUrlInput('');
-        }
-      } else {
-        setBotAvatarUrl(dataUrl);
-        setBotUrlInput('');
-      }
+      handleApplyUrl(target, dataUrl);
     };
     reader.readAsDataURL(file);
   };
@@ -328,38 +341,130 @@ export default function Profile() {
     }
   };
 
-  const handleApplyUrl = (target = 'logo') => {
+  const handleApplyUrl = async (target = 'logo', overrideValue) => {
+    const rawVal = overrideValue !== undefined ? overrideValue : (target === 'logo' ? urlInput : botUrlInput);
+    let val = String(rawVal || '').trim().replace(/^["']|["']$/g, '');
+    if (!val) {
+      setErrorMsg('Please enter or paste an image URL.');
+      return;
+    }
+    // Auto prefix https:// if plain domain or path without protocol
+    if (!val.startsWith('http://') && !val.startsWith('https://') && !val.startsWith('data:image/') && !val.startsWith('/')) {
+      val = 'https://' + val;
+    }
+    setErrorMsg('');
     if (target === 'logo') {
-      if (!urlInput.trim()) {
-        setErrorMsg('Please enter an image URL.');
-        return;
-      }
-      setErrorMsg('');
-      setLogoUrl(urlInput.trim());
+      setLogoUrl(val);
+      setUrlInput(val);
+      localStorage.setItem('businessLogo', val);
       if (useSameAvatar) {
-        setBotAvatarUrl(urlInput.trim());
+        setBotAvatarUrl(val);
+        setBotUrlInput(val);
+        localStorage.setItem('botAvatar', val);
       }
     } else {
-      if (!botUrlInput.trim()) {
-        setErrorMsg('Please enter an image URL.');
-        return;
-      }
-      setErrorMsg('');
-      setBotAvatarUrl(botUrlInput.trim());
+      setBotAvatarUrl(val);
+      setBotUrlInput(val);
+      localStorage.setItem('botAvatar', val);
+    }
+
+    window.dispatchEvent(new Event('brandingUpdated'));
+
+    try {
+      await API.post('/api/settings', {
+        logoUrl: target === 'logo' ? val : logoUrl,
+        botAvatarUrl: target === 'bot' ? val : (useSameAvatar ? val : botAvatarUrl),
+      });
+      setToastMessage(`${target === 'logo' ? 'Company logo' : 'Chatbot avatar'} updated and saved!`);
+      setToast(true);
+      setTimeout(() => setToast(false), 2500);
+    } catch {
+      setToastMessage(`${target === 'logo' ? 'Company logo' : 'Chatbot avatar'} applied!`);
+      setToast(true);
+      setTimeout(() => setToast(false), 2500);
     }
   };
 
-  const handleResetLogo = (target = 'logo') => {
+  const handleClipboardPaste = async (target = 'logo') => {
+    try {
+      if (!navigator.clipboard?.readText) {
+        setErrorMsg('Clipboard API not available. Please click inside the box and press Ctrl+V.');
+        return;
+      }
+      const text = await navigator.clipboard.readText();
+      const clean = (text || '').trim().replace(/^["']|["']$/g, '');
+      if (!clean) {
+        setErrorMsg('Clipboard is empty or contains non-text content. If copying an image, press Ctrl+V directly.');
+        return;
+      }
+      if (target === 'logo') {
+        setUrlInput(clean);
+      } else {
+        setBotUrlInput(clean);
+      }
+      await handleApplyUrl(target, clean);
+    } catch (err) {
+      console.warn('Clipboard read error:', err);
+      setErrorMsg('Could not read clipboard automatically. Please click inside the box and press Ctrl+V.');
+    }
+  };
+
+  const handlePasteEvent = (e, target = 'logo') => {
+    // 1. Check if an image is in clipboard (e.g. copied image or screenshot)
+    if (e.clipboardData && e.clipboardData.items) {
+      for (const item of e.clipboardData.items) {
+        if (item.type && item.type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            handleFileUpload(file, target);
+            return;
+          }
+        }
+      }
+    }
+    // 2. If it's plain text (URL)
+    const pasted = e.clipboardData?.getData('text');
+    if (pasted) {
+      const clean = pasted.trim().replace(/^["']|["']$/g, '');
+      if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:image/')) {
+        e.preventDefault();
+        if (target === 'logo') {
+          setUrlInput(clean);
+        } else {
+          setBotUrlInput(clean);
+        }
+        handleApplyUrl(target, clean);
+      }
+    }
+  };
+
+  const handleResetLogo = async (target = 'logo') => {
     if (target === 'logo') {
       setLogoUrl('');
       setUrlInput('');
+      localStorage.removeItem('businessLogo');
       if (useSameAvatar) {
         setBotAvatarUrl('');
         setBotUrlInput('');
+        localStorage.removeItem('botAvatar');
       }
     } else {
       setBotAvatarUrl('');
       setBotUrlInput('');
+      localStorage.removeItem('botAvatar');
+    }
+    window.dispatchEvent(new Event('brandingUpdated'));
+    try {
+      await API.post('/api/settings', {
+        logoUrl: target === 'logo' ? '' : logoUrl,
+        botAvatarUrl: target === 'bot' ? '' : (useSameAvatar ? '' : botAvatarUrl),
+      });
+      setToastMessage(`${target === 'logo' ? 'Company logo' : 'Chatbot avatar'} reset to default!`);
+      setToast(true);
+      setTimeout(() => setToast(false), 2000);
+    } catch {
+      // ignore
     }
   };
 
@@ -1048,27 +1153,86 @@ export default function Profile() {
                           }}
                         >
                           <div>
-                            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a', marginBottom: 8 }}>
-                              Or Enter Direct Image URL / Base64
-                            </label>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <input
-                                type="text"
-                                placeholder="https://... or data:image/..."
-                                value={urlInput}
-                                onChange={(e) => setUrlInput(e.target.value)}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a' }}>
+                                Or Enter Direct Image URL / Base64
+                              </label>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#6434df' }}>
+                                Paste link or image
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                              <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                                <input
+                                  ref={logoInputRef}
+                                  type="text"
+                                  placeholder="https://... or data:image/..."
+                                  value={urlInput}
+                                  onChange={(e) => setUrlInput(e.target.value)}
+                                  onFocus={(e) => e.target.select()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleApplyUrl('logo');
+                                    }
+                                  }}
+                                  onPaste={(e) => handlePasteEvent(e, 'logo')}
+                                  style={{
+                                    width: '100%',
+                                    background: '#fffdf5',
+                                    border: '2px solid #252b3a',
+                                    borderRadius: 12,
+                                    padding: urlInput ? '10px 32px 10px 12px' : '10px 12px',
+                                    fontSize: 13,
+                                    color: '#252b3a',
+                                    outline: 'none',
+                                    boxShadow: '2px 2px 0 0 #252b3a',
+                                  }}
+                                />
+                                {urlInput && (
+                                  <button
+                                    type="button"
+                                    title="Clear input"
+                                    onClick={() => setUrlInput('')}
+                                    style={{
+                                      position: 'absolute',
+                                      right: 8,
+                                      background: 'none',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      color: '#64748b',
+                                      fontSize: 14,
+                                      padding: 4,
+                                      lineHeight: 1,
+                                    }}
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                title="Paste link from clipboard"
+                                onClick={() => handleClipboardPaste('logo')}
                                 style={{
-                                  flex: 1,
                                   background: '#fffdf5',
+                                  color: '#252b3a',
                                   border: '2px solid #252b3a',
                                   borderRadius: 12,
                                   padding: '10px 12px',
-                                  fontSize: 13,
-                                  color: '#252b3a',
-                                  outline: 'none',
+                                  fontSize: 12,
+                                  fontWeight: 800,
+                                  cursor: 'pointer',
                                   boxShadow: '2px 2px 0 0 #252b3a',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 5,
+                                  whiteSpace: 'nowrap',
                                 }}
-                              />
+                              >
+                                <Clipboard size={13} />
+                                Paste
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => handleApplyUrl('logo')}
@@ -1082,6 +1246,7 @@ export default function Profile() {
                                   fontWeight: 800,
                                   cursor: 'pointer',
                                   boxShadow: '2px 2px 0 0 #cbd5e1',
+                                  whiteSpace: 'nowrap',
                                 }}
                               >
                                 Apply
@@ -1098,10 +1263,7 @@ export default function Profile() {
                                 <button
                                   key={preset.name}
                                   type="button"
-                                  onClick={() => {
-                                    setLogoUrl(preset.url);
-                                    setUrlInput(preset.url);
-                                  }}
+                                  onClick={() => handleApplyUrl('logo', preset.url)}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1298,27 +1460,86 @@ export default function Profile() {
                           }}
                         >
                           <div>
-                            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a', marginBottom: 8 }}>
-                              Or Enter Direct Image URL / Base64
-                            </label>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <input
-                                type="text"
-                                placeholder="https://... or data:image/..."
-                                value={botUrlInput}
-                                onChange={(e) => setBotUrlInput(e.target.value)}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a' }}>
+                                Or Enter Direct Image URL / Base64
+                              </label>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: '#6434df' }}>
+                                Paste link or image
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                              <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                                <input
+                                  ref={botInputRef}
+                                  type="text"
+                                  placeholder="https://... or data:image/..."
+                                  value={botUrlInput}
+                                  onChange={(e) => setBotUrlInput(e.target.value)}
+                                  onFocus={(e) => e.target.select()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleApplyUrl('bot');
+                                    }
+                                  }}
+                                  onPaste={(e) => handlePasteEvent(e, 'bot')}
+                                  style={{
+                                    width: '100%',
+                                    background: '#fffdf5',
+                                    border: '2px solid #252b3a',
+                                    borderRadius: 12,
+                                    padding: botUrlInput ? '10px 32px 10px 12px' : '10px 12px',
+                                    fontSize: 13,
+                                    color: '#252b3a',
+                                    outline: 'none',
+                                    boxShadow: '2px 2px 0 0 #252b3a',
+                                  }}
+                                />
+                                {botUrlInput && (
+                                  <button
+                                    type="button"
+                                    title="Clear input"
+                                    onClick={() => setBotUrlInput('')}
+                                    style={{
+                                      position: 'absolute',
+                                      right: 8,
+                                      background: 'none',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      color: '#64748b',
+                                      fontSize: 14,
+                                      padding: 4,
+                                      lineHeight: 1,
+                                    }}
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                title="Paste link from clipboard"
+                                onClick={() => handleClipboardPaste('bot')}
                                 style={{
-                                  flex: 1,
                                   background: '#fffdf5',
+                                  color: '#252b3a',
                                   border: '2px solid #252b3a',
                                   borderRadius: 12,
                                   padding: '10px 12px',
-                                  fontSize: 13,
-                                  color: '#252b3a',
-                                  outline: 'none',
+                                  fontSize: 12,
+                                  fontWeight: 800,
+                                  cursor: 'pointer',
                                   boxShadow: '2px 2px 0 0 #252b3a',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 5,
+                                  whiteSpace: 'nowrap',
                                 }}
-                              />
+                              >
+                                <Clipboard size={13} />
+                                Paste
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => handleApplyUrl('bot')}
@@ -1332,6 +1553,7 @@ export default function Profile() {
                                   fontWeight: 800,
                                   cursor: 'pointer',
                                   boxShadow: '2px 2px 0 0 #cbd5e1',
+                                  whiteSpace: 'nowrap',
                                 }}
                               >
                                 Apply
@@ -1348,10 +1570,7 @@ export default function Profile() {
                                 <button
                                   key={preset.name}
                                   type="button"
-                                  onClick={() => {
-                                    setBotAvatarUrl(preset.url);
-                                    setBotUrlInput(preset.url);
-                                  }}
+                                  onClick={() => handleApplyUrl('bot', preset.url)}
                                   style={{
                                     display: 'flex',
                                     alignItems: 'center',
