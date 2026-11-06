@@ -18,6 +18,7 @@ build/
 *.log
 
 # Scratch and temporary scripts
+INTERVIEW-GUIDE.md
 scraped__*.html
 scrape-puddis.js
 puddis_scraped.html
