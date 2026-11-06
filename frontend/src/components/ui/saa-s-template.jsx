@@ -102,9 +102,9 @@ export default function SaaSLandingTemplate() {
       <div className="mx-auto max-w-[1600px] px-5 pb-8 pt-5 md:px-8 lg:px-10">
         <header className="mb-7 rounded-[28px] border-[3px] border-[#252b3a] bg-[#fffdf5] px-4 py-4 shadow-[8px_8px_0_0_#252b3a] md:px-6">
           <nav className="flex items-center justify-between gap-4">
-            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }}>
+            <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }} className="flex items-center">
               <span
-                className="whitespace-nowrap text-[28px] sm:text-[34px] font-black tracking-[-0.05em] text-[#252b3a] leading-none inline-block hover:opacity-90 transition-opacity"
+                className="whitespace-nowrap text-[36px] sm:text-[44px] md:text-[48px] font-black tracking-[-0.06em] text-[#252b3a] leading-none inline-block hover:opacity-90 transition-opacity select-none"
                 style={{ fontFamily: 'Inter, "Segoe UI", Arial, sans-serif' }}
               >
                 Allié
