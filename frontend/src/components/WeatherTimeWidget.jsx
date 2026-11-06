@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Clock, Wind, Droplets, ChevronDown, RefreshCw, X, Sparkles } from 'lucide-react';
+import {
+  MapPin,
+  Clock,
+  Wind,
+  Droplets,
+  ChevronDown,
+  RefreshCw,
+  X,
+  Sparkles,
+  Sun,
+  Moon,
+  Cloud,
+  CloudSun,
+  CloudRain,
+  CloudSnow,
+  CloudLightning,
+  CloudFog
+} from 'lucide-react';
 
 function getWeatherMeta(code, isDay = 1) {
   if (code === 0) {
@@ -7,13 +24,23 @@ function getWeatherMeta(code, isDay = 1) {
       label: isDay ? 'Sunny' : 'Clear Night',
       pillBg: '#fff2b8',
       pillColor: '#8a5b00',
+      icon: isDay ? Sun : Moon,
+      gradient: isDay
+        ? 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 50%, #fde68a 100%)'
+        : 'linear-gradient(135deg, #1e2430 0%, #2a3447 100%)',
+      textColor: isDay ? '#252b3a' : '#ffffff',
     };
   }
   if (code === 1 || code === 2) {
     return {
-      label: isDay ? 'Partly Cloudy' : 'Partly Cloudy',
+      label: isDay ? 'Partly Cloudy' : 'Partly Cloudy Night',
       pillBg: '#e9fff5',
       pillColor: '#0f7a57',
+      icon: isDay ? CloudSun : Moon,
+      gradient: isDay
+        ? 'linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #fef9c3 100%)'
+        : 'linear-gradient(135deg, #1e2430 0%, #1e293b 100%)',
+      textColor: isDay ? '#252b3a' : '#ffffff',
     };
   }
   if (code === 3) {
@@ -21,6 +48,9 @@ function getWeatherMeta(code, isDay = 1) {
       label: 'Overcast',
       pillBg: '#f1ebff',
       pillColor: '#6434df',
+      icon: Cloud,
+      gradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+      textColor: '#252b3a',
     };
   }
   if (code === 45 || code === 48) {
@@ -28,6 +58,9 @@ function getWeatherMeta(code, isDay = 1) {
       label: 'Foggy',
       pillBg: '#f1f5f9',
       pillColor: '#475569',
+      icon: CloudFog,
+      gradient: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      textColor: '#252b3a',
     };
   }
   if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
@@ -35,6 +68,9 @@ function getWeatherMeta(code, isDay = 1) {
       label: code >= 65 || code === 82 ? 'Heavy Rain' : 'Rainy',
       pillBg: '#e0f2fe',
       pillColor: '#0369a1',
+      icon: CloudRain,
+      gradient: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
+      textColor: '#252b3a',
     };
   }
   if (code >= 71 && code <= 77) {
@@ -42,6 +78,9 @@ function getWeatherMeta(code, isDay = 1) {
       label: 'Snowy',
       pillBg: '#f0fdf4',
       pillColor: '#15803d',
+      icon: CloudSnow,
+      gradient: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+      textColor: '#252b3a',
     };
   }
   if (code >= 95) {
@@ -49,12 +88,20 @@ function getWeatherMeta(code, isDay = 1) {
       label: 'Thunderstorm',
       pillBg: '#fee2e2',
       pillColor: '#b91c1c',
+      icon: CloudLightning,
+      gradient: 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
+      textColor: '#252b3a',
     };
   }
   return {
     label: isDay ? 'Clear' : 'Clear Night',
     pillBg: '#fff2b8',
     pillColor: '#8a5b00',
+    icon: isDay ? Sun : Moon,
+    gradient: isDay
+      ? 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)'
+      : 'linear-gradient(135deg, #1e2430 0%, #2a3447 100%)',
+    textColor: isDay ? '#252b3a' : '#ffffff',
   };
 }
 
@@ -156,9 +203,11 @@ export default function WeatherTimeWidget() {
     initLocationAndWeather();
   }, []);
 
+  const isDay = weather ? weather.is_day === 1 : (time.getHours() >= 6 && time.getHours() < 19);
   const meta = weather
     ? getWeatherMeta(weather.weather_code, weather.is_day)
-    : { label: 'Clear', pillBg: '#fff2b8', pillColor: '#8a5b00' };
+    : getWeatherMeta(0, isDay ? 1 : 0);
+  const WeatherIcon = meta.icon || (isDay ? Sun : Moon);
 
   // Temperature calculations
   const rawCelsius = weather ? Math.round(weather.temperature_2m) : 24;
@@ -212,35 +261,26 @@ export default function WeatherTimeWidget() {
         }}
         title="Click to view live weather &amp; location details"
       >
-        {/* ── SECTION 1: ANIMATED WEATHER (User-Provided WebM) ───────── */}
+        {/* ── SECTION 1: LIVE WEATHER ICON & TEMP ─────────────────── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div
             style={{
-              width: 44,
-              height: 44,
+              width: 38,
+              height: 38,
               borderRadius: 12,
-              border: '2.5px solid #252b3a',
-              overflow: 'hidden',
-              background: '#f8fafc',
+              border: '2px solid #252b3a',
+              background: meta.pillBg,
               boxShadow: '2px 2px 0 0 #252b3a',
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              position: 'relative',
             }}
           >
-            <video
-              src="/weather-animation.webm"
-              autoPlay
-              loop
-              muted
-              playsInline
+            <WeatherIcon
+              size={20}
               style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
+                color: isDay ? (meta.label.includes('Rain') ? '#0284c7' : '#b45309') : '#334155',
               }}
             />
           </div>
@@ -461,50 +501,98 @@ export default function WeatherTimeWidget() {
             </div>
           </div>
 
-          {/* Full Animation Player Box */}
+          {/* Live Weather Hero Card */}
           <div
             style={{
               width: '100%',
-              height: 140,
-              borderRadius: 14,
+              borderRadius: 16,
               border: '2.5px solid #252b3a',
-              overflow: 'hidden',
-              background: '#000000',
+              background: meta.gradient,
               boxShadow: '3px 3px 0 0 #252b3a',
               marginBottom: 14,
+              padding: '16px 18px',
+              color: meta.textColor,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            <video
-              src="/weather-animation.webm"
-              autoPlay
-              loop
-              muted
-              playsInline
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    letterSpacing: '-0.03em',
+                    fontFamily: 'var(--dp-typography-display), sans-serif',
+                  }}
+                >
+                  {isLoading ? '--°' : displayTemp}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setTempUnit((u) => (u === 'C' ? 'F' : 'C'))}
+                  title="Toggle °C / °F"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    border: '1.5px solid #252b3a',
+                    borderRadius: 6,
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    color: '#252b3a',
+                  }}
+                >
+                  °{tempUnit === 'C' ? 'F' : 'C'}
+                </button>
+              </div>
+
+              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    background: meta.pillBg,
+                    color: meta.pillColor,
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    border: '1.5px solid #252b3a',
+                  }}
+                >
+                  {isLoading ? 'Detecting' : meta.label}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.85 }}>
+                  Feels {displayFeels}
+                </span>
+              </div>
+            </div>
+
             <div
               style={{
-                position: 'absolute',
-                bottom: 8,
-                left: 10,
-                background: 'rgba(37, 43, 58, 0.85)',
-                color: '#ffffff',
-                padding: '3px 8px',
-                borderRadius: 999,
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                backdropFilter: 'blur(4px)',
+                width: 64,
+                height: 64,
+                borderRadius: 18,
+                background: isDay ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.15)',
+                border: '2px solid #252b3a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '2px 2px 0 0 #252b3a',
+                flexShrink: 0,
               }}
             >
-              {meta.label} &bull; {displayTemp}
+              <WeatherIcon
+                size={36}
+                style={{
+                  color: isDay ? (meta.label.includes('Rain') ? '#0284c7' : '#d97706') : '#cbd5e1',
+                }}
+              />
             </div>
           </div>
 
