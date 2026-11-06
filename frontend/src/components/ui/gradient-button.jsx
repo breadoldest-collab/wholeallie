@@ -14,12 +14,12 @@ const gradientButtonVariants = cva(
   {
     variants: {
       variant: {
-        // Flagship Allié Signature: Violet -> Pink -> Amber with subtle ambient glow
+        // Sunset Rose & Amber Radiant - 100% Purple-Free!
         default:
           'text-white border-[3px] border-[#252b3a] shadow-[5px_5px_0_0_#252b3a] hover:shadow-[7px_7px_0_0_#252b3a] hover:-translate-y-0.5',
-        // Neo-brutalist outline with radiant animated text / inner gradient
+        // Radiant sunset neon glow
         glow:
-          'text-white border-[3px] border-[#252b3a] shadow-[5px_5px_0_0_#252b3a] hover:shadow-[0_0_24px_rgba(100,52,223,0.45),6px_6px_0_0_#252b3a] hover:-translate-y-0.5',
+          'text-white border-[3px] border-[#252b3a] shadow-[5px_5px_0_0_#252b3a] hover:shadow-[0_0_24px_rgba(255,120,197,0.55),6px_6px_0_0_#252b3a] hover:-translate-y-0.5',
         // Minimal softer gradient for secondary actions
         subtle:
           'text-[#252b3a] border-[2.5px] border-[#252b3a] shadow-[3px_3px_0_0_#252b3a] hover:shadow-[5px_5px_0_0_#252b3a] hover:-translate-y-0.5',
@@ -56,9 +56,10 @@ export const GradientButton = React.forwardRef(
   ) => {
     const Comp = to ? Link : (asChild ? Slot : 'button');
 
-    // Default palette blends Allié primary violet, secondary pink, and warm gold
+    // Sunset Neon & Amber Rose Palette (100% Purple-Free)
+    // Blends vibrant coral (#ff4365), Allié pink (#ff78c5), warm tangerine (#ff9057), and golden amber (#ffd05b)
     const defaultGradient =
-      'linear-gradient(115deg, #6434df 0%, #a855f7 25%, #ff78c5 50%, #ffd05b 75%, #6434df 100%)';
+      'linear-gradient(115deg, #ff4365 0%, #ff78c5 28%, #ff9057 62%, #ffd05b 88%, #ff4365 100%)';
     const bgGradient = gradientColors ? `linear-gradient(115deg, ${gradientColors.join(', ')})` : defaultGradient;
 
     const extraProps = to ? { to } : {};

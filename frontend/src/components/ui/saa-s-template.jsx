@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BrandLogo from '../BrandLogo';
+import WebsiteWalkthroughModal from '../WebsiteWalkthroughModal';
 import GradientButton from './gradient-button';
 import {
   ArrowRight,
@@ -10,6 +12,7 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Play,
 } from 'lucide-react';
 
 const navItems = [
@@ -94,6 +97,7 @@ function scrollToDemo(event) {
 }
 
 export default function SaaSLandingTemplate() {
+  const [walkthroughOpen, setWalkthroughOpen] = useState(false);
   return (
     <main className="playful-root min-h-screen bg-[#fffdf5] text-[#253044] antialiased">
       <div className="mx-auto max-w-[1600px] px-5 pb-8 pt-5 md:px-8 lg:px-10">
@@ -149,14 +153,15 @@ export default function SaaSLandingTemplate() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <GradientButton to="/register" size="lg" variant="glow">Book a demo →</GradientButton>
-                <a
-                  href="#demo-preview"
-                  onClick={scrollToDemo}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border-[3px] border-[#252b3a] bg-[#fffdf5] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#253044] shadow-[6px_6px_0_0_#252b3a] transition-all duration-180 ease-out hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
+                <GradientButton to="/register" size="lg" variant="glow">Try Now →</GradientButton>
+                <button
+                  type="button"
+                  onClick={() => setWalkthroughOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-[3px] border-[#252b3a] bg-[#fffdf5] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#253044] shadow-[6px_6px_0_0_#252b3a] transition-all duration-180 ease-out hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] cursor-pointer"
                 >
+                  <Play size={13} className="fill-current text-[#252b3a]" />
                   See demo
-                </a>
+                </button>
               </div>
             </div>
 
@@ -371,6 +376,12 @@ export default function SaaSLandingTemplate() {
           </div>
         </footer>
       </div>
+
+      {/* Full Platform Interactive Walkthrough Video Modal */}
+      <WebsiteWalkthroughModal
+        isOpen={walkthroughOpen}
+        onClose={() => setWalkthroughOpen(false)}
+      />
     </main>
   );
 }
