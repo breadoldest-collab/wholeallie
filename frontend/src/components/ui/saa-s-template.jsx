@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import BrandLogo from '../BrandLogo';
 import WebsiteWalkthroughModal from '../WebsiteWalkthroughModal';
 import GradientButton from './gradient-button';
 import {
@@ -104,7 +103,12 @@ export default function SaaSLandingTemplate() {
         <header className="mb-7 rounded-[28px] border-[3px] border-[#252b3a] bg-[#fffdf5] px-4 py-4 shadow-[8px_8px_0_0_#252b3a] md:px-6">
           <nav className="flex items-center justify-between gap-4">
             <Link to={localStorage.getItem('token') ? '/dashboard' : '/'} style={{ textDecoration: 'none' }}>
-              <BrandLogo compact showSubtitle={false} />
+              <span
+                className="whitespace-nowrap text-[28px] sm:text-[34px] font-black tracking-[-0.05em] text-[#252b3a] leading-none inline-block hover:opacity-90 transition-opacity"
+                style={{ fontFamily: 'Inter, "Segoe UI", Arial, sans-serif' }}
+              >
+                Allié
+              </span>
             </Link>
 
             <div className="hidden items-center gap-6 md:flex">
