@@ -122,7 +122,7 @@ export default function SaaSLandingTemplate() {
               >
                 Sign in
               </Link>
-              <GradientButton asChild size="sm"><Link to="/register">Start free</Link></GradientButton>
+              <GradientButton to="/register" size="sm">Start free</GradientButton>
             </div>
           </nav>
         </header>
@@ -149,7 +149,7 @@ export default function SaaSLandingTemplate() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <GradientButton asChild size="lg" variant="glow"><Link to="/register">Book a demo ?</Link></GradientButton>
+                <GradientButton to="/register" size="lg" variant="glow">Book a demo →</GradientButton>
                 <a
                   href="#demo-preview"
                   onClick={scrollToDemo}

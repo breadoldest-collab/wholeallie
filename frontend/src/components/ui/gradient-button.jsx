@@ -1,5 +1,6 @@
 import React from 'react';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
+import { Link } from 'react-router-dom';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
@@ -44,6 +45,7 @@ export const GradientButton = React.forwardRef(
       variant,
       size,
       asChild = false,
+      to,
       animate = true,
       children,
       gradientColors,
@@ -52,12 +54,14 @@ export const GradientButton = React.forwardRef(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : 'button';
+    const Comp = to ? Link : (asChild ? Slot : 'button');
 
     // Default palette blends Allié primary violet, secondary pink, and warm gold
     const defaultGradient =
       'linear-gradient(115deg, #6434df 0%, #a855f7 25%, #ff78c5 50%, #ffd05b 75%, #6434df 100%)';
     const bgGradient = gradientColors ? `linear-gradient(115deg, ${gradientColors.join(', ')})` : defaultGradient;
+
+    const extraProps = to ? { to } : {};
 
     return (
       <Comp
@@ -69,6 +73,7 @@ export const GradientButton = React.forwardRef(
           animation: animate ? 'prestigeGradientShift 5s ease infinite alternate' : 'none',
           ...style,
         }}
+        {...extraProps}
         {...props}
       >
         {/* Soft radial shimmer overlay */}
@@ -80,10 +85,9 @@ export const GradientButton = React.forwardRef(
           }}
           aria-hidden="true"
         />
-        {/* Children content */}
-        <span className="relative z-10 flex items-center gap-2">
+        <Slottable>
           {children}
-        </span>
+        </Slottable>
       </Comp>
     );
   }
