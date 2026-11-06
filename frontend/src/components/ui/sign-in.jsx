@@ -25,7 +25,7 @@ const InputShell = ({ children }) => (
   </div>
 );
 
-// ─── Split 6-box OTP Input ────────────────────────────────────────────────────
+// â”€â”€â”€ Split 6-box OTP Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SplitOtpInput = ({ onComplete, disabled }) => {
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const inputs = useRef([]);
@@ -39,7 +39,7 @@ const SplitOtpInput = ({ onComplete, disabled }) => {
     // Allow paste of full code into any box
     const sanitized = value.replace(/\D/g, '');
     if (sanitized.length > 1) {
-      // Paste path — distribute across boxes
+      // Paste path â€” distribute across boxes
       const chars = sanitized.slice(0, 6).split('');
       const next = ['', '', '', '', '', ''];
       chars.forEach((c, i) => { next[i] = c; });
@@ -101,7 +101,7 @@ const SplitOtpInput = ({ onComplete, disabled }) => {
   );
 };
 
-// ─── Sign-In Page ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Sign-In Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const SignInPage = ({
   title = <span className="font-light text-[#253044] tracking-tighter">Welcome</span>,
   description = 'Access your account and continue your journey with us',
@@ -193,7 +193,7 @@ export const SignInPage = ({
               </div>
             )}
 
-            {/* ── OTP Verification Panel ── */}
+            {/* â”€â”€ OTP Verification Panel â”€â”€ */}
             {verificationState?.required && (
               <div
                 ref={otpPanelRef}
@@ -203,7 +203,7 @@ export const SignInPage = ({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[15px] font-black uppercase tracking-[-0.02em] text-[#252b3a]">
-                      Check your inbox 📬
+                      Check your inbox ðŸ“¬
                     </p>
                     <p className="mt-1 text-[13px] leading-6 text-[#253044]/75">
                       We sent a 6-digit code to{' '}
@@ -251,7 +251,7 @@ export const SignInPage = ({
                       Verifying...
                     </span>
                   ) : (
-                    'Confirm & Continue →'
+                    'Confirm & Continue â†’'
                   )}
                 </button>
 
@@ -273,6 +273,31 @@ export const SignInPage = ({
                     )}
                   </div>
                   <span className="text-[11px] text-[#253044]/50">Code expires in 60 min</span>
+                </div>
+
+                {/* Fun Fact Card while waiting for email */}
+                <div className="mt-4 rounded-[16px] border-[2.5px] border-[#252b3a] bg-white p-3.5 shadow-[3px_3px_0_0_#252b3a]">
+                  <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em] text-[#6434df] mb-1.5">
+                    <span className="flex items-center gap-1.5">
+                      <span>💡</span> Did you know?
+                    </span>
+                    <span className="text-[10px] text-[#252b3a] font-black bg-[#ffd05b] px-2 py-0.5 rounded-full border border-[#252b3a]">
+                      {FUN_FACTS[factIndex].tag}
+                    </span>
+                  </div>
+                  <p className="text-[12.5px] leading-5 text-[#253044]/90 font-medium">
+                    <strong className="text-[#252b3a] font-bold">{FUN_FACTS[factIndex].person}:</strong> {FUN_FACTS[factIndex].fact}
+                  </p>
+                  <div className="mt-2.5 flex items-center justify-between border-t border-[#252b3a]/10 pt-2 text-[10.5px] text-[#253044]/60">
+                    <span>Checking email servers...</span>
+                    <button
+                      type="button"
+                      onClick={() => setFactIndex((prev) => (prev + 1) % FUN_FACTS.length)}
+                      className="font-bold text-[#6434df] hover:underline"
+                    >
+                      Next fact →
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -364,7 +389,7 @@ export const SignInPage = ({
                         onClick={() => onToggleResetStep?.(2)}
                         className="inline-flex items-center justify-center whitespace-nowrap rounded-full border-[3px] border-[#252b3a] bg-[#ffd05b] px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#252b3a]"
                       >
-                        Enter Code Directly →
+                        Enter Code Directly â†’
                       </button>
                     </div>
                   </div>
@@ -486,7 +511,15 @@ export const SignInPage = ({
                       disabled={isLoading}
                       className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
                     >
-                      {isLoading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'}
+                      {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        <span>Delivering OTP...</span>
+                      </span>
+                    ) : isRegister ? 'Create account' : 'Sign in'}
                     </button>
                   </form>
                 )}

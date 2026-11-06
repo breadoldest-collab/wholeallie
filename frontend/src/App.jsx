@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SaaSLandingTemplate from './components/ui/saa-s-template';
 import Login from './pages/Login';
@@ -12,7 +13,22 @@ function PrivateRoute({ children }) {
   return token ? children : <Navigate to="/login" replace />;
 }
 
+function useSecondaryColorTheme() {
+  useEffect(() => {
+    const applyColor = () => {
+      const saved = localStorage.getItem('allieSecondaryColor');
+      if (saved) {
+        document.documentElement.style.setProperty('--dp-color-accent-secondary', saved);
+      }
+    };
+    applyColor();
+    window.addEventListener('themeSecondaryColorUpdated', applyColor);
+    return () => window.removeEventListener('themeSecondaryColorUpdated', applyColor);
+  }, []);
+}
+
 export default function App() {
+  useSecondaryColorTheme();
   return (
     <BrowserRouter>
       <Routes>

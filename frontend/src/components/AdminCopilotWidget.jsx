@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Sparkles, MessageSquare, Clock, RefreshCw, Maximize2, Minimize2, Square } from 'lucide-react';
 import API from '../api/axios';
 import AITextLoading from './ui/ai-text-loading';
+import GradientButton from './ui/gradient-button';
 
 const CREATIVE_THINKING_MESSAGES = [
   "Consulting the support stars...",

@@ -91,7 +91,7 @@ async function sendViaResend({ to, subject, html, text }) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: fromAddress.includes('<') ? fromAddress : `"Allié" <${fromAddress}>`,
+      from: fromAddress.includes('<') ? fromAddress : `"AlliÃ©" <${fromAddress}>`,
       to: [to],
       subject,
       html,
@@ -118,7 +118,7 @@ async function sendViaBrevo({ to, subject, html, text }) {
       'accept': 'application/json'
     },
     body: JSON.stringify({
-      sender: { name: 'Allié', email: fromAddress },
+      sender: { name: 'AlliÃ©', email: fromAddress },
       to: [{ email: to }],
       subject,
       htmlContent: html,
@@ -161,7 +161,7 @@ async function sendEmailUniversal({ to, subject, html, text }) {
     const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'oldbreades@gmail.com';
     try {
       await transporter.sendMail({
-        from: `"Allié" <${fromAddress}>`,
+        from: `"AlliÃ©" <${fromAddress}>`,
         to,
         subject,
         text,
@@ -181,7 +181,7 @@ async function sendEmailUniversal({ to, subject, html, text }) {
 
 function renderCodeTiles(code) {
   const digits = String(code || '').trim().split('').slice(0, 6);
-  while (digits.length < 6) digits.push('•');
+  while (digits.length < 6) digits.push('â€¢');
 
   return digits.map(digit => `
     <td align="center" valign="middle" style="padding: 0 3px;">
@@ -221,7 +221,7 @@ function buildAllieEmailHtml({
 <body style="margin: 0; padding: 36px 14px; background-color: #fffdf5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #252b3a; -webkit-font-smoothing: antialiased;">
   <!-- Hidden preheader for email preview snippets -->
   <div style="display: none; font-size: 1px; color: #fffdf5; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">
-    ${preheader || `Your 6-digit Allié security code is ${code}. Valid for ${expiryMinutes} minutes.`}
+    ${preheader || `Your 6-digit AlliÃ© security code is ${code}. Valid for ${expiryMinutes} minutes.`}
   </div>
 
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 540px; margin: 0 auto; background: #ffffff; border: 3px solid #252b3a; border-right: 7px solid #252b3a; border-bottom: 7px solid #252b3a; border-radius: 24px; box-shadow: 8px 8px 0px #252b3a; overflow: hidden; border-collapse: separate;">
@@ -244,10 +244,10 @@ function buildAllieEmailHtml({
                   </td>
                   <td valign="middle" style="padding-left: 12px; line-height: 1.1;">
                     <span style="font-size: 24px; font-weight: 900; letter-spacing: -0.05em; color: #252b3a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                      Allié
+                      AlliÃ©
                     </span>
                     <div style="margin-top: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #5b6475; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399; margin-right: 4px; vertical-align: middle;"></span>ALLIÉ AI
+                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399; margin-right: 4px; vertical-align: middle;"></span>ALLIÃ‰ AI
                     </div>
                   </td>
                 </tr>
@@ -323,10 +323,10 @@ function buildAllieEmailHtml({
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td valign="top" style="width: 28px; font-size: 20px; line-height: 1;">
-                    🛡️
+                    ðŸ›¡ï¸
                   </td>
                   <td valign="top" style="padding-left: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12.5px; line-height: 1.55; color: #253044;">
-                    <strong style="color: #0f7a57;">Security Guarantee:</strong> This verification code is valid for ${expiryMinutes} minutes. If you did not request this, you can safely disregard this email — your account remains completely protected.
+                    <strong style="color: #0f7a57;">Security Guarantee:</strong> This verification code is valid for ${expiryMinutes} minutes. If you did not request this, you can safely disregard this email â€” your account remains completely protected.
                   </td>
                 </tr>
               </table>
@@ -340,7 +340,7 @@ function buildAllieEmailHtml({
     <tr>
       <td style="padding: 24px 30px 26px; background: #fffdf5; border-top: 3px solid #252b3a; text-align: center;">
         <p style="margin: 0 0 5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 0.04em; color: #252b3a;">
-          Allié AI Support Platform
+          AlliÃ© AI Support Platform
         </p>
         <p style="margin: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; line-height: 1.5; color: #64748b;">
           Automated security notification &bull; Please do not reply directly to this email
@@ -358,47 +358,76 @@ function buildAllieEmailHtml({
 }
 
 async function sendVerificationEmail(email, code) {
-  const html = buildAllieEmailHtml({
-    preheader: `Your Allié account verification code is ${code}. Activate your workspace now.`,
-    badgeText: '● VERIFY ACCOUNT',
-    badgeBg: '#e9fff5',
-    badgeColor: '#0f7a57',
-    titlePre: 'Verify your',
-    titleHighlight: 'Account',
-    description: 'Welcome to <strong>Allié</strong>! Enter the 6-digit verification passcode below to activate your account and start managing your AI customer operations workspace:',
-    code,
-    expiryMinutes: 60,
-    ctaText: 'Open Allié & Verify',
-    ctaUrl: 'https://wholeallie.vercel.app/login'
-  });
+  const subject = 'Login OTP from Allié';
+  const text = `Hi,\n\n${code} is your Allié verification OTP. Please do not share it with anyone.\n\nTeam Allié`;
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #111827; line-height: 1.6; margin: 0; padding: 24px; background-color: #ffffff;">
+  <p style="margin: 0 0 16px 0;">Hi,</p>
+  <p style="margin: 0 0 20px 0;">
+    <strong style="font-size: 18px; letter-spacing: 1px; color: #111827;">${code}</strong> is your Allié verification OTP. Please do not share it with anyone.
+  </p>
+  <p style="margin: 24px 0 0 0; color: #374151;">Team Allié</p>
+</body>
+</html>`;
 
   return await sendEmailUniversal({
     to: email,
-    subject: `${code} is your Allié verification code`,
-    text: `Your Allié verification code is: ${code}. It expires in 60 minutes. Use it at https://wholeallie.vercel.app/login`,
+    subject,
+    text,
+    html,
+  });
+}
+
+async function sendPasswordResetEmail(email, code) {
+  const subject = 'Login OTP from Allié';
+  const text = `Hi,\n\n${code} is your Allié password reset OTP. Please do not share it with anyone.\n\nTeam Allié`;
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #111827; line-height: 1.6; margin: 0; padding: 24px; background-color: #ffffff;">
+  <p style="margin: 0 0 16px 0;">Hi,</p>
+  <p style="margin: 0 0 20px 0;">
+    <strong style="font-size: 18px; letter-spacing: 1px; color: #111827;">${code}</strong> is your Allié password reset OTP. Please do not share it with anyone.
+  </p>
+  <p style="margin: 24px 0 0 0; color: #374151;">Team Allié</p>
+</body>
+</html>`;
+
+  return await sendEmailUniversal({
+    to: email,
+    subject,
+    text,
     html,
   });
 }
 
 async function sendPasswordResetEmail(email, code) {
   const html = buildAllieEmailHtml({
-    preheader: `Your Allié password reset code is ${code}. Valid for 60 minutes.`,
-    badgeText: '● SECURE RESET',
+    preheader: `Your AlliÃ© password reset code is ${code}. Valid for 60 minutes.`,
+    badgeText: 'â— SECURE RESET',
     badgeBg: '#ffd05b',
     badgeColor: '#252b3a',
     titlePre: 'Reset your',
     titleHighlight: 'Password',
-    description: 'We received a request to reset the password for your <strong>Allié</strong> account. Enter the 6-digit one-time code below to create a new password:',
+    description: 'We received a request to reset the password for your <strong>AlliÃ©</strong> account. Enter the 6-digit one-time code below to create a new password:',
     code,
     expiryMinutes: 60,
-    ctaText: 'Open Allié & Enter Code',
+    ctaText: 'Open AlliÃ© & Enter Code',
     ctaUrl: 'https://wholeallie.vercel.app/login'
   });
 
   return await sendEmailUniversal({
     to: email,
-    subject: `${code} is your Allié password reset code`,
-    text: `Your Allié password reset code is: ${code}. It expires in 60 minutes. Enter your code at https://wholeallie.vercel.app/login`,
+    subject: `${code} is your AlliÃ© password reset code`,
+    text: `Your AlliÃ© password reset code is: ${code}. It expires in 60 minutes. Enter your code at https://wholeallie.vercel.app/login`,
     html,
   });
 }
@@ -621,7 +650,7 @@ router.post('/verify-email', validate(verifyCodeSchema), async (req, res) => {
   }
 });
 
-// POST /api/auth/forgot-password — Send 6-digit password reset code to user email
+// POST /api/auth/forgot-password â€” Send 6-digit password reset code to user email
 router.post('/forgot-password', validate(z.object({ email: z.string().email('Invalid email address') })), async (req, res) => {
   try {
     if (!requireDb(res)) return;
@@ -656,7 +685,7 @@ router.post('/forgot-password', validate(z.object({ email: z.string().email('Inv
   }
 });
 
-// POST /api/auth/reset-password — Verify code and set new password
+// POST /api/auth/reset-password â€” Verify code and set new password
 router.post('/reset-password', validate(z.object({
   email: z.string().email('Invalid email address'),
   code: z.string().min(4, 'Verification code is required'),

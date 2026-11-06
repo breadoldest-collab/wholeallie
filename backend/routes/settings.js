@@ -9,6 +9,7 @@ const Business = require('../models/Business');
 const settingsSchema = z.object({
   businessName: z.string().min(1, 'Business name is required').optional(),
   description: z.string().optional().default(""),
+  secondaryColor: z.string().optional().default("#ff78c5"),
   logoUrl: z.string().optional().default(""),
   botAvatarUrl: z.string().optional().default(""),
   location: z.object({
@@ -42,6 +43,7 @@ router.get('/', async (req, res) => {
   try {
     const defaultData = {
       description: '',
+      secondaryColor: '#ff78c5',
       logoUrl: '',
       botAvatarUrl: '',
       businessName: '',
@@ -59,6 +61,7 @@ router.get('/', async (req, res) => {
     }
     return res.status(200).json({
       description: business.description || '',
+      secondaryColor: business.secondaryColor || '#ff78c5',
       logoUrl: business.logoUrl || '',
       botAvatarUrl: business.botAvatarUrl || '',
       businessName: business.businessName || '',
@@ -71,6 +74,7 @@ router.get('/', async (req, res) => {
   } catch (err) {
     return res.status(200).json({
       description: '',
+      secondaryColor: '#ff78c5',
       logoUrl: '',
       botAvatarUrl: '',
       businessName: '',
@@ -95,12 +99,13 @@ router.post('/', validate(settingsSchema), async (req, res) => {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: 'Database unavailable. Please try again shortly.' });
     }
-    const { businessName, description, logoUrl, botAvatarUrl, location, socialLinks, storeContact, faqs } = req.body;
+    const { businessName, description, secondaryColor, logoUrl, botAvatarUrl, location, socialLinks, storeContact, faqs } = req.body;
     const updateData = {};
     if (businessName !== undefined && businessName.trim()) {
       updateData.businessName = capitalizeBusinessName(businessName);
     }
     if (description !== undefined) updateData.description = description;
+    if (secondaryColor !== undefined) updateData.secondaryColor = secondaryColor;
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
     if (botAvatarUrl !== undefined) updateData.botAvatarUrl = botAvatarUrl;
     if (location !== undefined) updateData.location = location;

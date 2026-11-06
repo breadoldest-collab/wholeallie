@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import BrandLogo from '../BrandLogo';
+import GradientButton from './gradient-button';
 import {
   ArrowRight,
   BarChart3,
@@ -121,7 +122,7 @@ export default function SaaSLandingTemplate() {
               >
                 Sign in
               </Link>
-              <LandingButton to="/register" variant="primary">Start free</LandingButton>
+              <GradientButton asChild size="sm"><Link to="/register">Start free</Link></GradientButton>
             </div>
           </nav>
         </header>
@@ -148,7 +149,7 @@ export default function SaaSLandingTemplate() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <LandingButton to="/register" variant="primary">Book a demo</LandingButton>
+                <GradientButton asChild size="lg" variant="glow"><Link to="/register">Book a demo ?</Link></GradientButton>
                 <a
                   href="#demo-preview"
                   onClick={scrollToDemo}
