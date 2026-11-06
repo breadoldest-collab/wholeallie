@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axios';
-import { FileText, HelpCircle, Plus, Trash2, Save, CheckCircle2 } from 'lucide-react';
+import { FileText, HelpCircle, Plus, Trash2, Save, CheckCircle2, ClipboardPaste, ChevronDown, ChevronUp } from 'lucide-react';
 
 const MAX_DESC = 500;
 
@@ -14,6 +14,10 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [bulkText, setBulkText] = useState('');
+  const [showBulkImport, setShowBulkImport] = useState(false);
+  const [bulkError, setBulkError] = useState('');
+  const bulkRef = useRef(null);
 
   useEffect(() => {
     fetchSettings();
@@ -67,6 +71,73 @@ export default function Settings() {
       next[i] = { ...next[i], [field]: val };
       return next;
     });
+  };
+
+  /**
+   * Bulk import parser – supports formats:
+   *   Q: ... A: ...
+   *   Q: ... \n A: ...
+   *   "Question?" → "Answer"
+   *   Numbered:  1. Question? \n Answer text
+   *   Plain pairs: line 1 = question (ends with ?), line 2 = answer
+   */
+  const parseBulkFaqs = (text) => {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const parsed = [];
+
+    // Try Q: / A: block format
+    let i = 0;
+    while (i < lines.length) {
+      const qLine = lines[i];
+      const aLine = lines[i + 1];
+
+      const qMatch = qLine.match(/^(?:Q:|Question:|q\.)[\s*]*(.*)/i);
+      const aMatch = aLine && aLine.match(/^(?:A:|Answer:|a\.)[\s*]*(.*)/i);
+
+      if (qMatch && aMatch) {
+        parsed.push({ question: qMatch[1].trim(), answer: aMatch[1].trim() });
+        i += 2;
+        continue;
+      }
+
+      // Pipe-separated:  Question | Answer
+      if (qLine.includes('|')) {
+        const [q, a] = qLine.split('|').map(s => s.trim());
+        if (q && a) { parsed.push({ question: q, answer: a }); i++; continue; }
+      }
+
+      // Numbered:  1. What is ...? → Answer on next line
+      const numMatch = qLine.match(/^\d+[\.\)]\s*(.*\?)\s*$/);
+      if (numMatch && aLine && !aLine.match(/^\d+[\.\)]/)) {
+        parsed.push({ question: numMatch[1].trim(), answer: aLine });
+        i += 2;
+        continue;
+      }
+
+      // Plain question (ends with ?) followed by answer line
+      if (qLine.endsWith('?') && aLine && !aLine.endsWith('?')) {
+        parsed.push({ question: qLine, answer: aLine });
+        i += 2;
+        continue;
+      }
+
+      i++;
+    }
+
+    return parsed;
+  };
+
+  const handleBulkImport = () => {
+    setBulkError('');
+    if (!bulkText.trim()) { setBulkError('Please paste some FAQ text first.'); return; }
+    const parsed = parseBulkFaqs(bulkText);
+    if (parsed.length === 0) {
+      setBulkError('Could not parse any Q&A pairs. Use format:\nQ: What are your hours?\nA: We are open 10am–10pm.');
+      return;
+    }
+    setFaqs(prev => [...prev, ...parsed]);
+    setBulkText('');
+    setShowBulkImport(false);
   };
 
   const inputStyle = {
@@ -227,21 +298,100 @@ export default function Settings() {
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={addFaq}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 7,
-                      padding: '10px 18px', borderRadius: 999, border: '3px solid #252b3a',
-                      background: '#6434df', color: '#fff',
-                      fontSize: 12, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
-                      boxShadow: '4px 4px 0 0 #252b3a',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    <Plus size={15} /> Add FAQ
-                  </button>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    {/* Bulk Import Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => { setShowBulkImport(v => !v); setBulkError(''); }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '10px 16px', borderRadius: 999, border: '3px solid #252b3a',
+                        background: showBulkImport ? '#252b3a' : '#fffdf5', color: showBulkImport ? '#fff' : '#252b3a',
+                        fontSize: 12, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+                        boxShadow: '4px 4px 0 0 #252b3a', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <ClipboardPaste size={14} />
+                      Bulk Import
+                      {showBulkImport ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={addFaq}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 7,
+                        padding: '10px 18px', borderRadius: 999, border: '3px solid #252b3a',
+                        background: '#6434df', color: '#fff',
+                        fontSize: 12, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
+                        boxShadow: '4px 4px 0 0 #252b3a', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <Plus size={15} /> Add FAQ
+                    </button>
+                  </div>
                 </div>
+
+                {/* ── Bulk Import Panel ── */}
+                {showBulkImport && (
+                  <div style={{
+                    background: '#f8f5ff', border: '3px solid #252b3a',
+                    borderRadius: 18, padding: 20, marginBottom: 20,
+                    boxShadow: '4px 4px 0 0 #252b3a',
+                  }}>
+                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: '#252b3a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      📋 Paste FAQ Block
+                    </p>
+                    <p style={{ margin: '0 0 12px', fontSize: 12, color: '#64748b', lineHeight: 1.6 }}>
+                      Paste any format —{' '}
+                      <code style={{ background: '#ede9ff', padding: '1px 5px', borderRadius: 4 }}>Q: … A: …</code>{' '}
+                      or{' '}
+                      <code style={{ background: '#ede9ff', padding: '1px 5px', borderRadius: 4 }}>Question? | Answer</code>{' '}
+                      or question on one line + answer on the next.
+                    </p>
+                    <textarea
+                      ref={bulkRef}
+                      rows={8}
+                      value={bulkText}
+                      onChange={e => { setBulkText(e.target.value); setBulkError(''); }}
+                      onFocus={focusStyle}
+                      onBlur={blurStyle}
+                      placeholder={`Q: What are your store timings?\nA: We are open every day from 10 AM to 11 PM.\n\nQ: Do you offer home delivery?\nA: Yes, via Swiggy and Zomato within a 5 km radius.\n\nWhat is your most popular item?\nOur Original Recipe Fried Chicken is a fan favourite!`}
+                      style={{ ...inputStyle, resize: 'vertical', fontSize: 13, lineHeight: 1.6, fontFamily: 'monospace', marginBottom: 12 }}
+                    />
+                    {bulkError && (
+                      <p style={{ margin: '0 0 10px', fontSize: 12, color: '#dc2626', fontWeight: 700, whiteSpace: 'pre-line' }}>
+                        ⚠ {bulkError}
+                      </p>
+                    )}
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button
+                        type="button"
+                        onClick={handleBulkImport}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6,
+                          padding: '10px 20px', borderRadius: 999, border: '3px solid #252b3a',
+                          background: '#6434df', color: '#fff',
+                          fontSize: 12, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+                          boxShadow: '4px 4px 0 0 #252b3a',
+                        }}
+                      >
+                        <ClipboardPaste size={14} /> Import FAQs
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setBulkText(''); setBulkError(''); setShowBulkImport(false); }}
+                        style={{
+                          padding: '10px 18px', borderRadius: 999, border: '3px solid #252b3a',
+                          background: '#fffdf5', color: '#252b3a',
+                          fontSize: 12, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+                          boxShadow: '4px 4px 0 0 #252b3a',
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Empty state */}
                 {faqs.length === 0 ? (
