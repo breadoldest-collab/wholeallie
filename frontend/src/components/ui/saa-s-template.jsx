@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import WebsiteWalkthroughModal from '../WebsiteWalkthroughModal';
-import GradientButton from './gradient-button';
 import {
   ArrowRight,
   BarChart3,
@@ -130,7 +129,7 @@ export default function SaaSLandingTemplate() {
               >
                 Sign in
               </Link>
-              <GradientButton to="/register" size="sm">Start free</GradientButton>
+              <LandingButton to="/register" variant="primary">Create ac</LandingButton>
             </div>
           </nav>
         </header>
@@ -157,7 +156,7 @@ export default function SaaSLandingTemplate() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <GradientButton to="/register" size="lg" variant="glow">Try Now →</GradientButton>
+                <LandingButton to="/register" variant="primary">Try Now →</LandingButton>
                 <button
                   type="button"
                   onClick={() => setWalkthroughOpen(true)}

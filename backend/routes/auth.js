@@ -409,29 +409,6 @@ async function sendPasswordResetEmail(email, code) {
   });
 }
 
-async function sendPasswordResetEmail(email, code) {
-  const html = buildAllieEmailHtml({
-    preheader: `Your AlliÃ© password reset code is ${code}. Valid for 60 minutes.`,
-    badgeText: 'â— SECURE RESET',
-    badgeBg: '#ffd05b',
-    badgeColor: '#252b3a',
-    titlePre: 'Reset your',
-    titleHighlight: 'Password',
-    description: 'We received a request to reset the password for your <strong>AlliÃ©</strong> account. Enter the 6-digit one-time code below to create a new password:',
-    code,
-    expiryMinutes: 60,
-    ctaText: 'Open AlliÃ© & Enter Code',
-    ctaUrl: 'https://wholeallie.vercel.app/login'
-  });
-
-  return await sendEmailUniversal({
-    to: email,
-    subject: `${code} is your AlliÃ© password reset code`,
-    text: `Your AlliÃ© password reset code is: ${code}. It expires in 60 minutes. Enter your code at https://wholeallie.vercel.app/login`,
-    html,
-  });
-}
-
 async function issueVerificationCode(business) {
   const code = generateVerificationCode();
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
