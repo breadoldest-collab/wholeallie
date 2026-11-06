@@ -252,6 +252,7 @@ export const SignInPage = ({
               </form>
             ) : (
               <>
+                {!verificationState?.required && (
                 <form className="mt-8 space-y-7" onSubmit={onSubmit}>
                   {isRegister && (
                     <div>
@@ -340,12 +341,13 @@ export const SignInPage = ({
 
                   <button
                     type="submit"
-                    disabled={isLoading || (emailMeta.isPublicProvider && !emailMeta.isValidFormat)}
+                    disabled={isLoading}
                     className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
                   >
                     {isLoading ? 'Processing...' : isRegister ? 'Create account' : 'Sign in'}
                   </button>
                 </form>
+                )}
 
                 <p className="mt-6 text-center text-[15px] text-[#253044]/75">
                   {isRegister ? 'Already have an account?' : 'New to our platform?'}{' '}

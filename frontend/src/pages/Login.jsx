@@ -77,7 +77,7 @@ export default function Login({ initialMode = 'login' }) {
             devCode: res.data.verificationCode || '',
             message: res.data.message || 'We sent a verification code to your email.'
           });
-          setMode('register');
+          // Stay in register mode — no setMode call needed, it's already 'register'
           return;
         }
 
@@ -97,7 +97,7 @@ export default function Login({ initialMode = 'login' }) {
           devCode: res.data.verificationCode || '',
           message: res.data.message || 'Please verify your email before continuing.'
         });
-        setMode('register');
+        // Stay in 'login' mode — don't switch to register, which would show register-only fields
         return;
       }
 
