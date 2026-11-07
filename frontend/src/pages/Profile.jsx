@@ -203,10 +203,14 @@ export default function Profile() {
     if (!supportUrl || !qrRef.current) return;
 
     const styleMap = {
-      classic: { dots: 'square', corners: 'square' },
-      rounded: { dots: 'rounded', corners: 'rounded' },
-      dots: { dots: 'dots', corners: 'dot' },
-      premium: { dots: 'extra-rounded', corners: 'extra-rounded' },
+      classic:       { dots: 'square',         corners: 'square' },
+      rounded:       { dots: 'rounded',        corners: 'rounded' },
+      dots:          { dots: 'dots',           corners: 'dot' },
+      premium:       { dots: 'extra-rounded',  corners: 'extra-rounded' },
+      classy:        { dots: 'classy',         corners: 'extra-rounded' },
+      classyRounded: { dots: 'classy-rounded', corners: 'rounded' },
+      star:          { dots: 'star',           corners: 'dot' },
+      diamond:       { dots: 'diamond',        corners: 'square' },
     };
 
     const currentStyle = styleMap[qrStyle] || styleMap.rounded;
@@ -2591,10 +2595,14 @@ export default function Profile() {
                           </label>
                           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                             {[
-                              { id: 'rounded', label: 'Rounded' },
-                              { id: 'dots', label: 'Dots' },
-                              { id: 'classic', label: 'Classic' },
-                              { id: 'premium', label: 'Extra Rounded' },
+                              { id: 'rounded',       label: 'Rounded' },
+                              { id: 'dots',          label: 'Dots' },
+                              { id: 'classic',       label: 'Classic' },
+                              { id: 'premium',       label: 'Extra Rounded' },
+                              { id: 'classy',        label: 'Classy' },
+                              { id: 'classyRounded', label: 'Classy Round' },
+                              { id: 'star',          label: 'Star' },
+                              { id: 'diamond',       label: 'Diamond' },
                             ].map((style) => (
                               <button
                                 key={style.id}
@@ -2605,11 +2613,12 @@ export default function Profile() {
                                   color: qrStyle === style.id ? '#ffffff' : '#252b3a',
                                   border: '2px solid #252b3a',
                                   borderRadius: 12,
-                                  padding: '8px 16px',
+                                  padding: '8px 14px',
                                   fontSize: 12,
                                   fontWeight: 800,
                                   cursor: 'pointer',
-                                  boxShadow: '2px 2px 0 0 #252b3a',
+                                  boxShadow: qrStyle === style.id ? '2px 2px 0 0 #252b3a' : 'none',
+                                  transition: 'all 0.15s ease',
                                 }}
                               >
                                 {style.label}
@@ -2623,22 +2632,40 @@ export default function Profile() {
                           <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a', marginBottom: 8 }}>
                             QR Color
                           </label>
-                          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                            {['#252b3a', '#6434df', '#0f766e', '#b91c1c', '#1e3a8a'].map((c) => (
+                          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                            {[
+                              { color: '#252b3a', label: 'Ink' },
+                              { color: '#6434df', label: 'Purple' },
+                              { color: '#0f766e', label: 'Teal' },
+                              { color: '#b91c1c', label: 'Red' },
+                              { color: '#1e3a8a', label: 'Navy' },
+                              { color: '#059669', label: 'Emerald' },
+                              { color: '#d97706', label: 'Amber' },
+                              { color: '#7c3aed', label: 'Violet' },
+                            ].map((opt) => (
                               <button
-                                key={c}
+                                key={opt.color}
                                 type="button"
-                                onClick={() => setQrColor(c)}
+                                title={opt.label}
+                                onClick={() => setQrColor(opt.color)}
                                 style={{
                                   width: 32,
                                   height: 32,
                                   borderRadius: 8,
-                                  background: c,
-                                  border: qrColor === c ? '3px solid #6434df' : '2px solid #252b3a',
-                                  boxShadow: qrColor === c ? '0 0 0 2px #fff, 0 0 0 4px #6434df' : '2px 2px 0 0 #252b3a',
+                                  background: opt.color,
+                                  border: qrColor === opt.color ? '3px solid #252b3a' : '2px solid #cbd5e1',
+                                  boxShadow: qrColor === opt.color ? '2px 2px 0 0 #252b3a' : 'none',
                                   cursor: 'pointer',
+                                  position: 'relative',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
                                 }}
-                              />
+                              >
+                                {qrColor === opt.color && (
+                                  <Check size={14} style={{ color: '#ffffff', strokeWidth: 3 }} />
+                                )}
+                              </button>
                             ))}
                           </div>
                         </div>
