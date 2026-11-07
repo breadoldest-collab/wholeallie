@@ -78,20 +78,24 @@ export default function Sidebar() {
     if (!qrModalOpen || !supportUrl || !qrRef.current) return;
 
     const styleMap = {
-      classic:       { dots: 'square',         corners: 'square' },
-      rounded:       { dots: 'rounded',         corners: 'rounded' },
-      dots:          { dots: 'dots',            corners: 'dot' },
-      premium:       { dots: 'extra-rounded',   corners: 'extra-rounded' },
-      classy:        { dots: 'classy',          corners: 'extra-rounded' },
-      classyRounded: { dots: 'classy-rounded',  corners: 'rounded' },
-      star:          { dots: 'star',            corners: 'dot' },
-      diamond:       { dots: 'diamond',         corners: 'square' },
+      rounded:       { dots: 'rounded',        cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      dots:          { dots: 'dots',           cornersSquare: 'dot',           cornersDot: 'dot' },
+      classic:       { dots: 'square',         cornersSquare: 'square',        cornersDot: 'square' },
+      extraRounded:  { dots: 'extra-rounded',  cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      premium:       { dots: 'extra-rounded',  cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      classy:        { dots: 'classy',         cornersSquare: 'extra-rounded', cornersDot: 'square' },
+      classyRounded: { dots: 'classy-rounded', cornersSquare: 'dot',           cornersDot: 'dot' },
+      smoothEye:     { dots: 'square',         cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      circularEye:   { dots: 'dots',           cornersSquare: 'square',        cornersDot: 'dot' },
+      star:          { dots: 'classy',         cornersSquare: 'dot',           cornersDot: 'dot' },
+      diamond:       { dots: 'classy-rounded', cornersSquare: 'extra-rounded', cornersDot: 'dot' },
     };
 
     const currentStyle = styleMap[qrStyle] || styleMap.rounded;
     qrRef.current.innerHTML = '';
 
     const qrCode = new QRCodeStyling({
+      type: 'svg',
       width: 260,
       height: 260,
       margin: 12,
@@ -107,7 +111,11 @@ export default function Sidebar() {
       },
       cornersSquareOptions: {
         color: qrColor,
-        type: currentStyle.corners
+        type: currentStyle.cornersSquare
+      },
+      cornersDotOptions: {
+        color: qrColor,
+        type: currentStyle.cornersDot
       },
       backgroundOptions: {
         color: '#ffffff'
@@ -241,14 +249,14 @@ export default function Sidebar() {
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
                     {[
-                      { id: 'classic',       label: 'Classic' },
                       { id: 'rounded',       label: 'Rounded' },
                       { id: 'dots',          label: 'Dots' },
-                      { id: 'premium',       label: 'Premium' },
+                      { id: 'classic',       label: 'Classic' },
+                      { id: 'extraRounded',  label: 'Extra Rounded' },
                       { id: 'classy',        label: 'Classy' },
                       { id: 'classyRounded', label: 'Classy Round' },
-                      { id: 'star',          label: 'Star' },
-                      { id: 'diamond',       label: 'Diamond' },
+                      { id: 'smoothEye',     label: 'Soft Eyes' },
+                      { id: 'circularEye',   label: 'Bubble Frame' },
                     ].map(option => (
                       <button
                         key={option.id}

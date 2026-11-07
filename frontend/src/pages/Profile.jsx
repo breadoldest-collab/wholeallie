@@ -203,20 +203,24 @@ export default function Profile() {
     if (!supportUrl || !qrRef.current) return;
 
     const styleMap = {
-      classic:       { dots: 'square',         corners: 'square' },
-      rounded:       { dots: 'rounded',        corners: 'rounded' },
-      dots:          { dots: 'dots',           corners: 'dot' },
-      premium:       { dots: 'extra-rounded',  corners: 'extra-rounded' },
-      classy:        { dots: 'classy',         corners: 'extra-rounded' },
-      classyRounded: { dots: 'classy-rounded', corners: 'rounded' },
-      star:          { dots: 'star',           corners: 'dot' },
-      diamond:       { dots: 'diamond',        corners: 'square' },
+      rounded:       { dots: 'rounded',        cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      dots:          { dots: 'dots',           cornersSquare: 'dot',           cornersDot: 'dot' },
+      classic:       { dots: 'square',         cornersSquare: 'square',        cornersDot: 'square' },
+      extraRounded:  { dots: 'extra-rounded',  cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      premium:       { dots: 'extra-rounded',  cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      classy:        { dots: 'classy',         cornersSquare: 'extra-rounded', cornersDot: 'square' },
+      classyRounded: { dots: 'classy-rounded', cornersSquare: 'dot',           cornersDot: 'dot' },
+      smoothEye:     { dots: 'square',         cornersSquare: 'extra-rounded', cornersDot: 'dot' },
+      circularEye:   { dots: 'dots',           cornersSquare: 'square',        cornersDot: 'dot' },
+      star:          { dots: 'classy',         cornersSquare: 'dot',           cornersDot: 'dot' },
+      diamond:       { dots: 'classy-rounded', cornersSquare: 'extra-rounded', cornersDot: 'dot' },
     };
 
     const currentStyle = styleMap[qrStyle] || styleMap.rounded;
     qrRef.current.innerHTML = '';
 
     const qrCode = new QRCodeStyling({
+      type: 'svg',
       width: 240,
       height: 240,
       margin: 10,
@@ -232,7 +236,11 @@ export default function Profile() {
       },
       cornersSquareOptions: {
         color: qrColor,
-        type: currentStyle.corners,
+        type: currentStyle.cornersSquare,
+      },
+      cornersDotOptions: {
+        color: qrColor,
+        type: currentStyle.cornersDot,
       },
       backgroundOptions: {
         color: '#ffffff',
@@ -2598,11 +2606,11 @@ export default function Profile() {
                               { id: 'rounded',       label: 'Rounded' },
                               { id: 'dots',          label: 'Dots' },
                               { id: 'classic',       label: 'Classic' },
-                              { id: 'premium',       label: 'Extra Rounded' },
+                              { id: 'extraRounded',  label: 'Extra Rounded' },
                               { id: 'classy',        label: 'Classy' },
                               { id: 'classyRounded', label: 'Classy Round' },
-                              { id: 'star',          label: 'Star' },
-                              { id: 'diamond',       label: 'Diamond' },
+                              { id: 'smoothEye',     label: 'Soft Eyes' },
+                              { id: 'circularEye',   label: 'Bubble Frame' },
                             ].map((style) => (
                               <button
                                 key={style.id}

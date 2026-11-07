@@ -26,3 +26,5 @@ all_scraped_data.json
 parse-menu.js
 test_find.js
 test-*.js
+
+image.png
