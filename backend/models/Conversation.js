@@ -17,7 +17,7 @@ const ConversationSchema = new mongoose.Schema({
   businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business', required: true },
   sessionId: { type: String, required: true, unique: true },
   customerName: { type: String, default: "Customer" },
-  status: { type: String, enum: ["open", "resolved"], default: "open" },
+  status: { type: String, enum: ["open", "pending", "resolved"], default: "open" },
   rating: { type: String, enum: ["up", "down", null], default: null },
   priority: { type: String, enum: ["critical", "high", "medium", "low", "normal", "urgent", "escalated"], default: "normal" },
   isEscalated: { type: Boolean, default: false },

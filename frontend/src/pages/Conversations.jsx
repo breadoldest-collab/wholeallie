@@ -203,6 +203,7 @@ export default function Conversations() {
   // Human vs AI Classification
   const isHumanNeeded = (conv) => {
     return Boolean(conv.isEscalated) ||
+      conv.status === 'pending' ||
       conv.priority === 'urgent' ||
       conv.priority === 'escalated' ||
       ['critical', 'high'].includes(conv.priority) ||
@@ -210,13 +211,16 @@ export default function Conversations() {
       Boolean(conv.repliedByAdmin);
   };
 
-  const isConvUnreplied = (conv) => isHumanNeeded(conv) && !conv.repliedByAdmin && conv.status !== 'resolved';
+  const isConvUnreplied = (conv) =>
+    conv.status === 'pending' ||
+    (isHumanNeeded(conv) && !conv.repliedByAdmin && conv.status !== 'resolved');
 
   // Counts
   const totalCount = conversations.length;
   const humanCount = conversations.filter(isHumanNeeded).length;
   const aiCount = totalCount - humanCount;
   const unrepliedHumanCount = conversations.filter(isConvUnreplied).length;
+  const pendingAttentionConversations = conversations.filter(isConvUnreplied);
 
   // Filtering & Sorting (Pinned stay strictly at the top)
   const filtered = conversations.filter(conv => {
@@ -232,7 +236,9 @@ export default function Conversations() {
     if (channelTab === 'human' && !isHumanNeeded(conv)) return false;
 
     // 2. Status Filter
-    if (statusFilter === 'needs_reply') return isConvUnreplied(conv);
+    if (statusFilter === 'needs_attention' || statusFilter === 'needs_reply') return isConvUnreplied(conv);
+    if (statusFilter === 'pending') return conv.status === 'pending' || isConvUnreplied(conv);
+    if (statusFilter === 'open') return (conv.status === 'open' || !conv.status) && !isConvUnreplied(conv);
     if (statusFilter === 'resolved') return conv.status === 'resolved';
 
     return true;
@@ -423,13 +429,14 @@ export default function Conversations() {
           </div>
 
           {/* Secondary Quick Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b', marginRight: 4 }}>
               Status:
             </span>
             {[
               { id: 'all', label: 'All' },
-              { id: 'needs_reply', label: 'Needs Staff Reply' },
+              { id: 'needs_attention', label: 'Needs Attention', badge: unrepliedHumanCount, badgeColor: '#ff3366' },
+              { id: 'pending', label: 'Pending', badge: conversations.filter(c => c.status === 'pending').length, badgeColor: '#ea580c' },
               { id: 'resolved', label: 'Resolved' },
             ].map(st => (
               <button
@@ -437,6 +444,9 @@ export default function Conversations() {
                 type="button"
                 onClick={() => setStatusFilter(st.id)}
                 style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
                   padding: '5px 11px',
                   borderRadius: 8,
                   border: statusFilter === st.id ? '2px solid #252b3a' : '1.5px solid #cbd5e1',
@@ -447,11 +457,189 @@ export default function Conversations() {
                   cursor: 'pointer',
                 }}
               >
-                {st.label}
+                <span>{st.label}</span>
+                {Boolean(st.badge && st.badge > 0) && (
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 900,
+                    padding: '1px 5px',
+                    borderRadius: 999,
+                    background: st.badgeColor || '#252b3a',
+                    color: '#ffffff',
+                    marginLeft: 2,
+                  }}>
+                    {st.badge}
+                  </span>
+                )}
               </button>
             ))}
           </div>
         </div>
+
+        {/* NEEDS ATTENTION · PENDING HUMAN REPLY PRIORITY SECTION */}
+        {pendingAttentionConversations.length > 0 && (
+          <div style={{
+            background: '#fff9e6',
+            border: '3px solid #252b3a',
+            borderRadius: 20,
+            padding: '18px 22px',
+            boxShadow: '4px 4px 0 0 #252b3a',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 14,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: '#ffd05b',
+                  border: '2px solid #252b3a',
+                  boxShadow: '2px 2px 0 0 #252b3a',
+                }}>
+                  <AlertCircle size={20} style={{ color: '#92400e' }} />
+                </span>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <h3 style={{ margin: 0, fontSize: 15, fontWeight: 900, color: '#252b3a', letterSpacing: '-0.01em', textTransform: 'uppercase' }}>
+                      Needs Attention · Pending Human Reply
+                    </h3>
+                    <span style={{
+                      background: '#ff3366',
+                      color: '#ffffff',
+                      fontSize: 11,
+                      fontWeight: 900,
+                      padding: '2px 8px',
+                      borderRadius: 999,
+                      border: '1.5px solid #252b3a',
+                    }}>
+                      {pendingAttentionConversations.length} {pendingAttentionConversations.length === 1 ? 'ticket' : 'tickets'} waiting
+                    </span>
+                  </div>
+                  <p style={{ margin: '3px 0 0', fontSize: 12, color: '#78350f' }}>
+                    These customers requested human staff or have unresolved inquiries that require review and response.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setChannelTab('all');
+                  setStatusFilter('needs_attention');
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '7px 14px',
+                  borderRadius: 8,
+                  border: '2px solid #252b3a',
+                  background: statusFilter === 'needs_attention' ? '#ffd05b' : '#ffffff',
+                  color: '#252b3a',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '2px 2px 0 0 #252b3a',
+                }}
+              >
+                <span>Filter List by Pending</span>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+
+            {/* Quick Cards Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: 12,
+            }}>
+              {pendingAttentionConversations.map((ticket) => (
+                <div
+                  key={ticket.sessionId}
+                  style={{
+                    background: selectedSession === ticket.sessionId ? '#ffffff' : '#fffdf5',
+                    border: selectedSession === ticket.sessionId ? '2.5px solid #6434df' : '2px solid #252b3a',
+                    borderRadius: 14,
+                    padding: '12px 14px',
+                    boxShadow: selectedSession === ticket.sessionId ? '3px 3px 0 0 #6434df' : '2px 2px 0 0 #252b3a',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 900, color: '#252b3a' }}>
+                        {ticket.customerName || 'Customer'}
+                      </span>
+                      <span style={{
+                        fontSize: 10,
+                        fontWeight: 900,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                        border: '1px solid #252b3a',
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                      }}>
+                        Awaiting Staff
+                      </span>
+                    </div>
+                    <p style={{
+                      margin: 0,
+                      fontSize: 12,
+                      color: '#4b5563',
+                      lineHeight: 1.4,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}>
+                      "{ticket.lastMessage || 'Customer inquiry waiting for staff response.'}"
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px dashed #e2e8f0' }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: '#64748b', fontFamily: 'monospace' }}>
+                      {ticket.sessionId}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSession(ticket.sessionId);
+                        setIsTableMinimized(false);
+                        const ws = document.getElementById('conversation-workspace-panel');
+                        if (ws) ws.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        padding: '4px 10px',
+                        borderRadius: 6,
+                        border: '1.5px solid #252b3a',
+                        background: '#ffd05b',
+                        color: '#252b3a',
+                        fontSize: 11,
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                        boxShadow: '1.5px 1.5px 0 0 #252b3a',
+                      }}
+                    >
+                      <span>Open & Reply</span>
+                      <ArrowDown size={11} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 3. EXTENDIBLE / MINIMIZABLE CONVERSATIONS LIST */}
         {isTableMinimized && selectedSession ? (
@@ -580,7 +768,78 @@ export default function Conversations() {
             ) : filtered.length === 0 ? (
               <div style={{ padding: 48, textAlign: 'center', color: '#64748b', fontSize: 14 }}>
                 <MessageSquare size={32} style={{ margin: '0 auto 12px', display: 'block', opacity: 0.3 }} />
-                No conversations found matching this view.
+                <p style={{ margin: '0 0 14px', fontWeight: 800, fontSize: 14, color: '#252b3a' }}>
+                  No conversations found matching this view.
+                </p>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {channelTab === 'ai' && humanCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setChannelTab('human')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '8px 14px',
+                        borderRadius: 10,
+                        border: '2px solid #252b3a',
+                        background: '#ffd05b',
+                        color: '#252b3a',
+                        fontSize: 12,
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                        boxShadow: '2px 2px 0 0 #252b3a',
+                      }}
+                    >
+                      <User size={13} />
+                      <span>View {humanCount} tickets in Human Support</span>
+                    </button>
+                  )}
+                  {statusFilter !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => setStatusFilter('all')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '8px 14px',
+                        borderRadius: 10,
+                        border: '2px solid #252b3a',
+                        background: '#ffffff',
+                        color: '#252b3a',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '2px 2px 0 0 #252b3a',
+                      }}
+                    >
+                      <span>Clear Status Filter</span>
+                    </button>
+                  )}
+                  {channelTab !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => { setChannelTab('all'); setStatusFilter('all'); }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '8px 14px',
+                        borderRadius: 10,
+                        border: '2px solid #252b3a',
+                        background: '#ffffff',
+                        color: '#252b3a',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '2px 2px 0 0 #252b3a',
+                      }}
+                    >
+                      <span>View All Chats ({totalCount})</span>
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
@@ -951,11 +1210,43 @@ export default function Conversations() {
                     )}
                   </div>
                   
-                  <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 0' }}>
-                    Customer: <strong>{activeConversation.customerName || 'Customer'}</strong> · Channel:{' '}
-                    <strong>{isHumanNeeded(activeConversation) ? 'Human Support' : 'AI Handled'}</strong> · Status:{' '}
-                    <strong>{activeConversation.status || 'open'}</strong>
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>
+                      Customer: <strong>{activeConversation.customerName || 'Customer'}</strong>
+                    </span>
+                    <span style={{ color: '#cbd5e1' }}>•</span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>
+                      Channel: <strong>{isHumanNeeded(activeConversation) ? 'Human Support' : 'AI Handled'}</strong>
+                    </span>
+                    <span style={{ color: '#cbd5e1' }}>•</span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>Status:</span>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontSize: 11,
+                      fontWeight: 900,
+                      padding: '2px 8px',
+                      borderRadius: 6,
+                      border: '1.5px solid #252b3a',
+                      background: (activeConversation.status === 'pending' || isConvUnreplied(activeConversation))
+                        ? '#fee2e2'
+                        : activeConversation.status === 'resolved'
+                        ? '#e9fff5'
+                        : '#f1ebff',
+                      color: (activeConversation.status === 'pending' || isConvUnreplied(activeConversation))
+                        ? '#991b1b'
+                        : activeConversation.status === 'resolved'
+                        ? '#0f7a57'
+                        : '#6434df',
+                    }}>
+                      {(activeConversation.status === 'pending' || isConvUnreplied(activeConversation))
+                        ? 'Pending Staff Reply'
+                        : activeConversation.status === 'resolved'
+                        ? 'Resolved'
+                        : 'Open'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1289,7 +1580,30 @@ export default function Conversations() {
                   Reply as Support Staff (Acme)
                 </span>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {activeConversation.status !== 'pending' && (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStatus('pending')}
+                      title="Mark as needing human staff attention"
+                      style={{
+                        padding: '5px 10px',
+                        borderRadius: 8,
+                        border: '1.5px solid #252b3a',
+                        background: '#fee2e2',
+                        color: '#991b1b',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <AlertCircle size={12} /> Mark Pending Attention
+                    </button>
+                  )}
+
                   {activeConversation.status !== 'resolved' ? (
                     <button
                       type="button"

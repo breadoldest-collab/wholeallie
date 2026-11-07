@@ -491,7 +491,7 @@ YOUR INSTRUCTIONS:
             sessionId,
             customerName: conversation.customerName || 'Customer',
             priority: conversation.priority || (isUrgent ? 'urgent' : (isEscalated ? 'escalated' : 'normal')),
-            status: 'open',
+            status: isEscalated ? 'pending' : 'open',
             isEscalated: isEscalated,
             repliedByAdmin: false,
             messages: conversation.messages,
@@ -501,6 +501,9 @@ YOUR INSTRUCTIONS:
           dbConv.messages = conversation.messages;
           dbConv.unresolvedTopics = conversation.unresolvedTopics || [];
           dbConv.isEscalated = isEscalated;
+          if (isEscalated && dbConv.status !== 'resolved') {
+            dbConv.status = 'pending';
+          }
           if (isUrgent) {
             dbConv.priority = 'urgent';
           } else if (isEscalated) {

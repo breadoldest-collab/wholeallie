@@ -31,11 +31,14 @@ router.get('/', async (req, res) => {
       // A chat only needs human staff if human was explicitly asked, topics are unresolved, or negative rating was given
       const isEscalated = userAskedHuman || hasUnresolved || hasNegativeRating || (Boolean(conv.isEscalated) && (userAskedHuman || hasUnresolved));
       const isUrgent = isEscalated && (userAskedHuman || ['urgent', 'critical'].includes(conv.priority) || hasNegativeRating);
+      const effectiveStatus = conv.status === 'resolved'
+        ? 'resolved'
+        : (conv.status === 'pending' || (isEscalated && !repliedByAdmin) ? 'pending' : (conv.status || 'open'));
 
       return {
         sessionId: conv.sessionId,
         customerName: conv.customerName,
-        status: conv.status,
+        status: effectiveStatus,
         priority: isUrgent ? 'urgent' : (isEscalated ? 'escalated' : 'normal'),
         isEscalated,
         repliedByAdmin,
@@ -71,7 +74,7 @@ router.post('/assistant', async (req, res) => {
     if (require('mongoose').connection.readyState === 1) {
       try {
         const [openData, resolvedData, totalCount, bus] = await Promise.all([
-          Conversation.find({ businessId: req.business, status: 'open' })
+          Conversation.find({ businessId: req.business, status: { $in: ['open', 'pending'] } })
             .select('sessionId customerName messages')
             .sort({ updatedAt: -1 })
             .limit(8)
@@ -242,7 +245,15 @@ router.patch('/:sessionId/status', async (req, res) => {
     const { status, repliedByAdmin } = req.body;
     const conv = await Conversation.findOne({ sessionId, businessId: req.business });
     if (!conv) return res.status(404).json({ error: 'Conversation not found' });
-    if (status) conv.status = status;
+    if (status) {
+      conv.status = status;
+      if (status === 'resolved') {
+        conv.repliedByAdmin = true;
+      } else if (status === 'pending') {
+        conv.repliedByAdmin = false;
+        conv.isEscalated = true;
+      }
+    }
     if (repliedByAdmin !== undefined) conv.repliedByAdmin = repliedByAdmin;
     await conv.save();
     return res.status(200).json(conv);
