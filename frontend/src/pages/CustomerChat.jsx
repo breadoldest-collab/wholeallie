@@ -85,6 +85,7 @@ export default function CustomerChat() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isEscalated, setIsEscalated] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState({});
   const [copiedId, setCopiedId] = useState(false);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState(null);
@@ -209,6 +210,9 @@ export default function CustomerChat() {
 
       axios.get(`${API_BASE}/api/chat/messages/${sessionId}`)
         .then(res => {
+          if (typeof res.data?.isEscalated === 'boolean') {
+            setIsEscalated(res.data.isEscalated && res.data.status !== 'resolved');
+          }
           if (res.data?.messages && Array.isArray(res.data.messages) && res.data.messages.length > 0) {
             const formatted = res.data.messages.map(m => ({
               role: m.role,
@@ -298,10 +302,14 @@ export default function CustomerChat() {
         signal: controller.signal
       });
 
+      if (response.data?.isEscalated && response.data?.status !== 'resolved') {
+        setIsEscalated(true);
+      }
+
       const aiResponse = {
         role: 'ai',
         content: response.data.reply || "I'm having trouble processing that right now. Please try again.",
-        flagged: response.data.flagged || false,
+        flagged: Boolean(response.data.flagged || response.data.isEscalated),
       };
 
       setMessages(prev => [...prev, aiResponse]);
@@ -327,6 +335,7 @@ export default function CustomerChat() {
 
   const handleFeedback = async (msgIndex, rating) => {
     setFeedbackGiven(prev => ({ ...prev, [msgIndex]: rating }));
+    if (rating === 'down') setIsEscalated(true);
     try {
       await axios.post(`${API_BASE}/api/chat/feedback`, {
         sessionId,
@@ -366,6 +375,7 @@ export default function CustomerChat() {
       },
     ]);
     setFeedbackGiven({});
+    setIsEscalated(false);
   };
 
   // If a duplicate tab was opened, show single instance protection screen
@@ -552,6 +562,25 @@ export default function CustomerChat() {
               >
                 <Sparkles size={11} /> AI Assistant
               </span>
+              {isEscalated && (
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 900,
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    background: '#fee2e2',
+                    color: '#991b1b',
+                    border: '2px solid #252b3a',
+                    boxShadow: '2px 2px 0 0 #252b3a',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <ShieldAlert size={11} /> Escalated to Support Team
+                </span>
+              )}
             </div>
 
             {isDebugMode && (

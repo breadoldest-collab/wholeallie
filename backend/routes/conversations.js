@@ -4,6 +4,11 @@ const authMiddleware = require('../middleware/authMiddleware');
 const Conversation = require('../models/Conversation');
 const Business = require('../models/Business');
 const { getGeminiApiKey } = require('../config/aiKeys');
+const {
+  isEscalationRequestedByUser,
+  isCriticalIssueMessage,
+  isEscalationConfirmedByAi,
+} = require('../utils/escalation');
 
 router.use(authMiddleware);
 
@@ -16,21 +21,23 @@ router.get('/', async (req, res) => {
     const conversations = await Conversation.find({ businessId: req.business })
       .sort({ isPinned: -1, createdAt: -1 });
 
-    const HUMAN_REQUEST_REGEX = /(?:talk to|speak (?:with|to)|connect (?:me )?(?:to|with)|transfer (?:me )?to|get me)\s+(?:a\s+)?(?:human|agent|person|representative|support rep|real person|manager)|\b(?:live agent|human agent|human support|customer service representative|speak to human|talk to human)\b/i;
-    const CRITICAL_ISSUE_REGEX = /(?:\bhacked\b|security breach|credit card fraud|\boutage\b|chargeback|\blawyer\b|\bsue you\b)/i;
-
     const result = conversations.map(conv => {
       const msgs = conv.messages || [];
       const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1].content : "";
 
-      const userAskedHuman = msgs.some(m => m.role === 'user' && (HUMAN_REQUEST_REGEX.test(m.content || '') || CRITICAL_ISSUE_REGEX.test(m.content || '')));
+      const userAskedHuman = msgs.some(m => m.role === 'user' && (isEscalationRequestedByUser(m.content || '') || isCriticalIssueMessage(m.content || '')));
+      const aiConfirmedEscalation = msgs.some(m => m.role === 'ai' && isEscalationConfirmedByAi(m.content || ''));
       const hasUnresolved = (conv.unresolvedTopics || []).length > 0;
       const hasNegativeRating = conv.status !== 'resolved' && conv.rating === 'down';
       const repliedByAdmin = Boolean(conv.repliedByAdmin);
 
-      // A chat only needs human staff if human was explicitly asked, topics are unresolved, or negative rating was given
-      const isEscalated = userAskedHuman || hasUnresolved || hasNegativeRating || (Boolean(conv.isEscalated) && (userAskedHuman || hasUnresolved));
-      const isUrgent = isEscalated && (userAskedHuman || ['urgent', 'critical'].includes(conv.priority) || hasNegativeRating);
+      // Preserve persisted escalation from DB and also detect from transcript/rating/unresolved signals
+      const isEscalated = Boolean(conv.isEscalated) || userAskedHuman || aiConfirmedEscalation || hasUnresolved || hasNegativeRating;
+      const isUrgent = isEscalated && (
+        ['urgent', 'critical'].includes(conv.priority) ||
+        msgs.some(m => m.role === 'user' && isCriticalIssueMessage(m.content || '')) ||
+        hasNegativeRating
+      );
       const effectiveStatus = conv.status === 'resolved'
         ? 'resolved'
         : (conv.status === 'pending' || (isEscalated && !repliedByAdmin) ? 'pending' : (conv.status || 'open'));
@@ -117,9 +124,9 @@ You have real-time access to their business conversation telemetry:
 ${dbStatus}
 
 CRITICAL INSTRUCTIONS:
-1. CONVERSATIONAL MEMORY: You are having an ongoing conversation with the store owner/admin. Always remember and maintain context of previous turns in this chat session (e.g. if the user told you their name, previous questions they asked, or instructions they gave). If the user asks "who am I" or refers back to what they said, accurately use what they told you earlier in this conversation!
-2. STORE & CUSTOMER INTELLIGENCE: If the user asks about customer conversations, pending chats, customer sentiment, or store issues, use the real-time data above to provide concise, actionable insights.
-3. GENERAL CAPABILITIES: If the user asks general questions (e.g. general knowledge, tech, math, advice, "who is X", personal introductions), answer helpfully, accurately, and politely as Owner's Allié.
+1. CONVERSATIONAL MEMORY: You are having an ongoing conversation with the store owner/admin. Always remember and maintain context of previous turns in this chat session (e.g. their name or earlier instructions).
+2. STORE & ALLIÉ SCOPE ONLY: You must ONLY answer questions related to "${businessName || 'this store'}" (store performance, customer conversations, escalations, unresolved FAQs, ratings, support workflow) and the services/features that Allié provides (AI support portal, Knowledge Base & FAQs, QR studio, Brand Theme customization, live human escalation, staff replies, and analytics).
+3. OFF-TOPIC REFUSAL: If the owner asks general knowledge, trivia, coding, math, or topics unrelated to their store or Allié, politely decline in 1-2 sentences and redirect them to their store operations or Allié services.
 4. FORMATTING RULES:
    - DO NOT use markdown asterisks (no **, no ***, no *).
    - Use clean bullet points (•) or clean section headers.
@@ -182,7 +189,7 @@ CRITICAL INSTRUCTIONS:
             systemInstruction: { parts: [{ text: systemPrompt }] },
             generationConfig: {
               maxOutputTokens: 500,
-              temperature: 0.6
+              temperature: 0.3
             }
           })
         });
@@ -217,16 +224,17 @@ router.get('/:sessionId', async (req, res) => {
       return res.status(404).json({ error: 'Conversation not found' });
     }
 
-    const HUMAN_REQUEST_REGEX = /(?:talk to|speak (?:with|to)|connect (?:me )?(?:to|with)|transfer (?:me )?to|get me)\s+(?:a\s+)?(?:human|agent|person|representative|support rep|real person|manager)|\b(?:live agent|human agent|human support|customer service representative|speak to human|talk to human)\b/i;
-    const CRITICAL_ISSUE_REGEX = /(?:\bhacked\b|security breach|credit card fraud|\boutage\b|chargeback|\blawyer\b|\bsue you\b)/i;
-
     const convObj = conversation.toObject ? conversation.toObject() : conversation;
     const msgs = convObj.messages || [];
-    const userAskedHuman = msgs.some(m => m.role === 'user' && (HUMAN_REQUEST_REGEX.test(m.content || '') || CRITICAL_ISSUE_REGEX.test(m.content || '')));
+    const userAskedHuman = msgs.some(m => m.role === 'user' && (isEscalationRequestedByUser(m.content || '') || isCriticalIssueMessage(m.content || '')));
+    const aiConfirmedEscalation = msgs.some(m => m.role === 'ai' && isEscalationConfirmedByAi(m.content || ''));
     const hasUnresolved = (convObj.unresolvedTopics || []).length > 0;
     const hasNegativeRating = convObj.status !== 'resolved' && convObj.rating === 'down';
 
-    if (!userAskedHuman && !hasUnresolved && !hasNegativeRating && !convObj.repliedByAdmin) {
+    if (!convObj.isEscalated && (userAskedHuman || aiConfirmedEscalation || hasUnresolved || hasNegativeRating)) {
+      convObj.isEscalated = true;
+      if (convObj.priority === 'normal') convObj.priority = 'escalated';
+    } else if (!convObj.isEscalated && !userAskedHuman && !aiConfirmedEscalation && !hasUnresolved && !hasNegativeRating && !convObj.repliedByAdmin) {
       convObj.isEscalated = false;
       convObj.priority = 'normal';
       convObj.messages = msgs.map(m => ({ ...m, flagged: false }));
