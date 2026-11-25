@@ -29,6 +29,7 @@ router.post('/verify', async (req, res) => {
       publicAccess: true,
       businessId: business._id,
       businessName,
+      primaryColor: business.primaryColor || '#6434df',
       logoUrl: business.logoUrl || '',
       botAvatarUrl: business.botAvatarUrl || business.logoUrl || '',
       location: business.location || { address: '', city: '', country: '', mapsUrl: '' },

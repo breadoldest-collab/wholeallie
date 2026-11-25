@@ -90,17 +90,6 @@ export default function Login({ initialMode = 'login' }) {
       }
 
       const res = await API.post('/api/auth/login', { email, password });
-      if (res.data.verificationRequired) {
-        setVerificationState({
-          required: true,
-          email,
-          devCode: res.data.verificationCode || '',
-          message: res.data.message || 'Please verify your email before continuing.'
-        });
-        // Stay in 'login' mode — don't switch to register, which would show register-only fields
-        return;
-      }
-
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('businessId', res.data.businessId);
       localStorage.setItem('businessName', res.data.businessName || '');

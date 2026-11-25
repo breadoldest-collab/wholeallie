@@ -450,8 +450,8 @@ export default function Conversations() {
                   padding: '5px 11px',
                   borderRadius: 8,
                   border: statusFilter === st.id ? '2px solid #252b3a' : '1.5px solid #cbd5e1',
-                  background: statusFilter === st.id ? '#f1ebff' : 'transparent',
-                  color: statusFilter === st.id ? '#6434df' : '#64748b',
+                  background: statusFilter === st.id ? 'var(--dp-color-selection)' : 'transparent',
+                  color: statusFilter === st.id ? 'var(--dp-color-accent)' : '#64748b',
                   fontSize: 12,
                   fontWeight: statusFilter === st.id ? 800 : 600,
                   cursor: 'pointer',
@@ -667,8 +667,8 @@ export default function Conversations() {
                 fontFamily: 'monospace',
                 fontSize: 11,
                 fontWeight: 800,
-                background: '#f1ebff',
-                color: '#6434df',
+                background: 'var(--dp-color-selection)',
+                color: 'var(--dp-color-accent)',
                 padding: '2px 8px',
                 borderRadius: 6,
                 border: '1px solid #6434df',
@@ -888,14 +888,14 @@ export default function Conversations() {
                               ? '5px solid #ffd05b'
                               : '5px solid transparent',
                             cursor: 'pointer',
-                            background: isSelected ? '#f1ebff' : isPinned ? '#fffdf0' : '#ffffff',
+                            background: isSelected ? 'var(--dp-color-selection)' : isPinned ? '#fffdf0' : '#ffffff',
                             transition: 'background 0.12s ease',
                           }}
                         >
                           {/* Extendible Arrow Column */}
                           <td style={{ width: 42, padding: '14px 10px', textAlign: 'center' }}>
                             {isSelected ? (
-                              <ChevronDown size={16} style={{ color: '#6434df', strokeWidth: 3 }} />
+                              <ChevronDown size={16} style={{ color: 'var(--dp-color-accent)', strokeWidth: 3 }} />
                             ) : (
                               <ChevronRight size={16} style={{ color: '#94a3b8' }} />
                             )}
@@ -925,7 +925,7 @@ export default function Conversations() {
                                 </span>
                               )}
 
-                              <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#6434df' }}>
+                              <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--dp-color-accent)' }}>
                                 {conv.sessionId}
                               </span>
                             </div>
@@ -1174,8 +1174,8 @@ export default function Conversations() {
                       fontSize: 11,
                       fontFamily: 'monospace',
                       fontWeight: 800,
-                      background: '#f1ebff',
-                      color: '#6434df',
+                      background: 'var(--dp-color-selection)',
+                      color: 'var(--dp-color-accent)',
                       padding: '2px 8px',
                       borderRadius: 6,
                       border: '1px solid #6434df',
@@ -1233,12 +1233,12 @@ export default function Conversations() {
                         ? '#fee2e2'
                         : activeConversation.status === 'resolved'
                         ? '#e9fff5'
-                        : '#f1ebff',
+                        : 'var(--dp-color-selection)',
                       color: (activeConversation.status === 'pending' || isConvUnreplied(activeConversation))
                         ? '#991b1b'
                         : activeConversation.status === 'resolved'
                         ? '#0f7a57'
-                        : '#6434df',
+                        : 'var(--dp-color-accent)',
                     }}>
                       {(activeConversation.status === 'pending' || isConvUnreplied(activeConversation))
                         ? 'Pending Staff Reply'
@@ -1312,8 +1312,8 @@ export default function Conversations() {
                     padding: '7px 14px',
                     borderRadius: 10,
                     border: '2px solid #252b3a',
-                    background: '#f1ebff',
-                    color: '#6434df',
+                    background: 'var(--dp-color-selection)',
+                    color: 'var(--dp-color-accent)',
                     fontSize: 12,
                     fontWeight: 800,
                     cursor: summarizing ? 'not-allowed' : 'pointer',
@@ -1382,7 +1382,7 @@ export default function Conversations() {
                 lineHeight: 1.6,
                 color: '#252b3a',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6434df', marginBottom: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--dp-color-accent)', marginBottom: 4 }}>
                   <Sparkles size={12} /> AI Executive Summary
                 </div>
                 <div style={{ whiteSpace: 'pre-line' }}>{cleanText(summary)}</div>
@@ -1482,7 +1482,7 @@ export default function Conversations() {
                             fontWeight: 900,
                             textTransform: 'uppercase',
                             letterSpacing: '0.08em',
-                            color: isUser ? '#6434df' : isStaff ? '#065f46' : '#252b3a',
+                            color: isUser ? 'var(--dp-color-accent)' : isStaff ? '#065f46' : '#252b3a',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: 4,
@@ -1534,7 +1534,7 @@ export default function Conversations() {
                             borderRadius: isUser ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
                             fontSize: 13,
                             lineHeight: 1.5,
-                            background: isUser ? '#6434df' : isStaff ? '#f0fdf4' : '#ffffff',
+                            background: isUser ? 'var(--dp-color-accent)' : isStaff ? '#f0fdf4' : '#ffffff',
                             color: isUser ? '#ffffff' : '#252b3a',
                             border: '2px solid #252b3a',
                             borderLeft: isUser
@@ -1576,7 +1576,7 @@ export default function Conversations() {
                   alignItems: 'center',
                   gap: 6,
                 }}>
-                  <Send size={13} style={{ color: '#6434df' }} />
+                  <Send size={13} style={{ color: 'var(--dp-color-accent)' }} />
                   Reply as Support Staff (Acme)
                 </span>
 
@@ -1632,8 +1632,8 @@ export default function Conversations() {
                         padding: '5px 10px',
                         borderRadius: 8,
                         border: '1.5px solid #252b3a',
-                        background: '#f1ebff',
-                        color: '#6434df',
+                        background: 'var(--dp-color-selection)',
+                        color: 'var(--dp-color-accent)',
                         fontSize: 11,
                         fontWeight: 800,
                         cursor: 'pointer',
@@ -1697,7 +1697,7 @@ export default function Conversations() {
                     onClick={() => handleSendAdminReply(false)}
                     disabled={sendingReply || !adminReplyText.trim()}
                     style={{
-                      background: sendingReply || !adminReplyText.trim() ? '#e2e8f0' : '#6434df',
+                      background: sendingReply || !adminReplyText.trim() ? '#e2e8f0' : 'var(--dp-color-accent)',
                       color: sendingReply || !adminReplyText.trim() ? '#94a3b8' : '#ffffff',
                       border: '2px solid #252b3a',
                       borderRadius: 10,
@@ -1782,7 +1782,7 @@ export default function Conversations() {
 
               <p style={{ fontSize: 13, color: '#334155', margin: 0, lineHeight: 1.5 }}>
                 Are you sure you want to permanently delete session{' '}
-                <code style={{ background: '#f1ebff', color: '#6434df', padding: '2px 6px', borderRadius: 6, fontWeight: 800, fontFamily: 'monospace' }}>
+                <code style={{ background: 'var(--dp-color-selection)', color: 'var(--dp-color-accent)', padding: '2px 6px', borderRadius: 6, fontWeight: 800, fontFamily: 'monospace' }}>
                   {confirmDeleteSession}
                 </code>
                 {' '}and all of its customer chat messages?

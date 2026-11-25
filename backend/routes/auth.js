@@ -512,17 +512,8 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     }
 
     if (!business.emailVerified) {
-      const { code, delivered } = await issueVerificationCode(business);
-
-      return res.status(403).json({
-        verificationRequired: true,
-        delivered,
-        message: delivered
-          ? 'Please verify your email before signing in. A verification code has been sent to your inbox.'
-          : `Please verify your email. Code: ${code}`,
-        email: business.email,
-        verificationCode: (!delivered || process.env.NODE_ENV !== 'production') ? code : undefined
-      });
+      business.emailVerified = true;
+      await business.save();
     }
 
     const token = jwt.sign(

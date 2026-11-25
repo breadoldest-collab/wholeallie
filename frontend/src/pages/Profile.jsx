@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axios';
 import QRCodeStyling from 'qr-code-styling';
@@ -31,8 +32,17 @@ import {
   Phone,
   Clock,
   Share2,
-  Compass
+  Compass,
+  Palette
 } from 'lucide-react';
+import {
+  PRESET_PRIMARY_COLORS,
+  DEFAULT_PRIMARY_COLOR,
+  applyPrimaryColor,
+  getSavedPrimaryColor,
+  getSelectionTint,
+  isValidHex
+} from '../lib/theme';
 
 const PRESET_COMPANY_LOGOS = [
   {
@@ -73,8 +83,22 @@ const PRESET_BOT_AVATARS = [
 ];
 
 export default function Profile() {
-  const [activeTab, setActiveTab] = useState('photo'); // 'photo' | 'qr' | 'links' | 'misc'
+  const locationHook = useLocation();
+  const [activeTab, setActiveTab] = useState('photo'); // 'photo' | 'theme' | 'store' | 'qr' | 'links' | 'misc'
   const [avatarSubTab, setAvatarSubTab] = useState('sidebar'); // 'sidebar' | 'bot'
+
+  // Primary Theme Color State
+  const [primaryColor, setPrimaryColor] = useState(() => getSavedPrimaryColor());
+  const [customHexInput, setCustomHexInput] = useState(() => getSavedPrimaryColor());
+  const [themeSaving, setThemeSaving] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(locationHook.search);
+    const tabParam = params.get('tab');
+    if (tabParam && ['photo', 'theme', 'store', 'qr', 'links', 'misc'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [locationHook.search]);
 
   // Company / Sidebar Avatar
   const [logoUrl, setLogoUrl] = useState('');
@@ -158,6 +182,12 @@ export default function Profile() {
         setBotAvatarUrl(loadedBot);
         setBotUrlInput(loadedBot);
         localStorage.setItem('botAvatar', loadedBot);
+      }
+
+      if (res.data?.primaryColor) {
+        setPrimaryColor(res.data.primaryColor);
+        setCustomHexInput(res.data.primaryColor);
+        applyPrimaryColor(res.data.primaryColor);
       }
 
       if (res.data?.location) {
@@ -580,8 +610,56 @@ export default function Profile() {
     return '8px';
   };
 
+  const handleSelectThemeColor = (color) => {
+    setPrimaryColor(color);
+    setCustomHexInput(color);
+    applyPrimaryColor(color, { save: true });
+  };
+
+  const handleCustomHexChange = (e) => {
+    const val = e.target.value;
+    setCustomHexInput(val);
+    if (isValidHex(val)) {
+      setPrimaryColor(val);
+      applyPrimaryColor(val, { save: true });
+    }
+  };
+
+  const handleSaveThemeColor = async () => {
+    if (!isValidHex(primaryColor)) {
+      setErrorMsg('Please enter a valid hex color code (e.g. #6434df).');
+      return;
+    }
+    setThemeSaving(true);
+    setErrorMsg('');
+    try {
+      await API.post('/api/settings', { primaryColor });
+      applyPrimaryColor(primaryColor, { save: true });
+      setToastMessage('Website primary color saved successfully!');
+      setToast(true);
+      setTimeout(() => setToast(false), 2500);
+    } catch {
+      setErrorMsg('Failed to save theme color on server. It is applied locally.');
+    } finally {
+      setThemeSaving(false);
+    }
+  };
+
+  const handleResetThemeColor = async () => {
+    handleSelectThemeColor(DEFAULT_PRIMARY_COLOR);
+    try {
+      await API.post('/api/settings', { primaryColor: DEFAULT_PRIMARY_COLOR });
+      setToastMessage('Primary color reset to Allié Purple!');
+      setToast(true);
+      setTimeout(() => setToast(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
   const tabs = [
     { id: 'photo', label: 'Company Photo & Logo', icon: ImageIcon },
+    { id: 'theme', label: 'Brand & Theme Color', icon: Palette },
     { id: 'store', label: 'Store Profile & Location', icon: Store },
     { id: 'qr', label: 'QR Code Studio', icon: QrCode },
     { id: 'links', label: 'Links & Embedding', icon: LinkIcon },
@@ -1790,6 +1868,465 @@ export default function Profile() {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: Brand & Theme Color Customizer */}
+              {activeTab === 'theme' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  {/* Top: Introduction & Actions Card */}
+                  <div
+                    style={{
+                      background: '#fffdf5',
+                      border: '3px solid #252b3a',
+                      borderRadius: 28,
+                      padding: 26,
+                      boxShadow: '6px 6px 0 0 #252b3a',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 14,
+                            background: 'var(--dp-color-selection)',
+                            border: '3px solid #252b3a',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '3px 3px 0 0 #252b3a',
+                          }}
+                        >
+                          <Palette size={22} style={{ color: 'var(--dp-color-accent)' }} />
+                        </div>
+                        <div>
+                          <h2 style={{ fontSize: 18, fontWeight: 900, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                            Website Primary Theme Color
+                          </h2>
+                          <p style={{ fontSize: 13, color: '#4d586d', margin: '4px 0 0' }}>
+                            Customize your brand color from Allié purple to whatever color you like. Buttons, badges, and accents update instantly across the site.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <button
+                          type="button"
+                          onClick={handleResetThemeColor}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '10px 16px',
+                            borderRadius: 14,
+                            border: '2px solid #252b3a',
+                            background: '#ffffff',
+                            color: '#252b3a',
+                            fontWeight: 800,
+                            fontSize: 12,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.06em',
+                            cursor: 'pointer',
+                            boxShadow: '3px 3px 0 0 #252b3a',
+                            transition: 'all 0.15s ease',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #252b3a'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '3px 3px 0 0 #252b3a'; }}
+                        >
+                          <RotateCcw size={14} />
+                          Reset to Purple
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={themeSaving}
+                          onClick={handleSaveThemeColor}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '10px 20px',
+                            borderRadius: 14,
+                            border: '3px solid #252b3a',
+                            background: 'var(--dp-color-accent)',
+                            color: '#ffffff',
+                            fontWeight: 900,
+                            fontSize: 13,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            cursor: 'pointer',
+                            boxShadow: '4px 4px 0 0 #252b3a',
+                            transition: 'all 0.15s ease',
+                            opacity: themeSaving ? 0.7 : 1,
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 0 #252b3a'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #252b3a'; }}
+                        >
+                          <Sparkles size={16} />
+                          {themeSaving ? 'Saving...' : 'Save Theme'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Interactive Preview Card */}
+                  <div
+                    style={{
+                      background: '#ffffff',
+                      border: '3px solid #252b3a',
+                      borderRadius: 28,
+                      padding: 26,
+                      boxShadow: '6px 6px 0 0 #252b3a',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, borderBottom: '2px solid #f1f5f9', paddingBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Eye size={18} style={{ color: 'var(--dp-color-accent)' }} />
+                        <h3 style={{ fontSize: 15, fontWeight: 900, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Live Component Preview
+                        </h3>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 800,
+                          padding: '4px 10px',
+                          borderRadius: 999,
+                          background: 'var(--dp-color-selection)',
+                          color: 'var(--dp-color-accent)',
+                          border: '1.5px solid #252b3a',
+                          boxShadow: '2px 2px 0 0 #252b3a',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        ACTIVE: {primaryColor.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+                      {/* UI Controls Preview */}
+                      <div
+                        style={{
+                          background: '#fffdf5',
+                          border: '2.5px solid #252b3a',
+                          borderRadius: 20,
+                          padding: 20,
+                          boxShadow: '4px 4px 0 0 #252b3a',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 16,
+                        }}
+                      >
+                        <p style={{ margin: 0, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b' }}>
+                          Buttons &amp; Badges
+                        </p>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+                          <button
+                            type="button"
+                            style={{
+                              background: 'var(--dp-color-accent)',
+                              color: '#ffffff',
+                              border: '3px solid #252b3a',
+                              borderRadius: 999,
+                              padding: '10px 18px',
+                              fontWeight: 800,
+                              fontSize: 12,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.08em',
+                              boxShadow: '4px 4px 0 0 #252b3a',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Primary Action
+                          </button>
+
+                          <button
+                            type="button"
+                            style={{
+                              background: 'var(--dp-color-selection)',
+                              color: 'var(--dp-color-accent)',
+                              border: '2px solid #252b3a',
+                              borderRadius: 999,
+                              padding: '10px 16px',
+                              fontWeight: 800,
+                              fontSize: 12,
+                              boxShadow: '3px 3px 0 0 #252b3a',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Soft Highlight
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              background: 'var(--dp-color-selection)',
+                              color: 'var(--dp-color-accent)',
+                              border: '1.5px solid var(--dp-color-accent)',
+                              borderRadius: 8,
+                              padding: '4px 10px',
+                              fontSize: 11,
+                              fontWeight: 800,
+                            }}
+                          >
+                            New Feature
+                          </span>
+                          <span
+                            style={{
+                              background: 'var(--dp-color-accent)',
+                              color: '#ffffff',
+                              borderRadius: 8,
+                              padding: '4px 10px',
+                              fontSize: 11,
+                              fontWeight: 800,
+                              border: '1.5px solid #252b3a',
+                            }}
+                          >
+                            Pro Plan
+                          </span>
+                          <span
+                            style={{
+                              color: 'var(--dp-color-accent)',
+                              fontWeight: 800,
+                              fontSize: 13,
+                              textDecoration: 'underline',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Accent Link &rarr;
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Chat Bubble & Focus Preview */}
+                      <div
+                        style={{
+                          background: '#fffdf5',
+                          border: '2.5px solid #252b3a',
+                          borderRadius: 20,
+                          padding: 20,
+                          boxShadow: '4px 4px 0 0 #252b3a',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 12,
+                        }}
+                      >
+                        <p style={{ margin: 0, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b' }}>
+                          Customer Chat Bubble
+                        </p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <div style={{ alignSelf: 'flex-start', background: '#ffffff', border: '2px solid #252b3a', borderRadius: '16px 16px 16px 4px', padding: '10px 14px', maxWidth: '80%', fontSize: 13, boxShadow: '2px 2px 0 0 #252b3a', color: '#252b3a' }}>
+                            Hello! How can I track my package?
+                          </div>
+                          <div style={{ alignSelf: 'flex-end', background: 'var(--dp-color-accent)', color: '#ffffff', border: '2px solid #252b3a', borderRadius: '16px 16px 4px 16px', padding: '10px 14px', maxWidth: '80%', fontSize: 13, fontWeight: 600, boxShadow: '3px 3px 0 0 #252b3a' }}>
+                            I can help with that right away!
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preset Swatches Card */}
+                  <div
+                    style={{
+                      background: '#fffdf5',
+                      border: '3px solid #252b3a',
+                      borderRadius: 28,
+                      padding: 26,
+                      boxShadow: '6px 6px 0 0 #252b3a',
+                    }}
+                  >
+                    <div style={{ marginBottom: 18 }}>
+                      <h3 style={{ fontSize: 16, fontWeight: 900, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                        Curated Preset Palettes
+                      </h3>
+                      <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
+                        Hand-crafted colorways tuned specifically for Allié&apos;s neo-brutalist styling
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 14 }}>
+                      {PRESET_PRIMARY_COLORS.map(preset => {
+                        const isSelected = primaryColor.toLowerCase() === preset.color.toLowerCase();
+                        return (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => handleSelectThemeColor(preset.color)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 12,
+                              padding: '12px 14px',
+                              borderRadius: 16,
+                              border: isSelected ? '3px solid #252b3a' : '2px solid #cbd5e1',
+                              background: isSelected ? 'var(--dp-color-selection)' : '#ffffff',
+                              boxShadow: isSelected ? '4px 4px 0 0 #252b3a' : '2px 2px 0 0 #e2e8f0',
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              transition: 'all 0.15s ease',
+                              position: 'relative',
+                            }}
+                            onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = '#252b3a'; e.currentTarget.style.boxShadow = '3px 3px 0 0 #252b3a'; } }}
+                            onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.boxShadow = '2px 2px 0 0 #e2e8f0'; } }}
+                          >
+                            <div
+                              style={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: '50%',
+                                background: preset.color,
+                                border: '2.5px solid #252b3a',
+                                boxShadow: '2px 2px 0 0 #252b3a',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {isSelected && <Check size={16} style={{ color: '#ffffff', strokeWidth: 3 }} />}
+                            </div>
+
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: '#252b3a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {preset.name}
+                              </p>
+                              <p style={{ margin: '2px 0 0', fontSize: 11, fontFamily: 'monospace', color: '#64748b' }}>
+                                {preset.color.toUpperCase()}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Custom Hex Color Picker Card */}
+                  <div
+                    style={{
+                      background: '#fffdf5',
+                      border: '3px solid #252b3a',
+                      borderRadius: 28,
+                      padding: 26,
+                      boxShadow: '6px 6px 0 0 #252b3a',
+                    }}
+                  >
+                    <div style={{ marginBottom: 18 }}>
+                      <h3 style={{ fontSize: 16, fontWeight: 900, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                        Custom Color Picker
+                      </h3>
+                      <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
+                        Pick any custom color via visual spectrum picker or type your exact hex code
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                      {/* Visual Color Picker Swatch */}
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div
+                          style={{
+                            width: 56,
+                            height: 56,
+                            borderRadius: 16,
+                            background: primaryColor,
+                            border: '3px solid #252b3a',
+                            boxShadow: '4px 4px 0 0 #252b3a',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <input
+                            type="color"
+                            value={isValidHex(primaryColor) ? primaryColor : DEFAULT_PRIMARY_COLOR}
+                            onChange={e => handleSelectThemeColor(e.target.value)}
+                            style={{
+                              position: 'absolute',
+                              inset: -10,
+                              width: '200%',
+                              height: '200%',
+                              opacity: 0,
+                              cursor: 'pointer',
+                            }}
+                            title="Click to open color palette"
+                          />
+                        </div>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#4d586d' }}>
+                          Click swatch to open picker
+                        </span>
+                      </div>
+
+                      {/* Hex Text Input */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 240, maxWidth: 360 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            background: '#ffffff',
+                            border: '3px solid #252b3a',
+                            borderRadius: 14,
+                            padding: '6px 14px',
+                            boxShadow: '4px 4px 0 0 #252b3a',
+                            width: '100%',
+                          }}
+                        >
+                          <span style={{ fontSize: 14, fontWeight: 900, color: '#64748b', marginRight: 6, fontFamily: 'monospace' }}>#</span>
+                          <input
+                            type="text"
+                            value={customHexInput.replace('#', '')}
+                            onChange={handleCustomHexChange}
+                            placeholder="6434df"
+                            maxLength={7}
+                            style={{
+                              border: 'none',
+                              outline: 'none',
+                              fontSize: 14,
+                              fontWeight: 800,
+                              color: '#252b3a',
+                              fontFamily: 'monospace',
+                              width: '100%',
+                              textTransform: 'uppercase',
+                              background: 'transparent',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveThemeColor}
+                        disabled={themeSaving}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '12px 24px',
+                          borderRadius: 14,
+                          border: '3px solid #252b3a',
+                          background: 'var(--dp-color-accent)',
+                          color: '#ffffff',
+                          fontWeight: 900,
+                          fontSize: 13,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                          cursor: 'pointer',
+                          boxShadow: '4px 4px 0 0 #252b3a',
+                          transition: 'all 0.15s ease',
+                          opacity: themeSaving ? 0.7 : 1,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 0 #252b3a'; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #252b3a'; }}
+                      >
+                        <Check size={16} />
+                        Apply &amp; Save Color
+                      </button>
                     </div>
                   </div>
                 </div>

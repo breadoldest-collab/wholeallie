@@ -93,7 +93,7 @@ const SplitOtpInput = ({ onComplete, disabled }) => {
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onFocus={(e) => e.target.select()}
-          className="h-14 w-11 rounded-[14px] border-[3px] border-[#252b3a] bg-white text-center text-[22px] font-black text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] outline-none transition-all duration-150 focus:border-[#6434df] focus:shadow-[3px_3px_0_0_#6434df] focus:-translate-y-0.5 disabled:opacity-50"
+          className="h-14 w-11 rounded-[14px] border-[3px] border-[#252b3a] bg-white text-center text-[22px] font-black text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] outline-none transition-all duration-150 focus:border-[var(--dp-color-accent)] focus:shadow-[3px_3px_0_0_#6434df] focus:-translate-y-0.5 disabled:opacity-50"
         />
       ))}
     </div>
@@ -172,7 +172,7 @@ export const SignInPage = ({
               </span>
             </Link>
             <span className="inline-flex items-center gap-2 rounded-full border-[3px] border-[#252b3a] bg-[#e9fff5] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#253044]">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#6434df]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--dp-color-accent)]" />
               secure
             </span>
           </div>
@@ -201,7 +201,7 @@ export const SignInPage = ({
             {verificationState?.required && (
               <div
                 ref={otpPanelRef}
-                className="mt-6 rounded-[20px] border-[3px] border-[#252b3a] bg-[#f1ebff] px-5 py-5 text-sm text-[#253044] shadow-[5px_5px_0_0_#252b3a]"
+                className="mt-6 rounded-[20px] border-[3px] border-[#252b3a] bg-[var(--dp-color-selection)] px-5 py-5 text-sm text-[#253044] shadow-[5px_5px_0_0_#252b3a]"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
@@ -211,7 +211,7 @@ export const SignInPage = ({
                     </p>
                     <p className="mt-1 text-[13px] leading-6 text-[#253044]/75">
                       We sent a 6-digit code to{' '}
-                      <span className="font-semibold text-[#6434df]">{verificationState.email}</span>
+                      <span className="font-semibold text-[var(--dp-color-accent)]">{verificationState.email}</span>
                     </p>
                   </div>
                   {/* Wrong email escape hatch */}
@@ -244,7 +244,7 @@ export const SignInPage = ({
                   type="button"
                   onClick={() => { if (otpValue.length === 6) onVerifyEmail?.(otpValue); }}
                   disabled={isLoading || otpValue.length < 6}
-                  className="mt-4 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-4 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#252b3a] transition-all hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#252b3a] disabled:opacity-60"
+                  className="mt-4 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[var(--dp-color-accent)] px-4 py-3 text-[12px] font-bold uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#252b3a] transition-all hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#252b3a] disabled:opacity-60"
                 >
                   {isLoading ? (
                     <span className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export const SignInPage = ({
                       type="button"
                       onClick={() => { onResendCode?.(); setResendCooldown(60); }}
                       disabled={isLoading || resendCooldown > 0}
-                      className="text-[12px] font-semibold text-[#6434df] underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+                      className="text-[12px] font-semibold text-[var(--dp-color-accent)] underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Resend code
                     </button>
@@ -281,7 +281,7 @@ export const SignInPage = ({
 
                 {/* Fun Fact Card while waiting for email */}
                 <div className="mt-4 rounded-[16px] border-[2.5px] border-[#252b3a] bg-white p-3.5 shadow-[3px_3px_0_0_#252b3a]">
-                  <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em] text-[#6434df] mb-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.14em] text-[var(--dp-color-accent)] mb-1.5">
                     <span className="flex items-center gap-1.5">
                       Did you know?
                     </span>
@@ -297,7 +297,7 @@ export const SignInPage = ({
                     <button
                       type="button"
                       onClick={() => setFactIndex((prev) => (prev + 1) % FUN_FACTS.length)}
-                      className="font-bold text-[#6434df] hover:underline"
+                      className="font-bold text-[var(--dp-color-accent)] hover:underline"
                     >
                       Next fact →
                     </button>
@@ -376,13 +376,13 @@ export const SignInPage = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="mt-2 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60"
+                  className="mt-2 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[var(--dp-color-accent)] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60"
                 >
                   {isLoading ? 'Processing...' : resetStep === 2 ? 'Save New Password' : 'Send Reset Code'}
                 </button>
 
                 {resetStep === 1 ? (
-                  <div className="rounded-[18px] border-[3px] border-[#252b3a] bg-[#f1ebff] p-4 shadow-[4px_4px_0_0_#252b3a]">
+                  <div className="rounded-[18px] border-[3px] border-[#252b3a] bg-[var(--dp-color-selection)] p-4 shadow-[4px_4px_0_0_#252b3a]">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
                         <p className="text-[13px] font-bold text-[#252b3a]">Already have a 6-digit code?</p>
@@ -403,7 +403,7 @@ export const SignInPage = ({
                     <button
                       type="button"
                       onClick={() => onToggleResetStep?.(1)}
-                      className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                      className="font-bold text-[var(--dp-color-accent)] underline-offset-2 hover:underline"
                     >
                       Send code again
                     </button>
@@ -415,7 +415,7 @@ export const SignInPage = ({
                   <button
                     type="button"
                     onClick={() => onModeChange?.('login')}
-                    className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                    className="font-bold text-[var(--dp-color-accent)] underline-offset-2 hover:underline"
                   >
                     Back to sign in
                   </button>
@@ -455,7 +455,7 @@ export const SignInPage = ({
                       </InputShell>
                       {emailMeta.isPublicProvider && (
                         <p className="mt-2 text-[12px] leading-5 text-[#253044]/70">
-                          <span className="font-semibold text-[#6434df]">Note:</span> {emailMeta.note}
+                          <span className="font-semibold text-[var(--dp-color-accent)]">Note:</span> {emailMeta.note}
                         </p>
                       )}
                     </div>
@@ -504,7 +504,7 @@ export const SignInPage = ({
                           <input type="checkbox" name="rememberMe" className="h-4 w-4 rounded border-[2px] border-[#252b3a] accent-[#6434df]" />
                           <span className="font-medium">Keep me signed in</span>
                         </label>
-                        <button type="button" onClick={onResetPassword} className="font-semibold text-[#6434df] underline-offset-2 hover:underline">
+                        <button type="button" onClick={onResetPassword} className="font-semibold text-[var(--dp-color-accent)] underline-offset-2 hover:underline">
                           Reset password
                         </button>
                       </div>
@@ -513,7 +513,7 @@ export const SignInPage = ({
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#6434df] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
+                      className="mt-3 flex w-full items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[var(--dp-color-accent)] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white shadow-[6px_6px_0_0_#252b3a] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-color-accent)]"
                     >
                       {isLoading ? (
                       <span className="flex items-center gap-2">
@@ -521,7 +521,7 @@ export const SignInPage = ({
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                         </svg>
-                        <span>Delivering OTP...</span>
+                        <span>{isRegister ? 'Creating account...' : 'Signing in...'}</span>
                       </span>
                     ) : isRegister ? 'Create account' : 'Sign in'}
                     </button>
@@ -533,7 +533,7 @@ export const SignInPage = ({
                   <button
                     type="button"
                     onClick={() => onModeChange?.(isRegister ? 'login' : 'register')}
-                    className="font-bold text-[#6434df] underline-offset-2 hover:underline"
+                    className="font-bold text-[var(--dp-color-accent)] underline-offset-2 hover:underline"
                   >
                     {isRegister ? 'Sign in' : 'Create account'}
                   </button>

@@ -80,7 +80,7 @@ export default function Dashboard() {
           <div style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
             {label}
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 900, color: '#6434df' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 900, color: 'var(--dp-color-accent)' }}>
             <MessageSquare size={14} />
             <span>{val} {val === 1 ? 'chat' : 'chats'}</span>
           </div>
@@ -113,7 +113,7 @@ export default function Dashboard() {
     {
       label: 'AI confidence',
       value: analytics?.aiConfidence || '95%',
-      tone: '#6434df',
+      tone: 'var(--dp-color-accent)',
       note: 'High-confidence answers across top intents'
     },
     {
@@ -186,7 +186,7 @@ export default function Dashboard() {
               value={analytics?.totalChats ?? 0}
               icon={MessageSquare}
               iconBg="#f1ebff"
-              iconColor="#6434df"
+              iconColor="var(--dp-color-accent)"
             />
             <StatCard
               title="Resolved"
@@ -255,8 +255,8 @@ export default function Dashboard() {
                 Chat Activity {chartRange === '7d' ? '– Last 7 Days' : '– Last 30 Days'}
               </h2>
               <span style={{
-                background: '#f1ebff',
-                color: '#6434df',
+                background: 'var(--dp-color-selection)',
+                color: 'var(--dp-color-accent)',
                 border: '2px solid #252b3a',
                 borderRadius: 999,
                 padding: '3px 10px',
@@ -275,7 +275,7 @@ export default function Dashboard() {
                 onClick={() => setChartRange('7d')}
                 style={{
                   border: 'none',
-                  background: chartRange === '7d' ? '#6434df' : 'transparent',
+                  background: chartRange === '7d' ? 'var(--dp-color-accent)' : 'transparent',
                   color: chartRange === '7d' ? '#ffffff' : '#4d586d',
                   padding: '5px 14px',
                   borderRadius: 999,
@@ -293,7 +293,7 @@ export default function Dashboard() {
                 onClick={() => setChartRange('30d')}
                 style={{
                   border: 'none',
-                  background: chartRange === '30d' ? '#6434df' : 'transparent',
+                  background: chartRange === '30d' ? 'var(--dp-color-accent)' : 'transparent',
                   color: chartRange === '30d' ? '#ffffff' : '#4d586d',
                   padding: '5px 14px',
                   borderRadius: 999,
@@ -343,7 +343,7 @@ export default function Dashboard() {
                   {displayChartData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={entry.count > 0 ? '#6434df' : '#f1f5f9'}
+                      fill={entry.count > 0 ? 'var(--dp-color-accent)' : '#f1f5f9'}
                       stroke="#252b3a"
                       strokeWidth={entry.count > 0 ? 2.5 : 1.5}
                     />
@@ -418,7 +418,7 @@ export default function Dashboard() {
                         padding: '8px 14px',
                         borderRadius: 999,
                         border: '3px solid #252b3a',
-                        background: '#6434df',
+                        background: 'var(--dp-color-accent)',
                         color: '#ffffff',
                         fontSize: 12,
                         fontWeight: 800,
@@ -436,7 +436,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div style={{ marginTop: 22, background: '#f1ebff', border: '3px solid #252b3a', borderRadius: 20, padding: 18, boxShadow: '6px 6px 0 0 #252b3a' }}>
+          <div style={{ marginTop: 22, background: 'var(--dp-color-selection)', border: '3px solid #252b3a', borderRadius: 20, padding: 18, boxShadow: '6px 6px 0 0 #252b3a' }}>
             <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#252b3a', marginBottom: 12 }}>
               Suggested FAQ actions
             </div>

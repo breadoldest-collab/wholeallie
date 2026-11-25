@@ -46,8 +46,8 @@ function getWeatherMeta(code, isDay = 1) {
   if (code === 3) {
     return {
       label: 'Overcast',
-      pillBg: '#f1ebff',
-      pillColor: '#6434df',
+      pillBg: 'var(--dp-color-selection)',
+      pillColor: 'var(--dp-color-accent)',
       icon: Cloud,
       gradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
       textColor: '#252b3a',
@@ -456,7 +456,7 @@ export default function WeatherTimeWidget() {
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <Sparkles size={16} style={{ color: '#6434df' }} />
+              <Sparkles size={16} style={{ color: 'var(--dp-color-accent)' }} />
               <span style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#252b3a' }}>
                 Local Weather &amp; Time
               </span>
@@ -609,7 +609,7 @@ export default function WeatherTimeWidget() {
                 gap: 8,
               }}
             >
-              <Wind size={16} style={{ color: '#6434df' }} />
+              <Wind size={16} style={{ color: 'var(--dp-color-accent)' }} />
               <div>
                 <div style={{ fontSize: 9.5, color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Wind Speed</div>
                 <div style={{ fontSize: 12.5, fontWeight: 900, color: '#252b3a' }}>
@@ -642,7 +642,7 @@ export default function WeatherTimeWidget() {
           {/* Location & Time Footer in Modal */}
           <div
             style={{
-              background: '#f1ebff',
+              background: 'var(--dp-color-selection)',
               border: '2px solid #252b3a',
               borderRadius: 12,
               padding: '10px 12px',
@@ -655,7 +655,7 @@ export default function WeatherTimeWidget() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <MapPin size={12} style={{ color: '#6434df' }} />
+              <MapPin size={12} style={{ color: 'var(--dp-color-accent)' }} />
               <span>{locationName}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#64748b', fontSize: 10.5 }}>

@@ -33,6 +33,7 @@ import {
   Square
 } from 'lucide-react';
 import AITextLoading from '../components/ui/ai-text-loading';
+import { applyPrimaryColor } from '../lib/theme';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -168,6 +169,9 @@ export default function CustomerChat() {
       .then(res => {
         if (res.data) {
           const bName = capitalizeBusinessName(res.data.businessName) || 'Acme';
+          if (res.data.primaryColor) {
+            applyPrimaryColor(res.data.primaryColor, { save: false });
+          }
           setBusinessInfo({
             name: bName,
             botAvatar: res.data.botAvatarUrl || res.data.logoUrl || '',

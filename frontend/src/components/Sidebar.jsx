@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import QRCodeStyling from 'qr-code-styling';
-import { LayoutDashboard, MessageSquare, Settings, LogOut, X, Copy, Check, Hash, Store, FileText, HelpCircle, QrCode, ExternalLink, Sparkles, User } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Settings, LogOut, X, Copy, Check, Hash, Store, FileText, HelpCircle, QrCode, ExternalLink, Sparkles, User, Palette } from 'lucide-react';
 import API from '../api/axios';
 
 export default function Sidebar() {
@@ -443,7 +443,7 @@ export default function Sidebar() {
                   fontWeight: isActive ? 700 : 600,
                   textDecoration: 'none',
                   color: isActive ? '#252b3a' : '#4d586d',
-                  background: isActive ? '#f1ebff' : 'transparent',
+                  background: isActive ? 'var(--dp-color-selection)' : 'transparent',
                   border: isActive ? '3px solid #252b3a' : '3px solid transparent',
                   boxShadow: isActive ? '4px 4px 0 0 #252b3a' : 'none',
                   transition: 'all 0.15s ease',
@@ -628,8 +628,8 @@ export default function Sidebar() {
                   {businessName}
                 </p>
                 <span style={{
-                  background: '#f1ebff',
-                  color: '#6434df',
+                  background: 'var(--dp-color-selection)',
+                  color: 'var(--dp-color-accent)',
                   border: '1.5px solid #252b3a',
                   borderRadius: 999,
                   padding: '1px 6px',
@@ -649,6 +649,28 @@ export default function Sidebar() {
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={() => navigate('/profile?tab=theme')}
+              title="Change website primary color"
+              style={{
+                background: 'var(--dp-color-selection)',
+                border: '2px solid #252b3a',
+                borderRadius: 8,
+                color: 'var(--dp-color-accent)',
+                cursor: 'pointer',
+                padding: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '2px 2px 0 0 #252b3a',
+                transition: 'transform 0.15s ease',
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <Palette size={15} />
+            </button>
 
             <button
               onClick={handleLogout}

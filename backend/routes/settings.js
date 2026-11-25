@@ -9,6 +9,7 @@ const Business = require('../models/Business');
 const settingsSchema = z.object({
   businessName: z.string().min(1, 'Business name is required').optional(),
   description: z.string().optional().default(""),
+  primaryColor: z.string().optional().default("#6434df"),
   secondaryColor: z.string().optional().default("#ff78c5"),
   logoUrl: z.string().optional().default(""),
   botAvatarUrl: z.string().optional().default(""),
@@ -43,6 +44,7 @@ router.get('/', async (req, res) => {
   try {
     const defaultData = {
       description: '',
+      primaryColor: '#6434df',
       secondaryColor: '#ff78c5',
       logoUrl: '',
       botAvatarUrl: '',
@@ -61,6 +63,7 @@ router.get('/', async (req, res) => {
     }
     return res.status(200).json({
       description: business.description || '',
+      primaryColor: business.primaryColor || '#6434df',
       secondaryColor: business.secondaryColor || '#ff78c5',
       logoUrl: business.logoUrl || '',
       botAvatarUrl: business.botAvatarUrl || '',
@@ -99,12 +102,13 @@ router.post('/', validate(settingsSchema), async (req, res) => {
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: 'Database unavailable. Please try again shortly.' });
     }
-    const { businessName, description, secondaryColor, logoUrl, botAvatarUrl, location, socialLinks, storeContact, faqs } = req.body;
+    const { businessName, description, primaryColor, secondaryColor, logoUrl, botAvatarUrl, location, socialLinks, storeContact, faqs } = req.body;
     const updateData = {};
     if (businessName !== undefined && businessName.trim()) {
       updateData.businessName = capitalizeBusinessName(businessName);
     }
     if (description !== undefined) updateData.description = description;
+    if (primaryColor !== undefined) updateData.primaryColor = primaryColor;
     if (secondaryColor !== undefined) updateData.secondaryColor = secondaryColor;
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
     if (botAvatarUrl !== undefined) updateData.botAvatarUrl = botAvatarUrl;

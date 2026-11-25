@@ -152,7 +152,7 @@ export default function AdminCopilotWidget() {
             gap: 10,
             padding: '12px 20px',
             borderRadius: 9999,
-            background: '#6434df',
+            background: 'var(--dp-color-accent)',
             color: '#ffffff',
             border: '3px solid #252b3a',
             fontSize: 14,
@@ -219,7 +219,7 @@ export default function AdminCopilotWidget() {
           <div
             style={{
               padding: '16px 20px',
-              background: '#f1ebff',
+              background: 'var(--dp-color-selection)',
               color: '#252b3a',
               display: 'flex',
               alignItems: 'center',
@@ -365,7 +365,7 @@ export default function AdminCopilotWidget() {
                     width: 28,
                     height: 28,
                     borderRadius: '50%',
-                    background: msg.role === 'user' ? '#6434df' : '#9bf1cd',
+                    background: msg.role === 'user' ? 'var(--dp-color-accent)' : '#9bf1cd',
                     border: '2px solid #252b3a',
                     color: msg.role === 'user' ? '#ffffff' : '#252b3a',
                     display: 'flex',
@@ -380,7 +380,7 @@ export default function AdminCopilotWidget() {
 
                 <div
                   style={{
-                    background: msg.role === 'user' ? '#6434df' : '#ffffff',
+                    background: msg.role === 'user' ? 'var(--dp-color-accent)' : '#ffffff',
                     color: msg.role === 'user' ? '#ffffff' : '#252b3a',
                     border: '3px solid #252b3a',
                     borderLeft: msg.role === 'user' ? '3px solid #252b3a' : '6px solid #6434df',
@@ -412,9 +412,9 @@ export default function AdminCopilotWidget() {
                     width: 28,
                     height: 28,
                     borderRadius: '50%',
-                    background: '#f1ebff',
+                    background: 'var(--dp-color-selection)',
                     border: '2px solid #252b3a',
-                    color: '#6434df',
+                    color: 'var(--dp-color-accent)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -422,7 +422,7 @@ export default function AdminCopilotWidget() {
                     boxShadow: '2px 2px 0 0 rgba(37,43,58,0.12)',
                   }}
                 >
-                  <Sparkles size={14} className="text-[#6434df]" />
+                  <Sparkles size={14} className="text-[var(--dp-color-accent)]" />
                 </div>
                 <div
                   style={{
@@ -443,14 +443,14 @@ export default function AdminCopilotWidget() {
                       width: 6,
                       height: 6,
                       borderRadius: '50%',
-                      background: '#6434df',
+                      background: 'var(--dp-color-accent)',
                       display: 'inline-block',
                     }}
                   />
                   <AITextLoading
                     texts={thinkingTexts}
                     interval={1800}
-                    className="text-xs font-bold text-[#6434df]"
+                    className="text-xs font-bold text-[var(--dp-color-accent)]"
                   />
                 </div>
               </div>
@@ -524,7 +524,7 @@ export default function AdminCopilotWidget() {
                 padding: '10px 14px',
                 borderRadius: 10,
                 border: '3px solid #252b3a',
-                background: !input.trim() ? '#f1ebff' : '#6434df',
+                background: !input.trim() ? 'var(--dp-color-selection)' : 'var(--dp-color-accent)',
                 color: !input.trim() ? '#252b3a' : '#ffffff',
                 cursor: !input.trim() ? 'not-allowed' : 'pointer',
                 opacity: !input.trim() ? 0.75 : 1,

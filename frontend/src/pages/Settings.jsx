@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import API from '../api/axios';
-import { FileText, HelpCircle, Plus, Trash2, Save, CheckCircle2, ClipboardPaste, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, HelpCircle, Plus, Trash2, Save, CheckCircle2, ClipboardPaste, ChevronDown, ChevronUp, Palette } from 'lucide-react';
+import { PRESET_PRIMARY_COLORS, applyPrimaryColor } from '../lib/theme';
 
 const MAX_DESC = 2000;
 
@@ -155,8 +156,8 @@ export default function Settings() {
   };
 
   const focusStyle = (e) => {
-    e.target.style.borderColor = '#6434df';
-    e.target.style.boxShadow = '4px 4px 0 0 #6434df';
+    e.target.style.borderColor = 'var(--dp-color-accent)';
+    e.target.style.boxShadow = '4px 4px 0 0 var(--dp-color-accent)';
   };
   const blurStyle = (e) => {
     e.target.style.borderColor = '#252b3a';
@@ -230,6 +231,70 @@ export default function Settings() {
           ) : (
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
+              {/* Website Theme & Primary Color Banner */}
+              <div style={{
+                background: '#fffdf5', border: '3px solid #252b3a',
+                borderRadius: 28, padding: 24, boxShadow: '6px 6px 0 0 #252b3a',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'var(--dp-color-selection)', border: '3px solid #252b3a',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '3px 3px 0 0 #252b3a'
+                  }}>
+                    <Palette size={22} style={{ color: 'var(--dp-color-accent)' }} />
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: 17, fontWeight: 800, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                      Website Primary Theme Color
+                    </h2>
+                    <p style={{ fontSize: 13, color: '#64748b', margin: '3px 0 0' }}>
+                      Personalize Allié buttons, highlights and accents to match your brand style
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    {PRESET_PRIMARY_COLORS.slice(0, 5).map(preset => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        title={preset.name}
+                        onClick={() => {
+                          applyPrimaryColor(preset.color, { save: true });
+                          API.post('/api/settings', { primaryColor: preset.color }).catch(() => {});
+                        }}
+                        style={{
+                          width: 28, height: 28, borderRadius: '50%',
+                          background: preset.color,
+                          border: '2px solid #252b3a',
+                          boxShadow: '2px 2px 0 0 #252b3a',
+                          cursor: 'pointer',
+                          padding: 0
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <Link
+                    to="/profile?tab=theme"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '8px 16px', borderRadius: 12, border: '2px solid #252b3a',
+                      background: 'var(--dp-color-accent)', color: '#ffffff',
+                      fontWeight: 800, fontSize: 12, textTransform: 'uppercase',
+                      letterSpacing: '0.06em', textDecoration: 'none',
+                      boxShadow: '3px 3px 0 0 #252b3a'
+                    }}
+                  >
+                    <Palette size={14} />
+                    Customize Color &rarr;
+                  </Link>
+                </div>
+              </div>
+
               {/* Business Description Card */}
               <div style={{
                 background: '#fffdf5', border: '3px solid #252b3a',
@@ -239,10 +304,10 @@ export default function Settings() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10,
-                      background: '#f1ebff', border: '3px solid #252b3a',
+                      background: 'var(--dp-color-selection)', border: '3px solid #252b3a',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <FileText size={18} style={{ color: '#6434df' }} />
+                      <FileText size={18} style={{ color: 'var(--dp-color-accent)' }} />
                     </div>
                     <div>
                       <h2 style={{ fontSize: 17, fontWeight: 800, color: '#252b3a', margin: 0, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
@@ -321,7 +386,7 @@ export default function Settings() {
                       style={{
                         display: 'flex', alignItems: 'center', gap: 7,
                         padding: '10px 18px', borderRadius: 999, border: '3px solid #252b3a',
-                        background: '#6434df', color: '#fff',
+                        background: 'var(--dp-color-accent)', color: '#fff',
                         fontSize: 12, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer',
                         boxShadow: '4px 4px 0 0 #252b3a', whiteSpace: 'nowrap',
                       }}
@@ -370,7 +435,7 @@ export default function Settings() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '10px 20px', borderRadius: 999, border: '3px solid #252b3a',
-                          background: '#6434df', color: '#fff',
+                          background: 'var(--dp-color-accent)', color: '#fff',
                           fontSize: 12, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
                           boxShadow: '4px 4px 0 0 #252b3a',
                         }}
@@ -403,7 +468,7 @@ export default function Settings() {
                   }}>
                     <HelpCircle size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.4 }} />
                     No FAQs added yet.<br />
-                    <span style={{ color: '#6434df', fontWeight: 800, cursor: 'pointer' }} onClick={addFaq}>
+                    <span style={{ color: 'var(--dp-color-accent)', fontWeight: 800, cursor: 'pointer' }} onClick={addFaq}>
                       + Add your first FAQ
                     </span>
                   </div>
@@ -416,7 +481,7 @@ export default function Settings() {
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                           <span style={{
-                            fontSize: 11, fontWeight: 900, color: '#6434df',
+                            fontSize: 11, fontWeight: 900, color: 'var(--dp-color-accent)',
                             textTransform: 'uppercase', letterSpacing: '0.1em',
                           }}>
                             FAQ #{i + 1}
@@ -439,7 +504,7 @@ export default function Settings() {
 
                         {/* Question */}
                         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 10 }}>
-                          <span style={{ fontSize: 13, fontWeight: 900, color: '#6434df', marginTop: 10, flexShrink: 0 }}>Q:</span>
+                          <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--dp-color-accent)', marginTop: 10, flexShrink: 0 }}>Q:</span>
                           <input
                             type="text" required value={faq.question}
                             onChange={e => changeFaq(i, 'question', e.target.value)}
@@ -474,7 +539,7 @@ export default function Settings() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '14px 32px', borderRadius: 9999, border: '3px solid #252b3a',
-                    background: saving ? '#f1ebff' : '#6434df',
+                    background: saving ? 'var(--dp-color-selection)' : 'var(--dp-color-accent)',
                     color: '#fff', fontSize: 15, fontWeight: 900,
                     letterSpacing: '0.12em', textTransform: 'uppercase',
                     cursor: saving ? 'not-allowed' : 'pointer',

@@ -25,7 +25,7 @@ const features = [
     tag: '01',
     title: 'Smart answers',
     body: 'Resolve common questions with a friendly AI layer that understands brand voice, product detail, and customer intent.',
-    accent: 'bg-[#f1ebff]',
+    accent: 'bg-[var(--dp-color-selection)]',
   },
   {
     tag: '02',
@@ -72,9 +72,9 @@ const tickets = [
 
 function LandingButton({ children, to, variant = 'primary' }) {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-full border-[3px] border-[#252b3a] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-180 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]';
+    'inline-flex items-center justify-center gap-2 rounded-full border-[3px] border-[#252b3a] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-180 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-color-accent)]';
   const variants = {
-    primary: 'bg-[#6434df] text-white shadow-[6px_6px_0_0_#252b3a] hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a]',
+    primary: 'bg-[var(--dp-color-accent)] text-white shadow-[6px_6px_0_0_#252b3a] hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a]',
     secondary: 'bg-[#fffdf5] text-[#253044] shadow-[6px_6px_0_0_#252b3a] hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#252b3a]',
     soft: 'bg-[#e9fff5] text-[#253044] shadow-[5px_5px_0_0_#252b3a] hover:-translate-y-0.5 hover:shadow-[7px_7px_0_0_#252b3a]',
   };
@@ -115,7 +115,7 @@ export default function SaaSLandingTemplate() {
                 <a
                   key={item.label}
                   href={item.href}
-                  className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#253044] transition-colors hover:text-[#6434df] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df]"
+                  className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#253044] transition-colors hover:text-[var(--dp-color-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-color-accent)]"
                 >
                   {item.label}
                 </a>
@@ -125,7 +125,7 @@ export default function SaaSLandingTemplate() {
             <div className="flex items-center gap-3">
               <Link
                 to="/login"
-                className="hidden rounded-full border-[3px] border-[#252b3a] bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#253044] shadow-[5px_5px_0_0_#252b3a] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6434df] md:inline-flex"
+                className="hidden rounded-full border-[3px] border-[#252b3a] bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#253044] shadow-[5px_5px_0_0_#252b3a] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--dp-color-accent)] md:inline-flex"
               >
                 Sign in
               </Link>
@@ -141,14 +141,14 @@ export default function SaaSLandingTemplate() {
 
           <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div className="relative z-10 max-w-[720px]">
-              <div className="mb-5 inline-flex items-center gap-3 rounded-full border-[3px] border-[#252b3a] bg-[#f1ebff] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044] shadow-[4px_4px_0_0_#252b3a]">
-                <Sparkles className="h-4 w-4 text-[#6434df]" />
+              <div className="mb-5 inline-flex items-center gap-3 rounded-full border-[3px] border-[#252b3a] bg-[var(--dp-color-selection)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044] shadow-[4px_4px_0_0_#252b3a]">
+                <Sparkles className="h-4 w-4 text-[var(--dp-color-accent)]" />
                 Powered by Allié
               </div>
 
               <h1 className="max-w-[620px] text-[40px] font-black uppercase leading-[0.9] tracking-[-0.04em] text-[#252b3a] md:text-[56px] lg:text-[78px]">
                 Friendly help
-                <span className="mt-1 block text-[#6434df]">for every customer.</span>
+                <span className="mt-1 block text-[var(--dp-color-accent)]">for every customer.</span>
               </h1>
 
               <p className="mt-6 max-w-[470px] text-[15px] leading-[1.6] text-[#253044]/75 md:text-[17px]">
@@ -201,7 +201,7 @@ export default function SaaSLandingTemplate() {
                       </div>
 
                       <div className="mt-3 flex justify-end">
-                        <div className="rounded-[16px] border-[3px] border-[#252b3a] bg-[#6434df] p-3 text-[12px] font-medium text-white">
+                        <div className="rounded-[16px] border-[3px] border-[#252b3a] bg-[var(--dp-color-accent)] p-3 text-[12px] font-medium text-white">
                           Resolved in 2m 15s
                         </div>
                       </div>
@@ -215,7 +215,7 @@ export default function SaaSLandingTemplate() {
 
         <section id="platform" className="mt-8 rounded-[32px] border-[3px] border-[#252b3a] bg-[#fffdf5] p-5 shadow-[12px_12px_0_0_#252b3a] md:p-8">
           <div className="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044]/65">
-            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#6434df]" />
+            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[var(--dp-color-accent)]" />
             Platform
           </div>
 
@@ -252,7 +252,7 @@ export default function SaaSLandingTemplate() {
                     <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#ffd05b] text-[12px] font-black uppercase tracking-[0.18em] text-[#253044]">
                       0{index + 1}
                     </span>
-                    <span className="h-3 w-3 rounded-full border-[2px] border-[#252b3a] bg-[#6434df]" />
+                    <span className="h-3 w-3 rounded-full border-[2px] border-[#252b3a] bg-[var(--dp-color-accent)]" />
                   </div>
                   <div className="text-[15px] font-semibold uppercase tracking-[0.12em] text-[#253044]">{step}</div>
                 </div>
@@ -264,13 +264,13 @@ export default function SaaSLandingTemplate() {
         <section id="insights" className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[32px] border-[3px] border-[#252b3a] bg-[#fffdf5] p-5 shadow-[12px_12px_0_0_#252b3a] md:p-8">
             <div className="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044]/65">
-              <BarChart3 className="h-4 w-4 text-[#6434df]" />
+              <BarChart3 className="h-4 w-4 text-[var(--dp-color-accent)]" />
               Insights
             </div>
 
             <div className="grid gap-4 md:grid-cols-4">
               {factCards.map((item) => (
-                <div key={item.label} className="pop-card rounded-[22px] border-[3px] border-[#252b3a] bg-[#f1ebff] p-4 shadow-[5px_5px_0_0_#252b3a]">
+                <div key={item.label} className="pop-card rounded-[22px] border-[3px] border-[#252b3a] bg-[var(--dp-color-selection)] p-4 shadow-[5px_5px_0_0_#252b3a]">
                   <div className="text-[28px] font-black uppercase tracking-[-0.02em] text-[#253044]">{item.value}</div>
                   <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#253044]/65">{item.label}</div>
                 </div>
@@ -287,7 +287,7 @@ export default function SaaSLandingTemplate() {
             <div className="space-y-4 text-[15px] leading-[1.7] text-[#253044]/75">
               <p>47% of incoming questions are now resolved without a human handoff, while your team can focus on more valuable moments.</p>
               <div className="flex items-start gap-3 border-t-[2px] border-[#252b3a] pt-4">
-                <ShieldCheck className="mt-0.5 h-5 w-5 text-[#6434df]" />
+                <ShieldCheck className="mt-0.5 h-5 w-5 text-[var(--dp-color-accent)]" />
                 <span>Clear ownership and stronger customer trust across every interaction.</span>
               </div>
             </div>
@@ -297,14 +297,14 @@ export default function SaaSLandingTemplate() {
         <section className="mt-8 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[32px] border-[3px] border-[#252b3a] bg-[#fffdf5] p-5 shadow-[12px_12px_0_0_#252b3a] md:p-8">
             <div className="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044]/65">
-              <MessageSquareText className="h-4 w-4 text-[#6434df]" />
+              <MessageSquareText className="h-4 w-4 text-[var(--dp-color-accent)]" />
               What teams get
             </div>
 
             <div className="space-y-4">
               {tickets.map((ticket) => (
                 <div key={ticket.title} className="pop-card rounded-[22px] border-[3px] border-[#252b3a] bg-white p-4 shadow-[6px_6px_0_0_#252b3a]">
-                  <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6434df]">{ticket.title}</div>
+                  <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--dp-color-accent)]">{ticket.title}</div>
                   <p className="text-[16px] leading-[1.7] text-[#253044]/75">{ticket.text}</p>
                 </div>
               ))}
@@ -315,8 +315,8 @@ export default function SaaSLandingTemplate() {
             <div className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#253044]/65">Customer note</div>
             <div className="pop-card rounded-[26px] border-[3px] border-[#252b3a] bg-white p-5 shadow-[7px_7px_0_0_#252b3a]">
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[#f1ebff] text-[#253044]">
-                  <Star className="h-5 w-5 text-[#6434df]" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-[3px] border-[#252b3a] bg-[var(--dp-color-selection)] text-[#253044]">
+                  <Star className="h-5 w-5 text-[var(--dp-color-accent)]" />
                 </div>
                 <div>
                   <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#253044]/65">Sarah Chen</div>
@@ -345,9 +345,9 @@ export default function SaaSLandingTemplate() {
               </div>
 
               <ul className="mt-6 space-y-3 text-[15px] leading-[1.7] text-[#253044]/75">
-                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[#6434df]" /> 24/7 AI support</li>
-                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[#6434df]" /> Live chat widget</li>
-                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[#6434df]" /> Weekly summaries</li>
+                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[var(--dp-color-accent)]" /> 24/7 AI support</li>
+                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[var(--dp-color-accent)]" /> Live chat widget</li>
+                <li className="flex items-center gap-3"><Check className="h-4 w-4 text-[var(--dp-color-accent)]" /> Weekly summaries</li>
               </ul>
             </div>
 

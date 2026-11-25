@@ -15,6 +15,7 @@ const BusinessSchema = new mongoose.Schema({
   resetPasswordCode: { type: String, default: '' },
   resetPasswordExpiresAt: { type: Date, default: null },
   description: { type: String, default: "" },
+  primaryColor: { type: String, default: "#6434df" },
   secondaryColor: { type: String, default: "#ff78c5" },
   logoUrl: { type: String, default: "" },
   botAvatarUrl: { type: String, default: "" },
