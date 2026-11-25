@@ -199,8 +199,8 @@ export default function Customization() {
 
           {/* Page Title */}
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 10px', borderRadius: 999, background: '#f1ebff', border: '2px solid #252b3a', boxShadow: '2px 2px 0 0 #252b3a', marginBottom: 10 }}>
-              <Palette size={14} style={{ color: '#6434df' }} />
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 10px', borderRadius: 999, background: 'var(--dp-color-selection)', border: '2px solid #252b3a', boxShadow: '2px 2px 0 0 #252b3a', marginBottom: 10 }}>
+              <Palette size={14} style={{ color: 'var(--dp-color-accent)' }} />
               <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#252b3a' }}>
                 Admin Customization
               </span>
@@ -254,7 +254,7 @@ export default function Customization() {
                 borderRadius: 28, padding: 26, boxShadow: '6px 6px 0 0 #252b3a',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 12, background: '#f1ebff', border: '3px solid #252b3a' }} />
+                  <div style={{ width: 38, height: 38, borderRadius: 12, background: 'var(--dp-color-selection)', border: '3px solid #252b3a' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ width: 190, height: 20, background: '#e2e8f0', borderRadius: 6 }} />
                     <div style={{ width: 270, height: 12, background: '#f1f5f9', borderRadius: 4 }} />
@@ -343,8 +343,8 @@ export default function Customization() {
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
                     style={{
-                      background: dragActive ? '#f1ebff' : '#ffffff',
-                      border: `3px dashed ${dragActive ? '#6434df' : '#252b3a'}`,
+                      background: dragActive ? 'var(--dp-color-selection)' : '#ffffff',
+                      border: `3px dashed ${dragActive ? 'var(--dp-color-accent)' : '#252b3a'}`,
                       borderRadius: 20,
                       padding: 24,
                       display: 'flex',
@@ -354,7 +354,7 @@ export default function Customization() {
                       textAlign: 'center',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
-                      boxShadow: dragActive ? '6px 6px 0 0 #6434df' : '4px 4px 0 0 #252b3a',
+                      boxShadow: dragActive ? '6px 6px 0 0 var(--dp-color-accent)' : '4px 4px 0 0 #252b3a',
                     }}
                   >
                     <input
@@ -370,12 +370,12 @@ export default function Customization() {
                         width: 52,
                         height: 52,
                         borderRadius: 16,
-                        background: '#f1ebff',
+                        background: 'var(--dp-color-selection)',
                         border: '3px solid #252b3a',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#6434df',
+                        color: 'var(--dp-color-accent)',
                         marginBottom: 12,
                         boxShadow: '2px 2px 0 0 #252b3a',
                       }}
@@ -466,7 +466,7 @@ export default function Customization() {
                               gap: 6,
                               padding: '5px 9px',
                               borderRadius: 999,
-                              background: logoUrl === preset.url ? '#f1ebff' : '#fffdf5',
+                              background: logoUrl === preset.url ? 'var(--dp-color-selection)' : '#fffdf5',
                               border: '2px solid #252b3a',
                               cursor: 'pointer',
                               boxShadow: '2px 2px 0 0 #252b3a',
@@ -505,7 +505,7 @@ export default function Customization() {
                         type="button"
                         onClick={() => setLogoShape(opt.id)}
                         style={{
-                          background: logoShape === opt.id ? '#6434df' : '#ffffff',
+                          background: logoShape === opt.id ? 'var(--dp-color-accent)' : '#ffffff',
                           color: logoShape === opt.id ? '#ffffff' : '#252b3a',
                           border: '2px solid #252b3a',
                           borderRadius: 999,
@@ -540,7 +540,7 @@ export default function Customization() {
                       width: 36,
                       height: 36,
                       borderRadius: 12,
-                      background: '#f1ebff',
+                      background: 'var(--dp-color-selection)',
                       border: '3px solid #252b3a',
                       display: 'flex',
                       alignItems: 'center',
@@ -548,7 +548,7 @@ export default function Customization() {
                       boxShadow: '2px 2px 0 0 #252b3a',
                     }}
                   >
-                    <Eye size={18} style={{ color: '#6434df' }} />
+                    <Eye size={18} style={{ color: 'var(--dp-color-accent)' }} />
                   </div>
                   <div>
                     <h2 style={{ fontSize: 18, fontWeight: 800, color: '#252b3a', margin: 0 }}>
@@ -644,7 +644,7 @@ export default function Customization() {
                     <div
                       style={{
                         padding: 12,
-                        background: '#f1ebff',
+                        background: 'var(--dp-color-selection)',
                         border: '2px solid #252b3a',
                         borderRadius: 14,
                         display: 'flex',
@@ -729,7 +729,7 @@ export default function Customization() {
                           width: 50,
                           height: 50,
                           borderRadius: getBorderRadius(),
-                          background: '#f1ebff',
+                          background: 'var(--dp-color-selection)',
                           border: '3px solid #252b3a',
                           display: 'flex',
                           alignItems: 'center',
@@ -773,7 +773,7 @@ export default function Customization() {
                   flexWrap: 'wrap',
                   gap: 16,
                   padding: '20px 24px',
-                  background: '#f1ebff',
+                  background: 'var(--dp-color-selection)',
                   border: '3px solid #252b3a',
                   borderRadius: 24,
                   boxShadow: '5px 5px 0 0 #252b3a',
@@ -796,7 +796,7 @@ export default function Customization() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 10,
-                    background: '#6434df',
+                    background: 'var(--dp-color-accent)',
                     color: '#ffffff',
                     border: '3px solid #252b3a',
                     borderRadius: 16,

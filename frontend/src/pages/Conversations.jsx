@@ -563,10 +563,10 @@ export default function Conversations() {
                   key={ticket.sessionId}
                   style={{
                     background: selectedSession === ticket.sessionId ? '#ffffff' : '#fffdf5',
-                    border: selectedSession === ticket.sessionId ? '2.5px solid #6434df' : '2px solid #252b3a',
+                    border: selectedSession === ticket.sessionId ? '2.5px solid var(--dp-color-accent)' : '2px solid #252b3a',
                     borderRadius: 14,
                     padding: '12px 14px',
-                    boxShadow: selectedSession === ticket.sessionId ? '3px 3px 0 0 #6434df' : '2px 2px 0 0 #252b3a',
+                    boxShadow: selectedSession === ticket.sessionId ? '3px 3px 0 0 var(--dp-color-accent)' : '2px 2px 0 0 #252b3a',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -671,7 +671,7 @@ export default function Conversations() {
                 color: 'var(--dp-color-accent)',
                 padding: '2px 8px',
                 borderRadius: 6,
-                border: '1px solid #6434df',
+                border: '1px solid var(--dp-color-accent)',
               }}>
                 {selectedSession}
               </span>
@@ -883,7 +883,7 @@ export default function Conversations() {
                           style={{
                             borderBottom: '1.5px solid #e2e8f0',
                             borderLeft: isSelected
-                              ? '5px solid #6434df'
+                              ? '5px solid var(--dp-color-accent)'
                               : isPinned
                               ? '5px solid #ffd05b'
                               : '5px solid transparent',
@@ -1178,7 +1178,7 @@ export default function Conversations() {
                       color: 'var(--dp-color-accent)',
                       padding: '2px 8px',
                       borderRadius: 6,
-                      border: '1px solid #6434df',
+                      border: '1px solid var(--dp-color-accent)',
                     }}>
                       {selectedSession}
                     </span>
@@ -1375,7 +1375,7 @@ export default function Conversations() {
               <div style={{
                 background: '#f8f5ff',
                 border: '2.5px solid #252b3a',
-                borderLeft: '6px solid #6434df',
+                borderLeft: '6px solid var(--dp-color-accent)',
                 borderRadius: 14,
                 padding: '12px 16px',
                 fontSize: 13,
@@ -1541,7 +1541,7 @@ export default function Conversations() {
                               ? '2px solid #252b3a'
                               : isStaff
                               ? '5px solid #10b981'
-                              : '5px solid #6434df',
+                              : '5px solid var(--dp-color-accent)',
                             boxShadow: '2px 2px 0 0 #252b3a',
                             wordBreak: 'break-word',
                           }}>

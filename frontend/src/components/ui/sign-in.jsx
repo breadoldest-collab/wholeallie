@@ -93,7 +93,7 @@ const SplitOtpInput = ({ onComplete, disabled }) => {
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onFocus={(e) => e.target.select()}
-          className="h-14 w-11 rounded-[14px] border-[3px] border-[#252b3a] bg-white text-center text-[22px] font-black text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] outline-none transition-all duration-150 focus:border-[var(--dp-color-accent)] focus:shadow-[3px_3px_0_0_#6434df] focus:-translate-y-0.5 disabled:opacity-50"
+          className="h-14 w-11 rounded-[14px] border-[3px] border-[#252b3a] bg-white text-center text-[22px] font-black text-[#252b3a] shadow-[3px_3px_0_0_#252b3a] outline-none transition-all duration-150 focus:border-[var(--dp-color-accent)] focus:shadow-[3px_3px_0_0_var(--dp-color-accent)] focus:-translate-y-0.5 disabled:opacity-50"
         />
       ))}
     </div>
@@ -501,7 +501,7 @@ export const SignInPage = ({
                     {!isRegister && (
                       <div className="flex items-center justify-between gap-3 text-sm text-[#253044]">
                         <label className="flex cursor-pointer items-center gap-3">
-                          <input type="checkbox" name="rememberMe" className="h-4 w-4 rounded border-[2px] border-[#252b3a] accent-[#6434df]" />
+                          <input type="checkbox" name="rememberMe" className="h-4 w-4 rounded border-[2px] border-[#252b3a] accent-[var(--dp-color-accent)]" />
                           <span className="font-medium">Keep me signed in</span>
                         </label>
                         <button type="button" onClick={onResetPassword} className="font-semibold text-[var(--dp-color-accent)] underline-offset-2 hover:underline">

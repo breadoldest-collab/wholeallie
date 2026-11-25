@@ -210,7 +210,7 @@ export default function Sidebar() {
                   width: 56,
                   height: 56,
                   borderRadius: 16,
-                  background: '#f1ebff',
+                  background: 'var(--dp-color-selection)',
                   border: '3px solid #252b3a',
                   display: 'flex',
                   alignItems: 'center',
@@ -264,7 +264,7 @@ export default function Sidebar() {
                         onClick={() => setQrStyle(option.id)}
                         style={{
                           border: qrStyle === option.id ? '2px solid #252b3a' : '2px solid #cbd5e1',
-                          background: qrStyle === option.id ? '#6434df' : '#ffffff',
+                          background: qrStyle === option.id ? 'var(--dp-color-accent)' : '#ffffff',
                           color: qrStyle === option.id ? '#ffffff' : '#252b3a',
                           borderRadius: 999,
                           padding: '7px 12px',
@@ -489,7 +489,7 @@ export default function Sidebar() {
             {/* Header */}
             <div style={{
               padding: '14px 16px',
-              background: '#f1ebff',
+              background: 'var(--dp-color-selection)',
               borderBottom: '3px solid #252b3a',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
@@ -554,7 +554,7 @@ export default function Sidebar() {
                     width: '100%',
                     border: '2px solid #252b3a',
                     borderRadius: 10,
-                    background: '#f1ebff',
+                    background: 'var(--dp-color-selection)',
                     color: '#252b3a',
                     fontWeight: 800,
                     fontSize: 11,

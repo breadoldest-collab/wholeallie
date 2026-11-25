@@ -185,7 +185,7 @@ export default function Dashboard() {
               title="Total Chats"
               value={analytics?.totalChats ?? 0}
               icon={MessageSquare}
-              iconBg="#f1ebff"
+              iconBg="var(--dp-color-selection)"
               iconColor="var(--dp-color-accent)"
             />
             <StatCard

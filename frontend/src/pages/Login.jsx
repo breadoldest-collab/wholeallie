@@ -211,21 +211,21 @@ export default function Login({ initialMode = 'login' }) {
     ? (
         <span className="block font-black uppercase leading-[1.05] tracking-[-0.03em] text-[#252b3a]">
           <span className="block">Reset your</span>
-          <span className="block text-[#6434df]">Password</span>
+          <span className="block text-[var(--dp-color-accent)]">Password</span>
         </span>
       )
     : mode === 'register'
     ? (
         <span className="block font-black uppercase leading-[1.05] tracking-[-0.03em] text-[#252b3a]">
           <span className="block">Create your</span>
-          <span className="block text-[#6434df]">Allié</span>
+          <span className="block text-[var(--dp-color-accent)]">Allié</span>
           <span className="block">Account</span>
         </span>
       )
     : (
         <span className="block font-black uppercase leading-[1.05] tracking-[-0.03em] text-[#252b3a]">
           <span className="block">Sign in to</span>
-          <span className="block text-[#6434df]">Allié</span>
+          <span className="block text-[var(--dp-color-accent)]">Allié</span>
         </span>
       );
 

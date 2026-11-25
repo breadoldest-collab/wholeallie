@@ -426,7 +426,7 @@ export default function CustomerChat() {
               type="button"
               onClick={handleTakeoverSession}
               style={{
-                background: '#6434df',
+                background: 'var(--dp-color-accent)',
                 color: '#ffffff',
                 border: '3px solid #252b3a',
                 borderRadius: 14,
@@ -593,7 +593,7 @@ export default function CustomerChat() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: storeDrawerOpen ? '#6434df' : '#ffd05b',
+              background: storeDrawerOpen ? 'var(--dp-color-accent)' : '#ffd05b',
               color: storeDrawerOpen ? '#ffffff' : '#252b3a',
               border: '3px solid #252b3a',
               borderRadius: 12,
@@ -747,7 +747,7 @@ export default function CustomerChat() {
                           e.currentTarget.style.boxShadow = '2px 2px 0 0 #252b3a';
                         }}
                       >
-                        <chip.icon size={13} style={{ color: '#6434df' }} />
+                        <chip.icon size={13} style={{ color: 'var(--dp-color-accent)' }} />
                         <span>{chip.label}</span>
                       </button>
                     ))}
@@ -820,10 +820,10 @@ export default function CustomerChat() {
                           borderRadius: isUser ? '20px 20px 6px 20px' : '6px 20px 20px 20px',
                           fontSize: 14,
                           lineHeight: 1.6,
-                          background: isUser ? '#6434df' : '#ffffff',
+                          background: isUser ? 'var(--dp-color-accent)' : '#ffffff',
                           color: isUser ? '#ffffff' : '#252b3a',
                           border: '3px solid #252b3a',
-                          borderLeft: isUser ? '3px solid #252b3a' : (isStaff ? '6px solid #10b981' : '6px solid #6434df'),
+                          borderLeft: isUser ? '3px solid #252b3a' : (isStaff ? '6px solid #10b981' : '6px solid var(--dp-color-accent)'),
                           boxShadow: '4px 4px 0 0 #252b3a',
                           wordBreak: 'break-word',
                         }}
@@ -918,7 +918,7 @@ export default function CustomerChat() {
                       borderRadius: '6px 20px 20px 20px',
                       background: '#ffffff',
                       border: '3px solid #252b3a',
-                      borderLeft: '6px solid #6434df',
+                      borderLeft: '6px solid var(--dp-color-accent)',
                       boxShadow: '4px 4px 0 0 #252b3a',
                     }}
                   >
@@ -1030,7 +1030,7 @@ export default function CustomerChat() {
                 type="submit"
                 disabled={!input.trim()}
                 style={{
-                  background: !input.trim() ? '#f1ebff' : '#6434df',
+                  background: !input.trim() ? 'var(--dp-color-selection)' : 'var(--dp-color-accent)',
                   color: !input.trim() ? '#252b3a' : '#ffffff',
                   border: '3px solid #252b3a',
                   borderRadius: 16,
@@ -1170,7 +1170,7 @@ export default function CustomerChat() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <MapPin size={16} style={{ color: '#6434df' }} />
+                <MapPin size={16} style={{ color: 'var(--dp-color-accent)' }} />
                 <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
                   Store Location
                 </span>
@@ -1194,8 +1194,8 @@ export default function CustomerChat() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 6,
-                    background: '#f1ebff',
-                    color: '#6434df',
+                    background: 'var(--dp-color-selection)',
+                    color: 'var(--dp-color-accent)',
                     border: '2px solid #252b3a',
                     borderRadius: 10,
                     padding: '8px 14px',
@@ -1292,7 +1292,7 @@ export default function CustomerChat() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Mail size={15} style={{ color: '#6434df' }} />
+                    <Mail size={15} style={{ color: 'var(--dp-color-accent)' }} />
                     <span style={{ fontSize: 13, fontWeight: 800, wordBreak: 'break-all' }}>{businessInfo.storeContact.supportEmail}</span>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Email</span>
@@ -1327,8 +1327,8 @@ export default function CustomerChat() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
-                      background: '#f1ebff',
-                      color: '#6434df',
+                      background: 'var(--dp-color-selection)',
+                      color: 'var(--dp-color-accent)',
                       border: '2px solid #252b3a',
                       borderRadius: 8,
                       padding: '6px 10px',
@@ -1444,7 +1444,7 @@ export default function CustomerChat() {
                 setStoreDrawerOpen(false);
               }}
               style={{
-                background: '#6434df',
+                background: 'var(--dp-color-accent)',
                 color: '#ffffff',
                 border: '2px solid #252b3a',
                 borderRadius: 12,

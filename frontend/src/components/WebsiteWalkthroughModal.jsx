@@ -405,7 +405,7 @@ export default function WebsiteWalkthroughModal({ isOpen, onClose }) {
                     <div style={{ fontSize: 10, fontWeight: 800, color: '#ff4365', textAlign: 'right', marginBottom: 4 }}>Allié AI • Instant (0.3s)</div>
                     <div
                       style={{
-                        background: '#f1ebff',
+                        background: 'var(--dp-color-selection)',
                         border: '2px solid #252b3a',
                         borderRadius: '16px 16px 4px 16px',
                         padding: '12px 14px',
@@ -483,7 +483,7 @@ export default function WebsiteWalkthroughModal({ isOpen, onClose }) {
                       style={{
                         padding: 10,
                         borderRadius: 12,
-                        background: i === 1 ? '#f1ebff' : '#ffffff',
+                        background: i === 1 ? 'var(--dp-color-selection)' : '#ffffff',
                         border: '2px solid #252b3a',
                         cursor: 'pointer',
                         boxShadow: '2px 2px 0 0 #252b3a',
@@ -540,7 +540,7 @@ export default function WebsiteWalkthroughModal({ isOpen, onClose }) {
                     <div style={{ background: '#ffffff', border: '1.5px solid #252b3a', padding: 8, borderRadius: 8 }}>
                       <strong>Customer:</strong> My package says delivered yesterday, but I don't see it at my porch.
                     </div>
-                    <div style={{ background: '#f1ebff', border: '1.5px solid #252b3a', padding: 8, borderRadius: 8 }}>
+                    <div style={{ background: 'var(--dp-color-selection)', border: '1.5px solid #252b3a', padding: 8, borderRadius: 8 }}>
                       <strong>Allié Copilot:</strong> I checked carrier tracking — photo delivery was taken at Parcel Locker #4. Notifying customer now.
                     </div>
                   </div>

@@ -383,7 +383,7 @@ export default function AdminCopilotWidget() {
                     background: msg.role === 'user' ? 'var(--dp-color-accent)' : '#ffffff',
                     color: msg.role === 'user' ? '#ffffff' : '#252b3a',
                     border: '3px solid #252b3a',
-                    borderLeft: msg.role === 'user' ? '3px solid #252b3a' : '6px solid #6434df',
+                    borderLeft: msg.role === 'user' ? '3px solid #252b3a' : '6px solid var(--dp-color-accent)',
                     padding: '10px 14px',
                     borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '4px 14px 14px 14px',
                     fontSize: 13,
@@ -428,7 +428,7 @@ export default function AdminCopilotWidget() {
                   style={{
                     background: '#fffdf5',
                     border: '2px solid #252b3a',
-                    borderLeft: '4px solid #6434df',
+                    borderLeft: '4px solid var(--dp-color-accent)',
                     borderRadius: '4px 14px 14px 14px',
                     padding: '8px 14px',
                     boxShadow: '3px 3px 0 0 rgba(37,43,58,0.12)',

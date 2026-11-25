@@ -174,7 +174,7 @@ export default function SaaSLandingTemplate() {
                 <div className="absolute -right-8 top-12 h-16 w-16 rotate-12 rounded-[18px] border-[3px] border-[#252b3a] bg-[#ffd05b] shadow-[8px_8px_0_0_#252b3a]" />
                 <div className="absolute bottom-4 left-6 h-14 w-14 rounded-full border-[3px] border-[#252b3a] bg-[#ff78c5] shadow-[8px_8px_0_0_#252b3a]" />
 
-                <div id="demo-preview" className="relative overflow-hidden rounded-[28px] border-[3px] border-[#252b3a] bg-[linear-gradient(135deg,#f1ebff_0%,#ff78c5_32%,#ffd05b_100%)] p-4 shadow-[12px_12px_0_0_#252b3a]">
+                <div id="demo-preview" className="relative overflow-hidden rounded-[28px] border-[3px] border-[#252b3a] bg-[linear-gradient(135deg,var(--dp-color-selection)_0%,#ff78c5_32%,#ffd05b_100%)] p-4 shadow-[12px_12px_0_0_#252b3a]">
                   <div className="rounded-[22px] border-[3px] border-[#252b3a] bg-white/60 p-4 backdrop-blur-sm">
                     <div className="mb-4 flex items-center justify-between border-b-[2px] border-[#252b3a] pb-3">
                       <div className="flex items-center gap-2">
@@ -363,7 +363,7 @@ export default function SaaSLandingTemplate() {
           </div>
         </section>
 
-        <footer className="mt-8 rounded-[32px] border-[3px] border-[#252b3a] bg-[#252b3a] px-5 py-6 text-[#eef3ff] shadow-[12px_12px_0_0_#6434df] md:px-8">
+        <footer className="mt-8 rounded-[32px] border-[3px] border-[#252b3a] bg-[#252b3a] px-5 py-6 text-[#eef3ff] shadow-[12px_12px_0_0_var(--dp-color-accent)] md:px-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="text-[12px] font-bold uppercase tracking-[0.24em] text-[#eef3ff]">Allié</div>
 

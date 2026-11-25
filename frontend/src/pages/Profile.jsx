@@ -729,13 +729,13 @@ export default function Profile() {
                   gap: 8,
                   padding: '4px 12px',
                   borderRadius: 999,
-                  background: '#f1ebff',
+                  background: 'var(--dp-color-selection)',
                   border: '2px solid #252b3a',
                   boxShadow: '2px 2px 0 0 #252b3a',
                   marginBottom: 10,
                 }}
               >
-                <User size={13} style={{ color: '#6434df' }} />
+                <User size={13} style={{ color: 'var(--dp-color-accent)' }} />
                 <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#252b3a' }}>
                   Business Profile & Branding
                 </span>
@@ -768,7 +768,7 @@ export default function Profile() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
-                  background: '#6434df',
+                  background: 'var(--dp-color-accent)',
                   color: '#ffffff',
                   border: '3px solid #252b3a',
                   borderRadius: 14,
@@ -832,7 +832,7 @@ export default function Profile() {
                     fontSize: 13,
                     fontWeight: isActive ? 800 : 700,
                     cursor: 'pointer',
-                    background: isActive ? '#f1ebff' : '#ffffff',
+                    background: isActive ? 'var(--dp-color-selection)' : '#ffffff',
                     color: '#252b3a',
                     border: '3px solid #252b3a',
                     boxShadow: isActive ? '4px 4px 0 0 #252b3a' : '2px 2px 0 0 #252b3a',
@@ -840,7 +840,7 @@ export default function Profile() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Icon size={16} style={{ color: isActive ? '#6434df' : '#252b3a' }} />
+                  <Icon size={16} style={{ color: isActive ? 'var(--dp-color-accent)' : '#252b3a' }} />
                   <span>{label}</span>
                 </button>
               );
@@ -892,7 +892,7 @@ export default function Profile() {
                   >
                     <div style={{ flex: 1, minWidth: 260 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                        <Building size={16} style={{ color: '#6434df' }} />
+                        <Building size={16} style={{ color: 'var(--dp-color-accent)' }} />
                         <label style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#252b3a' }}>
                           Company / Business Name
                         </label>
@@ -932,7 +932,7 @@ export default function Profile() {
                   <div
                     onClick={() => handleToggleSameAvatar(!useSameAvatar)}
                     style={{
-                      background: useSameAvatar ? '#f1ebff' : '#ffffff',
+                      background: useSameAvatar ? 'var(--dp-color-selection)' : '#ffffff',
                       border: '3px solid #252b3a',
                       borderRadius: 22,
                       padding: '16px 20px',
@@ -953,7 +953,7 @@ export default function Profile() {
                           height: 26,
                           borderRadius: 8,
                           border: '3px solid #252b3a',
-                          background: useSameAvatar ? '#6434df' : '#ffffff',
+                          background: useSameAvatar ? 'var(--dp-color-accent)' : '#ffffff',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -982,7 +982,7 @@ export default function Profile() {
                         fontWeight: 800,
                         padding: '5px 12px',
                         borderRadius: 999,
-                        background: useSameAvatar ? '#6434df' : '#fef08a',
+                        background: useSameAvatar ? 'var(--dp-color-accent)' : '#fef08a',
                         color: useSameAvatar ? '#ffffff' : '#854d0e',
                         border: '2px solid #252b3a',
                         boxShadow: '2px 2px 0 0 #252b3a',
@@ -1002,12 +1002,12 @@ export default function Profile() {
                         padding: '16px 20px',
                         borderRadius: 20,
                         border: '3px solid #252b3a',
-                        background: avatarSubTab === 'sidebar' ? '#f1ebff' : '#ffffff',
+                        background: avatarSubTab === 'sidebar' ? 'var(--dp-color-selection)' : '#ffffff',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 14,
-                        boxShadow: avatarSubTab === 'sidebar' ? '5px 5px 0 0 #6434df' : '3px 3px 0 0 #252b3a',
+                        boxShadow: avatarSubTab === 'sidebar' ? '5px 5px 0 0 var(--dp-color-accent)' : '3px 3px 0 0 #252b3a',
                         transform: avatarSubTab === 'sidebar' ? 'translate(-2px, -2px)' : 'none',
                         transition: 'all 0.15s ease',
                         textAlign: 'left',
@@ -1018,7 +1018,7 @@ export default function Profile() {
                           width: 44,
                           height: 44,
                           borderRadius: 14,
-                          background: avatarSubTab === 'sidebar' ? '#6434df' : '#e2e8f0',
+                          background: avatarSubTab === 'sidebar' ? 'var(--dp-color-accent)' : '#e2e8f0',
                           border: '2px solid #252b3a',
                           display: 'flex',
                           alignItems: 'center',
@@ -1058,12 +1058,12 @@ export default function Profile() {
                         padding: '16px 20px',
                         borderRadius: 20,
                         border: '3px solid #252b3a',
-                        background: avatarSubTab === 'bot' ? '#f1ebff' : '#ffffff',
+                        background: avatarSubTab === 'bot' ? 'var(--dp-color-selection)' : '#ffffff',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 14,
-                        boxShadow: avatarSubTab === 'bot' ? '5px 5px 0 0 #6434df' : '3px 3px 0 0 #252b3a',
+                        boxShadow: avatarSubTab === 'bot' ? '5px 5px 0 0 var(--dp-color-accent)' : '3px 3px 0 0 #252b3a',
                         transform: avatarSubTab === 'bot' ? 'translate(-2px, -2px)' : 'none',
                         transition: 'all 0.15s ease',
                         textAlign: 'left',
@@ -1091,7 +1091,7 @@ export default function Profile() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 15, fontWeight: 900, color: '#252b3a' }}>2. Customer Chatbot</span>
                           {useSameAvatar ? (
-                            <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: '#f1ebff', color: '#6434df', border: '1px solid #6434df' }}>
+                            <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'var(--dp-color-selection)', color: 'var(--dp-color-accent)', border: '1px solid var(--dp-color-accent)' }}>
                               Linked
                             </span>
                           ) : (
@@ -1127,7 +1127,7 @@ export default function Profile() {
                               width: 40,
                               height: 40,
                               borderRadius: 12,
-                              background: '#f1ebff',
+                              background: 'var(--dp-color-selection)',
                               border: '3px solid #252b3a',
                               display: 'flex',
                               alignItems: 'center',
@@ -1135,7 +1135,7 @@ export default function Profile() {
                               boxShadow: '2px 2px 0 0 #252b3a',
                             }}
                           >
-                            <Building size={20} style={{ color: '#6434df' }} />
+                            <Building size={20} style={{ color: 'var(--dp-color-accent)' }} />
                           </div>
                           <div>
                             <h2 style={{ fontSize: 18, fontWeight: 800, color: '#252b3a', margin: 0 }}>
@@ -1181,8 +1181,8 @@ export default function Profile() {
                           onDrop={handleDropLogo}
                           onClick={() => fileInputRef.current?.click()}
                           style={{
-                            background: dragActiveLogo ? '#f1ebff' : '#ffffff',
-                            border: `3px dashed ${dragActiveLogo ? '#6434df' : '#252b3a'}`,
+                            background: dragActiveLogo ? 'var(--dp-color-selection)' : '#ffffff',
+                            border: `3px dashed ${dragActiveLogo ? 'var(--dp-color-accent)' : '#252b3a'}`,
                             borderRadius: 20,
                             padding: 24,
                             display: 'flex',
@@ -1192,7 +1192,7 @@ export default function Profile() {
                             textAlign: 'center',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
-                            boxShadow: dragActiveLogo ? '6px 6px 0 0 #6434df' : '4px 4px 0 0 #252b3a',
+                            boxShadow: dragActiveLogo ? '6px 6px 0 0 var(--dp-color-accent)' : '4px 4px 0 0 #252b3a',
                           }}
                         >
                           <input
@@ -1208,12 +1208,12 @@ export default function Profile() {
                               width: 52,
                               height: 52,
                               borderRadius: 16,
-                              background: '#f1ebff',
+                              background: 'var(--dp-color-selection)',
                               border: '3px solid #252b3a',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              color: '#6434df',
+                              color: 'var(--dp-color-accent)',
                               marginBottom: 12,
                               boxShadow: '2px 2px 0 0 #252b3a',
                             }}
@@ -1247,7 +1247,7 @@ export default function Profile() {
                               <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a' }}>
                                 Or Enter Direct Image URL / Base64
                               </label>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#6434df' }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--dp-color-accent)' }}>
                                 Paste link or image
                               </span>
                             </div>
@@ -1360,7 +1360,7 @@ export default function Profile() {
                                     gap: 6,
                                     padding: '5px 10px',
                                     borderRadius: 999,
-                                    background: logoUrl === preset.url ? '#f1ebff' : '#fffdf5',
+                                    background: logoUrl === preset.url ? 'var(--dp-color-selection)' : '#fffdf5',
                                     border: '2px solid #252b3a',
                                     cursor: 'pointer',
                                     boxShadow: '2px 2px 0 0 #252b3a',
@@ -1397,7 +1397,7 @@ export default function Profile() {
                               type="button"
                               onClick={() => setLogoShape(opt.id)}
                               style={{
-                                background: logoShape === opt.id ? '#6434df' : '#ffffff',
+                                background: logoShape === opt.id ? 'var(--dp-color-accent)' : '#ffffff',
                                 color: logoShape === opt.id ? '#ffffff' : '#252b3a',
                                 border: '2px solid #252b3a',
                                 borderRadius: 999,
@@ -1488,8 +1488,8 @@ export default function Profile() {
                           onDrop={handleDropBot}
                           onClick={() => botFileInputRef.current?.click()}
                           style={{
-                            background: dragActiveBot ? '#f1ebff' : '#ffffff',
-                            border: `3px dashed ${dragActiveBot ? '#6434df' : '#252b3a'}`,
+                            background: dragActiveBot ? 'var(--dp-color-selection)' : '#ffffff',
+                            border: `3px dashed ${dragActiveBot ? 'var(--dp-color-accent)' : '#252b3a'}`,
                             borderRadius: 20,
                             padding: 24,
                             display: 'flex',
@@ -1499,7 +1499,7 @@ export default function Profile() {
                             textAlign: 'center',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
-                            boxShadow: dragActiveBot ? '6px 6px 0 0 #6434df' : '4px 4px 0 0 #252b3a',
+                            boxShadow: dragActiveBot ? '6px 6px 0 0 var(--dp-color-accent)' : '4px 4px 0 0 #252b3a',
                           }}
                         >
                           <input
@@ -1554,7 +1554,7 @@ export default function Profile() {
                               <label style={{ display: 'block', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#252b3a' }}>
                                 Or Enter Direct Image URL / Base64
                               </label>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#6434df' }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--dp-color-accent)' }}>
                                 Paste link or image
                               </span>
                             </div>
@@ -1667,7 +1667,7 @@ export default function Profile() {
                                     gap: 6,
                                     padding: '5px 10px',
                                     borderRadius: 999,
-                                    background: botAvatarUrl === preset.url ? '#f1ebff' : '#fffdf5',
+                                    background: botAvatarUrl === preset.url ? 'var(--dp-color-selection)' : '#fffdf5',
                                     border: '2px solid #252b3a',
                                     cursor: 'pointer',
                                     boxShadow: '2px 2px 0 0 #252b3a',
@@ -1704,7 +1704,7 @@ export default function Profile() {
                               type="button"
                               onClick={() => setBotShape(opt.id)}
                               style={{
-                                background: botShape === opt.id ? '#6434df' : '#ffffff',
+                                background: botShape === opt.id ? 'var(--dp-color-accent)' : '#ffffff',
                                 color: botShape === opt.id ? '#ffffff' : '#252b3a',
                                 border: '2px solid #252b3a',
                                 borderRadius: 999,
@@ -1735,7 +1735,7 @@ export default function Profile() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap', gap: 10 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Eye size={18} style={{ color: '#6434df' }} />
+                        <Eye size={18} style={{ color: 'var(--dp-color-accent)' }} />
                         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#252b3a' }}>
                           Live Avatar Previews (Real-Time)
                         </h3>
@@ -1754,14 +1754,14 @@ export default function Profile() {
                           borderRadius: 20,
                           padding: 18,
                           boxShadow: '4px 4px 0 0 #252b3a',
-                          borderTop: avatarSubTab === 'sidebar' ? '5px solid #6434df' : '2px solid #252b3a',
+                          borderTop: avatarSubTab === 'sidebar' ? '5px solid var(--dp-color-accent)' : '2px solid #252b3a',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                           <p style={{ margin: 0, fontSize: 11, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748b' }}>
                             In Sidebar Avatar
                           </p>
-                          <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: '#f1ebff', color: '#6434df', border: '1px solid #6434df' }}>
+                          <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 999, background: 'var(--dp-color-selection)', color: 'var(--dp-color-accent)', border: '1px solid var(--dp-color-accent)' }}>
                             Company Identity
                           </span>
                         </div>
@@ -1818,9 +1818,9 @@ export default function Profile() {
                               fontWeight: 800,
                               padding: '2px 8px',
                               borderRadius: 999,
-                              background: useSameAvatar ? '#f1ebff' : '#e9fff5',
-                              color: useSameAvatar ? '#6434df' : '#0f7a57',
-                              border: `1px solid ${useSameAvatar ? '#6434df' : '#0f7a57'}`,
+                              background: useSameAvatar ? 'var(--dp-color-selection)' : '#e9fff5',
+                              color: useSameAvatar ? 'var(--dp-color-accent)' : '#0f7a57',
+                              border: `1px solid ${useSameAvatar ? 'var(--dp-color-accent)' : '#0f7a57'}`,
                             }}
                           >
                             {useSameAvatar ? 'Mirrored Company Logo' : 'Custom Mascot'}
@@ -2393,7 +2393,7 @@ export default function Profile() {
                               boxShadow: '2px 2px 0 0 #252b3a',
                             }}
                           >
-                            <Compass size={14} style={{ color: '#6434df' }} />
+                            <Compass size={14} style={{ color: 'var(--dp-color-accent)' }} />
                             <span>Preview Map</span>
                           </a>
                         )}
@@ -2548,7 +2548,7 @@ export default function Profile() {
                                   href={location.mapsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  style={{ fontSize: 11, fontWeight: 700, color: '#6434df', textDecoration: 'underline' }}
+                                  style={{ fontSize: 11, fontWeight: 700, color: 'var(--dp-color-accent)', textDecoration: 'underline' }}
                                 >
                                   Test Link
                                 </a>
@@ -2595,7 +2595,7 @@ export default function Profile() {
                               width: 34,
                               height: 34,
                               borderRadius: 10,
-                              background: '#f1ebff',
+                              background: 'var(--dp-color-selection)',
                               border: '2px solid #252b3a',
                               display: 'flex',
                               alignItems: 'center',
@@ -2603,7 +2603,7 @@ export default function Profile() {
                               boxShadow: '2px 2px 0 0 #252b3a',
                             }}
                           >
-                            <Phone size={18} style={{ color: '#6434df' }} />
+                            <Phone size={18} style={{ color: 'var(--dp-color-accent)' }} />
                           </div>
                           <div>
                             <h3 style={{ fontSize: 16, fontWeight: 900, color: '#252b3a', margin: 0 }}>
@@ -2932,7 +2932,7 @@ export default function Profile() {
 
                           {location.address && (
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 12px', background: '#f8fafc', borderRadius: 10, border: '1px solid #eaecf0', marginBottom: 10 }}>
-                              <MapPin size={15} style={{ color: '#6434df', marginTop: 2, flexShrink: 0 }} />
+                              <MapPin size={15} style={{ color: 'var(--dp-color-accent)', marginTop: 2, flexShrink: 0 }} />
                               <span style={{ fontSize: 12, color: '#252b3a', fontWeight: 600 }}>
                                 {location.address}
                               </span>
@@ -2980,8 +2980,8 @@ export default function Profile() {
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: 6,
-                                  background: '#f1ebff',
-                                  color: '#6434df',
+                                  background: 'var(--dp-color-selection)',
+                                  color: 'var(--dp-color-accent)',
                                   border: '2px solid #252b3a',
                                   borderRadius: 8,
                                   padding: '5px 10px',
@@ -3045,7 +3045,7 @@ export default function Profile() {
                             width: 40,
                             height: 40,
                             borderRadius: 12,
-                            background: '#f1ebff',
+                            background: 'var(--dp-color-selection)',
                             border: '3px solid #252b3a',
                             display: 'flex',
                             alignItems: 'center',
@@ -3053,7 +3053,7 @@ export default function Profile() {
                             boxShadow: '2px 2px 0 0 #252b3a',
                           }}
                         >
-                          <QrCode size={20} style={{ color: '#6434df' }} />
+                          <QrCode size={20} style={{ color: 'var(--dp-color-accent)' }} />
                         </div>
                         <div>
                           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#252b3a', margin: 0 }}>
@@ -3154,7 +3154,7 @@ export default function Profile() {
                                 type="button"
                                 onClick={() => setQrStyle(style.id)}
                                 style={{
-                                  background: qrStyle === style.id ? '#6434df' : '#ffffff',
+                                  background: qrStyle === style.id ? 'var(--dp-color-accent)' : '#ffffff',
                                   color: qrStyle === style.id ? '#ffffff' : '#252b3a',
                                   border: '2px solid #252b3a',
                                   borderRadius: 12,
@@ -3217,13 +3217,13 @@ export default function Profile() {
 
                         {/* Center Logo Toggle */}
                         {logoUrl && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f1ebff', border: '2px solid #252b3a', borderRadius: 14, padding: '10px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--dp-color-selection)', border: '2px solid #252b3a', borderRadius: 14, padding: '10px 14px' }}>
                             <input
                               type="checkbox"
                               id="centerLogo"
                               checked={showCenterLogo}
                               onChange={(e) => setShowCenterLogo(e.target.checked)}
-                              style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#6434df' }}
+                              style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--dp-color-accent)' }}
                             />
                             <label htmlFor="centerLogo" style={{ fontSize: 13, fontWeight: 800, color: '#252b3a', cursor: 'pointer' }}>
                               Embed Company Logo in QR Center
@@ -3299,7 +3299,7 @@ export default function Profile() {
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: 6,
-                            background: copiedLink ? '#dcfce7' : '#6434df',
+                            background: copiedLink ? '#dcfce7' : 'var(--dp-color-accent)',
                             color: copiedLink ? '#10b981' : '#ffffff',
                             border: '2px solid #252b3a',
                             borderRadius: 10,
@@ -3356,7 +3356,7 @@ export default function Profile() {
                             width: 40,
                             height: 40,
                             borderRadius: 12,
-                            background: '#f1ebff',
+                            background: 'var(--dp-color-selection)',
                             border: '3px solid #252b3a',
                             display: 'flex',
                             alignItems: 'center',
@@ -3364,7 +3364,7 @@ export default function Profile() {
                             boxShadow: '2px 2px 0 0 #252b3a',
                           }}
                         >
-                          <Code size={20} style={{ color: '#6434df' }} />
+                          <Code size={20} style={{ color: 'var(--dp-color-accent)' }} />
                         </div>
                         <div>
                           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#252b3a', margin: 0 }}>
@@ -3494,7 +3494,7 @@ export default function Profile() {
                           <button
                             type="button"
                             onClick={handleCopyId}
-                            style={{ background: 'none', border: 'none', color: copiedId ? '#10b981' : '#6434df', cursor: 'pointer', fontWeight: 700, fontSize: 11 }}
+                            style={{ background: 'none', border: 'none', color: copiedId ? '#10b981' : 'var(--dp-color-accent)', cursor: 'pointer', fontWeight: 700, fontSize: 11 }}
                           >
                             {copiedId ? 'Copied' : 'Copy'}
                           </button>
