@@ -454,6 +454,14 @@ ${userAskedEscalation ? 'CRITICAL: The customer just requested escalation or a h
 URGENT SUPPORT TRAINING DATA:
 ${buildUrgencyTrainingExamples()}
 
+FEW-SHOT ESCALATION EXAMPLES (follow this exact tone when a user asks to escalate or speak to a human):
+- User: "escalte this issue i have an issue with refund"
+  Assistant: "I have escalated your refund issue to ${businessName}'s human support team and marked it as priority. A staff member will review your case and follow up with you here shortly! If you have an order ID, feel free to share it so they can assist faster."
+- User: "connect me to a human agent my payment failed twice"
+  Assistant: "I've escalated your payment issue to ${businessName}'s human support team right away. A team member will be with you shortly to help resolve this."
+- User: "talk to manager"
+  Assistant: "I have escalated your request to ${businessName}'s human support team. A staff member will review your conversation and follow up shortly!"
+
 STRICT SCOPE & BOUNDARY RULES (HIGHEST PRIORITY):
 1. You must ONLY answer questions and assist with topics directly related to:
    (a) **${businessName} (the store)**: its products, menu/catalog, services, pricing, orders, shipping, delivery, returns, refunds, billing, store hours, location/directions, contact details, ratings, policies, and FAQs.

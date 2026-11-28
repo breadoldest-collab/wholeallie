@@ -1415,6 +1415,7 @@ export default function Conversations() {
                 transition: 'max-height 0.25s ease',
               }}>
                 {activeConversation.messages?.map((msg, idx) => {
+                  const businessName = localStorage.getItem('businessName') || 'Store';
                   const isUser = msg.role === 'user';
                   const isStaff = !isUser && (
                     msg.intent === 'staff_reply' ||
@@ -1462,11 +1463,11 @@ export default function Conversations() {
                         </div>
                       )}
 
-                      {/* Message Container */}
+                      {/* Message Container — Support Staff (You) on right; Customer & AI on left */}
                       <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: isUser ? 'flex-end' : 'flex-start',
+                        alignItems: isStaff ? 'flex-end' : 'flex-start',
                       }}>
                         {/* Sender Label */}
                         <div style={{
@@ -1474,8 +1475,8 @@ export default function Conversations() {
                           alignItems: 'center',
                           gap: 6,
                           marginBottom: 3,
-                          paddingLeft: isUser ? 0 : 4,
-                          paddingRight: isUser ? 4 : 0,
+                          paddingLeft: isStaff ? 0 : 4,
+                          paddingRight: isStaff ? 4 : 0,
                         }}>
                           <span style={{
                             fontSize: 10,
@@ -1494,12 +1495,12 @@ export default function Conversations() {
                             )}
                             {isAiBot && (
                               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                                <Bot size={11} /> Acme’s Allié (AI Assistant)
+                                <Bot size={11} /> {businessName}’s Allié (AI Assistant)
                               </span>
                             )}
                             {isStaff && (
                               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                                <ShieldAlert size={11} /> Acme Support Staff (Human Agent)
+                                <ShieldAlert size={11} /> {businessName} Support Staff (Human Agent)
                               </span>
                             )}
                           </span>
@@ -1510,14 +1511,14 @@ export default function Conversations() {
                           display: 'flex',
                           alignItems: 'flex-start',
                           gap: 10,
-                          maxWidth: isUser ? '80%' : '85%',
+                          maxWidth: isStaff ? '80%' : '85%',
                         }}>
-                          {!isUser && (
+                          {!isStaff && (
                             <div style={{
                               width: 28,
                               height: 28,
                               borderRadius: 8,
-                              background: isStaff ? '#ffd05b' : '#9bf1cd',
+                              background: isUser ? 'var(--dp-color-selection)' : '#9bf1cd',
                               border: '2px solid #252b3a',
                               display: 'flex',
                               alignItems: 'center',
@@ -1525,28 +1526,46 @@ export default function Conversations() {
                               flexShrink: 0,
                               marginTop: 2,
                             }}>
-                              {isStaff ? <User size={14} style={{ color: '#252b3a' }} /> : <Bot size={14} style={{ color: '#252b3a' }} />}
+                              {isUser ? <User size={14} style={{ color: '#252b3a' }} /> : <Bot size={14} style={{ color: '#252b3a' }} />}
                             </div>
                           )}
 
                           <div style={{
                             padding: '10px 15px',
-                            borderRadius: isUser ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
+                            borderRadius: isStaff ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
                             fontSize: 13,
                             lineHeight: 1.5,
-                            background: isUser ? 'var(--dp-color-accent)' : isStaff ? '#f0fdf4' : '#ffffff',
+                            background: isStaff ? '#f0fdf4' : isUser ? 'var(--dp-color-accent)' : '#ffffff',
                             color: isUser ? '#ffffff' : '#252b3a',
                             border: '2px solid #252b3a',
-                            borderLeft: isUser
+                            borderLeft: isStaff
                               ? '2px solid #252b3a'
-                              : isStaff
-                              ? '5px solid #10b981'
+                              : isUser
+                              ? '2px solid #252b3a'
                               : '5px solid var(--dp-color-accent)',
+                            borderRight: isStaff ? '5px solid #10b981' : '2px solid #252b3a',
                             boxShadow: '2px 2px 0 0 #252b3a',
                             wordBreak: 'break-word',
                           }}>
                             {displayContent}
                           </div>
+
+                          {isStaff && (
+                            <div style={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: 8,
+                              background: '#ffd05b',
+                              border: '2px solid #252b3a',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                              marginTop: 2,
+                            }}>
+                              <User size={14} style={{ color: '#252b3a' }} />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1577,7 +1596,7 @@ export default function Conversations() {
                   gap: 6,
                 }}>
                   <Send size={13} style={{ color: 'var(--dp-color-accent)' }} />
-                  Reply as Support Staff (Acme)
+                  Reply as Support Staff ({localStorage.getItem('businessName') || 'Store'})
                 </span>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
